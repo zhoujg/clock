@@ -199,10 +199,10 @@ body {
 
 /* 手机横屏模式 - 专门优化布局 */
 @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
-    /* 日期显示 - 缩小并移到左上角 */
+    /* 日期显示 - 缩小并移到左上角，为森林按钮留出空间 */
     .date-display {
         top: 8px;
-        left: 10px;
+        left: 60px;
         transform: none;
         gap: 8px;
         max-width: 35%;
@@ -251,7 +251,7 @@ body {
 @media (max-width: 700px) and (max-height: 400px) and (orientation: landscape) {
     .date-display {
         top: 5px;
-        left: 8px;
+        left: 50px;
         gap: 6px;
         max-width: 30%;
     }
