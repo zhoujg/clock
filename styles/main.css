@@ -1,0 +1,141 @@
+/* 基础样式 */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #e74c3c;
+    transition: background-color 0.5s ease;
+}
+
+/* 日期显示样式 */
+.date-display {
+    position: fixed;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+#dateText {
+    font-size: 2.5vw;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+    font-weight: 300;
+}
+
+#weekText {
+    font-size: 2vw;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: 3px;
+    font-weight: 300;
+    padding-left: 20px;
+    border-left: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+/* 时钟样式 */
+.tick {
+    padding-bottom: 1em;
+    font-size: 15vw;
+    font-family: 'Helvetica Neue', sans-serif;    
+    z-index: 10;
+    position: relative;
+    white-space: nowrap;
+}
+
+.tick-label {
+    font-size: 0.375em;
+    text-align: center;
+}
+
+.tick-group {
+    margin: 0 0.25em;
+    text-align: center;
+}
+
+
+/* 励志语样式 */
+.quote-container {
+    position: fixed;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    text-align: center;
+    max-width: 85%;
+}
+
+#quoteDisplay {
+    padding: 25px 35px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+#quoteEnglish {
+    font-size: 2vw;
+    color: rgba(255, 255, 255, 0.95);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    line-height: 1.5;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-style: italic;
+    font-weight: 400;
+}
+
+#quoteChinese {
+    font-size: 1.6vw;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+    line-height: 1.6;
+    letter-spacing: 1px;
+    font-weight: 300;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    #quoteEnglish {
+        font-size: 3.5vw;
+        margin-bottom: 12px;
+    }
+    #quoteChinese {
+        font-size: 2.8vw;
+    }
+    #quoteDisplay {
+        padding: 20px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    #quoteEnglish {
+        font-size: 4.5vw;
+        margin-bottom: 10px;
+    }
+    #quoteChinese {
+        font-size: 3.5vw;
+    }
+    #quoteDisplay {
+        padding: 15px 20px;
+    }
+}

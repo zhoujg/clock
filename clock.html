@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>周墨欣时钟</title>
+
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="styles/flip.min.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/controls.css" />
+    <link rel="stylesheet" href="styles/animation.css" />
+    <link rel="stylesheet" href="styles/pomodoro.css" />
+</head>
+<body>
+    <!-- 控制面板 -->
+    <div class="controls">
+        <button id="settingsToggle" class="settings-btn" title="设置">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
+        
+        <div class="settings-panel" id="settingsPanel">
+            <div class="panel-header">设置面板</div>
+            <div class="panel-content">
+                <div class="setting-item" id="bgColorBtn">
+                    <span class="setting-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                        </svg>
+                    </span>
+                    <span class="setting-text">背景颜色</span>
+                </div>
+                <div class="setting-item" id="animationBtn">
+                    <span class="setting-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                        </svg>
+                    </span>
+                    <span class="setting-text">动画线条</span>
+                    <span class="setting-status" id="animationStatus">关闭</span>
+                </div>
+                <div class="setting-item" id="tickSoundBtn">
+                    <span class="setting-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                        </svg>
+                    </span>
+                    <span class="setting-text">滴答声音</span>
+                    <span class="setting-status" id="tickSoundStatus">关闭</span>
+                </div>
+                <div class="setting-item" id="imageBtn">
+                    <span class="setting-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </span>
+                    <span class="setting-text">背景图片</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 动画线条容器 -->
+    <canvas id="animationCanvas"></canvas>
+
+    <!-- 日期显示 -->
+    <div class="date-display">
+        <div id="dateText"></div>
+        <div id="weekText"></div>
+    </div>
+
+    <!-- 翻转时钟 -->
+    <div class="tick" data-did-init="handleTickInit" data-credits="false">
+        <div data-layout="horizontal fit">
+            <span data-key="hours" data-transform="pad(00)" data-view="flip"></span>
+            <span data-key="minutes" data-transform="pad(00)" data-view="flip"></span>
+            <span data-key="seconds" data-transform="pad(00)" data-view="flip"></span>
+        </div>
+    </div>
+
+    <!-- 励志语显示区域 -->
+    <div class="quote-container">
+        <div id="quoteDisplay">
+            <div id="quoteEnglish"></div>
+            <div id="quoteChinese"></div>
+        </div>
+    </div>
+
+    <!-- 背景图片文件输入 -->
+    <input type="file" id="imageInput" accept="image/*" />
+    
+    <!-- 颜色选择面板 -->
+    <div class="color-panel" id="colorPanel">
+        <div class="color-option" style="background-color: #1a1a1a;" data-color="#1a1a1a"></div>
+        <div class="color-option" style="background-color: #2c3e50;" data-color="#2c3e50"></div>
+        <div class="color-option" style="background-color: #34495e;" data-color="#34495e"></div>
+        <div class="color-option" style="background-color: #8e44ad;" data-color="#8e44ad"></div>
+        <div class="color-option" style="background-color: #2980b9;" data-color="#2980b9"></div>
+        <div class="color-option" style="background-color: #27ae60;" data-color="#27ae60"></div>
+        <div class="color-option" style="background-color: #e74c3c;" data-color="#e74c3c"></div>
+        <div class="color-option" style="background-color: #f39c12;" data-color="#f39c12"></div>
+    </div>
+
+    <!-- JavaScript 文件 -->
+    <script src="scripts/flip.min.js"></script>
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/particle.js"></script>
+    <script src="scripts/animation.js"></script>
+    <script src="scripts/background.js"></script>
+    <script src="scripts/quotes-data.js"></script>
+    <script src="scripts/quotes.js"></script>
+    <script src="scripts/tickSound.js"></script>
+    <script src="scripts/pomodoro.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+</html>

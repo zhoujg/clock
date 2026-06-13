@@ -1,0 +1,366 @@
+/* 番茄钟样式 */
+.pomodoro-container {
+    position: fixed;
+    top: 20px;
+    right: 82px;
+    z-index: 1000;
+}
+
+.pomodoro-toggle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    font-size: 26px;
+    position: relative;
+}
+
+.pomodoro-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.pomodoro-toggle.running-work {
+    background: rgba(255, 107, 107, 0.3);
+    animation: pulse-work 2s infinite;
+}
+
+.pomodoro-toggle.running-break {
+    background: rgba(78, 205, 196, 0.3);
+    animation: pulse-break 2s infinite;
+}
+
+@keyframes pulse-work {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+}
+
+@keyframes pulse-break {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(78, 205, 196, 0); }
+}
+
+/* 状态指示器 */
+.pomodoro-status-indicator {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(30, 30, 30, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    transition: all 0.3s ease;
+}
+
+.pomodoro-status-indicator.working {
+    background: #ff6b6b;
+}
+
+.pomodoro-status-indicator.breaking {
+    background: #4ecdc4;
+}
+
+.pomodoro-panel {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 280px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 18px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pomodoro-panel.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.pomodoro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.pomodoro-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.pomodoro-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.pomodoro-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* 状态显示 */
+.pomodoro-status {
+    text-align: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.pomodoro-status-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+}
+
+.pomodoro-status-mode {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.pomodoro-status-mode.work {
+    color: #ff6b6b;
+}
+
+.pomodoro-status-mode.break {
+    color: #4ecdc4;
+}
+
+.pomodoro-status-mode.custom {
+    color: #667eea;
+}
+
+/* 自定义时长区域 */
+.pomodoro-custom {
+    margin-bottom: 15px;
+}
+
+.pomodoro-custom label {
+    display: block;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 8px;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.custom-input-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.custom-input-wrapper input {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.custom-input-wrapper input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+.custom-input-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.custom-start-btn {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.custom-start-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.custom-start-btn:active {
+    transform: translateY(0);
+}
+
+.pomodoro-modes {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.mode-btn span {
+    display: block;
+}
+
+.mode-btn small {
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+.mode-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.mode-btn.active {
+    background: rgba(255, 107, 107, 0.8);
+    color: white;
+    font-weight: 500;
+}
+
+.mode-btn[data-mode="shortBreak"].active {
+    background: rgba(78, 205, 196, 0.8);
+}
+
+.mode-btn[data-mode="longBreak"].active {
+    background: rgba(102, 126, 234, 0.8);
+}
+
+/* 进度条 */
+.pomodoro-progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.pomodoro-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b6b, #ee5a5a);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.pomodoro-progress-fill.break {
+    background: linear-gradient(90deg, #4ecdc4, #44a08d);
+}
+
+.pomodoro-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.pomodoro-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.pomodoro-btn.start {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: white;
+}
+
+.pomodoro-btn.pause {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+}
+
+.pomodoro-btn.reset {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.pomodoro-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.pomodoro-sessions {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.pomodoro-sessions #sessionCount {
+    font-weight: 600;
+    color: #ff6b6b;
+    font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .pomodoro-container {
+        right: 72px;
+    }
+    
+    .pomodoro-panel {
+        width: 240px;
+        padding: 14px;
+    }
+    
+    .pomodoro-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
