@@ -20,6 +20,7 @@
     justify-content: center;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
 }
 
 .settings-btn:hover {
@@ -177,12 +178,12 @@
 @media (max-width: 768px) {
     .controls {
         top: 15px;
-        right: 15px;
+        right: 20px;
     }
     
     .settings-btn {
-        width: 45px;
-        height: 45px;
+        width: 50px;
+        height: 50px;
     }
     
     .settings-panel {
@@ -214,5 +215,15 @@
     
     .color-panel.active {
         transform: translateX(-50%) translateY(0) scale(1);
+    }
+    
+    .controls {
+        top: 15px;
+        right: 20px;
+    }
+    
+    .settings-btn {
+        width: 50px;
+        height: 50px;
     }
 }

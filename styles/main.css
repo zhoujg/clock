@@ -115,6 +115,25 @@ body {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+    .date-display {
+        top: 6%;
+        gap: 12px;
+        max-width: calc(100% - 170px);
+        left: 40%;
+        transform: translateX(-50%);
+    }
+    
+    #dateText {
+        font-size: 3.2vw;
+        letter-spacing: 1px;
+    }
+    
+    #weekText {
+        font-size: 2.6vw;
+        padding-left: 12px;
+        letter-spacing: 2px;
+    }
+    
     #quoteEnglish {
         font-size: 3.5vw;
         margin-bottom: 12px;
@@ -128,6 +147,28 @@ body {
 }
 
 @media (max-width: 480px) {
+    .date-display {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+        top: 70px;
+        left: 15px;
+        transform: none;
+        max-width: calc(100% - 190px);
+    }
+    
+    #dateText {
+        font-size: 4vw;
+    }
+    
+    #weekText {
+        font-size: 3.2vw;
+        padding-left: 0;
+        border-left: none;
+        padding-top: 4px;
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
     #quoteEnglish {
         font-size: 4.5vw;
         margin-bottom: 10px;

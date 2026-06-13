@@ -27,55 +27,66 @@ class AnimationManager {
 
     // 创建极简抽象兔子形状的粒子点（左下角位置）
     getRabbitShape() {
-        // 将兔子放在左下角，更靠近边缘
-        const scale = Math.min(this.canvas.width, this.canvas.height) / 12;
+        // 根据屏幕宽度判断是否为移动设备，使用更合理的缩放
+        const isMobile = this.canvas.width < 768;
+        
+        // 移动端使用更大的缩放比例和更宽松的间距
+        const baseScale = isMobile ? 
+            Math.min(this.canvas.width, this.canvas.height) / 8 : 
+            Math.min(this.canvas.width, this.canvas.height) / 12;
+        
+        const scale = baseScale;
         const offsetX = scale * 1.5; // 距离左边更近
         const offsetY = this.canvas.height - scale * 2.5; // 距离底部更近
         
         const points = [];
         
-        // 头部（极简圆形）
-        for (let angle = 0; angle < Math.PI * 2; angle += 0.8) {
+        // 头部（极简圆形）- 调整点的间距
+        const headAngleStep = isMobile ? 1.0 : 0.8;
+        for (let angle = 0; angle < Math.PI * 2; angle += headAngleStep) {
             points.push({
                 x: offsetX + Math.cos(angle) * scale * 0.7,
                 y: offsetY + Math.sin(angle) * scale * 0.8
             });
         }
         
-        // 左耳（3个点）
-        for (let t = 0; t <= 1; t += 0.5) {
+        // 左耳 - 增加点的间距，避免纵向挤压
+        const earStep = isMobile ? 0.33 : 0.5;
+        for (let t = 0; t <= 1; t += earStep) {
             points.push({
                 x: offsetX - scale * 0.4,
                 y: offsetY - scale * 0.5 - t * scale * 1.0
             });
         }
         
-        // 右耳（3个点）
-        for (let t = 0; t <= 1; t += 0.5) {
+        // 右耳 - 增加点的间距，避免纵向挤压
+        for (let t = 0; t <= 1; t += earStep) {
             points.push({
                 x: offsetX + scale * 0.4,
                 y: offsetY - scale * 0.5 - t * scale * 1.0
             });
         }
         
-        // 身体（极简椭圆）
-        for (let angle = 0; angle < Math.PI * 2; angle += 0.7) {
+        // 身体（极简椭圆）- 调整点的间距
+        const bodyAngleStep = isMobile ? 0.9 : 0.7;
+        for (let angle = 0; angle < Math.PI * 2; angle += bodyAngleStep) {
             points.push({
                 x: offsetX + Math.cos(angle) * scale * 0.8,
                 y: offsetY + Math.sin(angle) * scale * 1.0 + scale * 1.2
             });
         }
         
-        // 左前腿（2个点）
-        for (let t = 0; t <= 1; t += 1) {
+        // 左前腿 - 增加点的间距
+        const legStep = isMobile ? 0.5 : 1.0;
+        for (let t = 0; t <= 1; t += legStep) {
             points.push({
                 x: offsetX - scale * 0.4,
                 y: offsetY + scale * 1.2 + t * scale * 0.6
             });
         }
         
-        // 右前腿（2个点）
-        for (let t = 0; t <= 1; t += 1) {
+        // 右前腿 - 增加点的间距
+        for (let t = 0; t <= 1; t += legStep) {
             points.push({
                 x: offsetX + scale * 0.4,
                 y: offsetY + scale * 1.2 + t * scale * 0.6
