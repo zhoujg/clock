@@ -42,7 +42,10 @@ class TickSoundManager {
     }
     
     playTick() {
-        if (!this.enabled || !this.isLoaded || !this.audio) return;
+        if (!this.enabled || !this.isLoaded || !this.audio) {
+            // console.log('滴答声未播放 - enabled:', this.enabled, 'isLoaded:', this.isLoaded, 'audio:', !!this.audio);
+            return;
+        }
         
         try {
             // 重置播放位置到开头

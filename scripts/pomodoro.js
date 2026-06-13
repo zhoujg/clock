@@ -55,10 +55,6 @@ class PomodoroTimer {
                     <span class="pomodoro-title">🍅 番茄钟</span>
                     <button class="pomodoro-close" id="pomodoroClose">×</button>
                 </div>
-                <div class="pomodoro-status">
-                    <div class="pomodoro-status-text" id="statusText">准备开始</div>
-                    <div class="pomodoro-status-mode work" id="statusMode">工作时间</div>
-                </div>
                 <div class="pomodoro-modes">
                     <button class="mode-btn active" data-mode="work">
                         <span>工作</span>
@@ -116,8 +112,6 @@ class PomodoroTimer {
         // 获取DOM元素引用
         this.toggle = document.getElementById('pomodoroToggle');
         this.statusIndicator = document.getElementById('statusIndicator');
-        this.statusText = document.getElementById('statusText');
-        this.statusMode = document.getElementById('statusMode');
         this.progressFill = document.getElementById('progressFill');
         this.startBtn = document.getElementById('pomodoroStart');
         this.pauseBtn = document.getElementById('pomodoroPause');
@@ -231,7 +225,6 @@ class PomodoroTimer {
         this.statusIndicator.className = 'pomodoro-status-indicator';
         
         this.updateDisplay();
-        this.updateStatusDisplay();
         
         // 切换回正常时钟模式
         this.clockManager.switchToNormalMode();
@@ -251,7 +244,6 @@ class PomodoroTimer {
         
         // 更新显示
         this.updateDisplay();
-        this.updateStatusDisplay();
         
         // 立即开始倒计时
         this.start();
@@ -263,9 +255,6 @@ class PomodoroTimer {
         this.isRunning = true;
         this.startBtn.style.display = 'none';
         this.pauseBtn.style.display = 'flex';
-        
-        // 更新状态
-        this.updateStatusDisplay();
         
         // 更新按钮状态
         this.toggle.classList.add(this.currentMode === 'work' ? 'running-work' : 'running-break');
@@ -294,9 +283,6 @@ class PomodoroTimer {
         this.startBtn.style.display = 'flex';
         this.pauseBtn.style.display = 'none';
         
-        // 更新状态显示
-        this.statusText.textContent = '已暂停';
-        
         // 切换回正常时钟模式
         this.clockManager.switchToNormalMode();
     }
@@ -316,7 +302,6 @@ class PomodoroTimer {
         
         // 如果是自定义模式，完成后不自动切换
         if (this.isCustomMode) {
-            this.statusText.textContent = '倒计时完成！';
             this.showNotification();
             this.panel.classList.add('active');
             // 清空输入框
@@ -348,9 +333,6 @@ class PomodoroTimer {
             this.setMode('work');
         }
         
-        // 更新状态文字
-        this.statusText.textContent = '已完成！';
-        
         // 显示通知
         this.showNotification();
         
@@ -376,33 +358,6 @@ class PomodoroTimer {
             this.progressFill.classList.remove('break');
         } else {
             this.progressFill.classList.add('break');
-        }
-    }
-    
-    updateStatusDisplay() {
-        // 更新状态文字
-        if (this.isRunning) {
-            this.statusText.textContent = '计时中...';
-        } else {
-            this.statusText.textContent = '准备开始';
-        }
-        
-        // 更新模式文字
-        const modeNames = {
-            'work': '工作时间',
-            'shortBreak': '短休息',
-            'longBreak': '长休息',
-            'custom': '自定义倒计时'
-        };
-        this.statusMode.textContent = modeNames[this.currentMode];
-        
-        // 更新模式样式
-        if (this.currentMode === 'work') {
-            this.statusMode.className = 'pomodoro-status-mode work';
-        } else if (this.currentMode === 'custom') {
-            this.statusMode.className = 'pomodoro-status-mode custom';
-        } else {
-            this.statusMode.className = 'pomodoro-status-mode break';
         }
     }
     

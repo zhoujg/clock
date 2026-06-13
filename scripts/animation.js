@@ -27,22 +27,40 @@ class AnimationManager {
 
     // 创建极简抽象兔子形状的粒子点（左下角位置）
     getRabbitShape() {
-        // 根据屏幕宽度判断是否为移动设备，使用更合理的缩放
+        // 根据屏幕尺寸判断设备类型和方向
         const isMobile = this.canvas.width < 768;
+        const isLandscape = this.canvas.width > this.canvas.height;
+        const isSmallLandscape = isLandscape && this.canvas.height < 500;
         
-        // 移动端使用更大的缩放比例和更宽松的间距
-        const baseScale = isMobile ? 
-            Math.min(this.canvas.width, this.canvas.height) / 8 : 
-            Math.min(this.canvas.width, this.canvas.height) / 12;
+        // 横屏模式使用特殊的缩放和位置计算
+        let scale, offsetX, offsetY;
         
-        const scale = baseScale;
-        const offsetX = scale * 1.5; // 距离左边更近
-        const offsetY = this.canvas.height - scale * 2.5; // 距离底部更近
+        if (isSmallLandscape) {
+            // 横屏模式：使用屏幕高度作为基准，放大兔子
+            scale = this.canvas.height / 3.5; // 增大缩放，避免被挤压
+            offsetX = scale * 1.2; // 距离左边
+            offsetY = this.canvas.height - scale * 1.8; // 距离底部
+        } else if (isMobile) {
+            // 竖屏移动端
+            const baseScale = Math.min(this.canvas.width, this.canvas.height) / 8;
+            scale = baseScale;
+            offsetX = scale * 1.5;
+            offsetY = this.canvas.height - scale * 2.5;
+        } else {
+            // 桌面端
+            const baseScale = Math.min(this.canvas.width, this.canvas.height) / 12;
+            scale = baseScale;
+            offsetX = scale * 1.5;
+            offsetY = this.canvas.height - scale * 2.5;
+        }
         
         const points = [];
         
-        // 头部（极简圆形）- 调整点的间距
-        const headAngleStep = isMobile ? 1.0 : 0.8;
+        // 根据是否横屏调整点的密度
+        const densityFactor = isSmallLandscape ? 1.5 : 1.0;
+        
+        // 头部（极简圆形）
+        const headAngleStep = (isMobile ? 1.0 : 0.8) * densityFactor;
         for (let angle = 0; angle < Math.PI * 2; angle += headAngleStep) {
             points.push({
                 x: offsetX + Math.cos(angle) * scale * 0.7,
@@ -50,8 +68,8 @@ class AnimationManager {
             });
         }
         
-        // 左耳 - 增加点的间距，避免纵向挤压
-        const earStep = isMobile ? 0.33 : 0.5;
+        // 左耳
+        const earStep = (isMobile ? 0.33 : 0.5) * densityFactor;
         for (let t = 0; t <= 1; t += earStep) {
             points.push({
                 x: offsetX - scale * 0.4,
@@ -59,7 +77,7 @@ class AnimationManager {
             });
         }
         
-        // 右耳 - 增加点的间距，避免纵向挤压
+        // 右耳
         for (let t = 0; t <= 1; t += earStep) {
             points.push({
                 x: offsetX + scale * 0.4,
@@ -67,8 +85,8 @@ class AnimationManager {
             });
         }
         
-        // 身体（极简椭圆）- 调整点的间距
-        const bodyAngleStep = isMobile ? 0.9 : 0.7;
+        // 身体（极简椭圆）
+        const bodyAngleStep = (isMobile ? 0.9 : 0.7) * densityFactor;
         for (let angle = 0; angle < Math.PI * 2; angle += bodyAngleStep) {
             points.push({
                 x: offsetX + Math.cos(angle) * scale * 0.8,
@@ -76,8 +94,8 @@ class AnimationManager {
             });
         }
         
-        // 左前腿 - 增加点的间距
-        const legStep = isMobile ? 0.5 : 1.0;
+        // 左前腿
+        const legStep = (isMobile ? 0.5 : 1.0) * densityFactor;
         for (let t = 0; t <= 1; t += legStep) {
             points.push({
                 x: offsetX - scale * 0.4,
@@ -85,7 +103,7 @@ class AnimationManager {
             });
         }
         
-        // 右前腿 - 增加点的间距
+        // 右前腿
         for (let t = 0; t <= 1; t += legStep) {
             points.push({
                 x: offsetX + scale * 0.4,

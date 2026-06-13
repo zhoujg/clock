@@ -13,7 +13,6 @@ class QuoteManager {
         // quotes-data.js 会定义全局变量 QUOTES_DATA
         if (window.QUOTES_DATA && Array.isArray(window.QUOTES_DATA)) {
             this.quotes = window.QUOTES_DATA;
-            console.log(`成功加载 ${this.quotes.length} 条励志语`);
         } else {
             console.warn('未找到励志语数据，使用默认励志语');
             this.quotes = [{

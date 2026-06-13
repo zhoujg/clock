@@ -4,20 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>周墨欣时钟</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg">
 
     <!-- 样式文件 -->
     <link rel="stylesheet" href="styles/flip.min.css" />
     <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="styles/controls.css" />
     <link rel="stylesheet" href="styles/animation.css" />
+    <link rel="stylesheet" href="styles/bgmPlayer.css" />
     <link rel="stylesheet" href="styles/pomodoro.css" />
     <link rel="stylesheet" href="styles/achievement.css" />
 </head>
 <body>
     <!-- 控制面板 -->
     <div class="controls">
-        <button id="settingsToggle" class="settings-btn" title="设置">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="musicBtn" class="control-btn" title="音乐播放器">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+            </svg>
+        </button>
+        
+        <button id="settingsToggle" class="control-btn" title="设置">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
@@ -28,7 +39,7 @@
             <div class="panel-content">
                 <div class="setting-item" id="bgColorBtn">
                     <span class="setting-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <circle cx="12" cy="12" r="4"></circle>
                         </svg>
@@ -37,7 +48,7 @@
                 </div>
                 <div class="setting-item" id="animationBtn">
                     <span class="setting-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
                         </svg>
                     </span>
@@ -46,7 +57,7 @@
                 </div>
                 <div class="setting-item" id="tickSoundBtn">
                     <span class="setting-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                             <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
                             <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
@@ -57,13 +68,59 @@
                 </div>
                 <div class="setting-item" id="imageBtn">
                     <span class="setting-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                             <circle cx="8.5" cy="8.5" r="1.5"></circle>
                             <polyline points="21 15 16 10 5 21"></polyline>
                         </svg>
                     </span>
                     <span class="setting-text">背景图片</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 音乐列表面板 -->
+        <div class="music-panel" id="musicPanel">
+            <div class="panel-header">
+                <span>🎵 音乐播放器</span>
+                <button id="musicPanelCloseBtn" class="panel-close-btn" title="关闭">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="music-panel-content">
+                <div class="music-current-track">
+                    <div id="musicPanelTrackName">未播放</div>
+                </div>
+                <!-- 音乐控制按钮 -->
+                <div class="music-controls">
+                    <button id="musicPlayPauseBtn" class="music-control-btn" title="播放/暂停">
+                        <svg class="play-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg class="pause-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                        </svg>
+                    </button>
+                    <button id="musicStopBtn" class="music-control-btn" title="停止">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6" y="6" width="12" height="12"/>
+                        </svg>
+                    </button>
+                    <button id="musicPrevBtn" class="music-control-btn" title="上一曲">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                        </svg>
+                    </button>
+                    <button id="musicNextBtn" class="music-control-btn" title="下一曲">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="music-panel-list" id="musicPanelList">
+                    <div class="no-music">加载中...</div>
                 </div>
             </div>
         </div>
@@ -109,6 +166,10 @@
         <div class="color-option" style="background-color: #e74c3c;" data-color="#e74c3c"></div>
         <div class="color-option" style="background-color: #f39c12;" data-color="#f39c12"></div>
     </div>
+
+    <!-- BGM 音乐播放器 - 已移除，使用顶部音乐按钮代替 -->
+
+    <!-- Pomodoro 番茄钟 - 由 pomodoro.js 动态创建 -->
 
     <!-- JavaScript 文件 -->
     <script src="scripts/flip.min.js"></script>

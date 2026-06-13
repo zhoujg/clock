@@ -2,28 +2,28 @@
 .pomodoro-container {
     position: fixed;
     top: 20px;
-    right: 80px;
+    right: 130px;
     z-index: 1000;
 }
 
 .pomodoro-toggle {
-    width: 50px !important;
-    height: 50px !important;
-    min-width: 50px;
-    min-height: 50px;
-    max-width: 50px;
-    max-height: 50px;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px;
+    min-height: 40px;
+    max-width: 40px;
+    max-height: 40px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    font-size: 26px;
+    font-size: 20px;
     position: relative;
     box-sizing: border-box;
     padding: 0;
@@ -68,12 +68,12 @@
     position: absolute;
     top: 60px;
     right: 0;
-    width: 280px;
+    width: 300px;
     background: rgba(20, 20, 20, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 18px;
+    padding: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
     opacity: 0;
     visibility: hidden;
@@ -95,7 +95,7 @@
 }
 
 .pomodoro-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -121,39 +121,6 @@
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* 状态显示 */
-.pomodoro-status {
-    text-align: center;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    margin-bottom: 15px;
-}
-
-.pomodoro-status-text {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 5px;
-}
-
-.pomodoro-status-mode {
-    font-size: 18px;
-    font-weight: 600;
-    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-}
-
-.pomodoro-status-mode.work {
-    color: #ff6b6b;
-}
-
-.pomodoro-status-mode.break {
-    color: #4ecdc4;
-}
-
-.pomodoro-status-mode.custom {
-    color: #667eea;
-}
-
 /* 自定义时长区域 */
 .pomodoro-custom {
     margin-bottom: 15px;
@@ -161,8 +128,8 @@
 
 .pomodoro-custom label {
     display: block;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
     margin-bottom: 8px;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
@@ -174,12 +141,12 @@
 
 .custom-input-wrapper input {
     flex: 1;
-    padding: 8px 12px;
+    padding: 10px 14px;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
     color: white;
-    font-size: 13px;
+    font-size: 14px;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
     outline: none;
     transition: all 0.3s ease;
@@ -195,12 +162,12 @@
 }
 
 .custom-start-btn {
-    padding: 8px 16px;
+    padding: 10px 18px;
     background: linear-gradient(135deg, #667eea, #764ba2);
     border: none;
     border-radius: 10px;
     color: white;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -224,19 +191,19 @@
 
 .mode-btn {
     flex: 1;
-    padding: 8px 4px;
+    padding: 10px 6px;
     border: none;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.6);
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
 }
 
 .mode-btn span {
@@ -244,7 +211,7 @@
 }
 
 .mode-btn small {
-    font-size: 10px;
+    font-size: 11px;
     opacity: 0.7;
 }
 
@@ -327,15 +294,15 @@
 
 .pomodoro-sessions {
     text-align: center;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .pomodoro-sessions #sessionCount {
     font-weight: 600;
     color: #ff6b6b;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 /* 响应式设计 */
@@ -385,5 +352,207 @@
     .pomodoro-panel {
         width: 220px;
         padding: 12px;
+    }
+}
+
+/* 手机横屏模式优化 */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+    .pomodoro-container {
+        top: 8px;
+        right: 105px;
+    }
+    
+    .pomodoro-toggle {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px;
+        min-height: 36px;
+        max-width: 36px;
+        max-height: 36px;
+        font-size: 18px;
+    }
+    
+    .pomodoro-panel {
+        width: 220px;
+        padding: 10px;
+        top: 45px;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+    }
+    
+    .pomodoro-header {
+        margin-bottom: 10px;
+    }
+    
+    .pomodoro-title {
+        font-size: 13px;
+    }
+    
+    .pomodoro-close {
+        width: 24px;
+        height: 24px;
+        font-size: 16px;
+    }
+    
+    .pomodoro-custom {
+        margin-bottom: 10px;
+    }
+    
+    .pomodoro-custom label {
+        font-size: 10px;
+        margin-bottom: 6px;
+    }
+    
+    .custom-input-wrapper {
+        gap: 6px;
+    }
+    
+    .custom-input-wrapper input {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .custom-start-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+    
+    .pomodoro-modes {
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+    
+    .mode-btn {
+        padding: 5px 3px;
+        font-size: 10px;
+        gap: 1px;
+    }
+    
+    .mode-btn small {
+        font-size: 8px;
+    }
+    
+    .pomodoro-progress-bar {
+        margin-bottom: 10px;
+        height: 5px;
+    }
+    
+    .pomodoro-controls {
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    
+    .pomodoro-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .pomodoro-sessions {
+        font-size: 11px;
+    }
+    
+    .pomodoro-sessions #sessionCount {
+        font-size: 13px;
+    }
+}
+
+/* 更小的横屏设备 */
+@media (max-width: 700px) and (max-height: 400px) and (orientation: landscape) {
+    .pomodoro-container {
+        top: 6px;
+        right: 92px;
+    }
+    
+    .pomodoro-toggle {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px;
+        min-height: 32px;
+        max-width: 32px;
+        max-height: 32px;
+        font-size: 16px;
+    }
+    
+    .pomodoro-panel {
+        width: 200px;
+        padding: 8px;
+        top: 40px;
+        max-height: calc(100vh - 50px);
+        overflow-y: auto;
+    }
+    
+    .pomodoro-header {
+        margin-bottom: 8px;
+    }
+    
+    .pomodoro-title {
+        font-size: 12px;
+    }
+    
+    .pomodoro-close {
+        width: 22px;
+        height: 22px;
+        font-size: 14px;
+    }
+    
+    .pomodoro-custom {
+        margin-bottom: 8px;
+    }
+    
+    .pomodoro-custom label {
+        font-size: 9px;
+        margin-bottom: 5px;
+    }
+    
+    .custom-input-wrapper {
+        gap: 5px;
+    }
+    
+    .custom-input-wrapper input {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+    
+    .custom-start-btn {
+        padding: 5px 10px;
+        font-size: 10px;
+    }
+    
+    .pomodoro-modes {
+        gap: 5px;
+        margin-bottom: 8px;
+    }
+    
+    .mode-btn {
+        padding: 4px 2px;
+        font-size: 9px;
+        gap: 1px;
+    }
+    
+    .mode-btn small {
+        font-size: 7px;
+    }
+    
+    .pomodoro-progress-bar {
+        margin-bottom: 8px;
+        height: 4px;
+    }
+    
+    .pomodoro-controls {
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+    
+    .pomodoro-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .pomodoro-sessions {
+        font-size: 10px;
+    }
+    
+    .pomodoro-sessions #sessionCount {
+        font-size: 12px;
     }
 }

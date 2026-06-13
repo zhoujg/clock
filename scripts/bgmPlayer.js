@@ -1,6 +1,6 @@
 // BGM 音乐播放器管理器
 class BGMPlayerManager {
-    constructor() {
+    constructor(tickSoundManager = null) {
         this.enabled = false;
         this.audio = null;
         this.currentTrack = null;
@@ -9,6 +9,8 @@ class BGMPlayerManager {
         this.currentTrackIndex = -1;
         this.isPlaying = false;
         this.isLooping = false; // 单曲循环
+        this.tickSoundManager = tickSoundManager; // 滴答声管理器引用
+        this.tickSoundWasEnabled = undefined; // 记录音乐播放前滴答声是否开启，undefined表示未记录
         
         this.initializeAudio();
         this.loadMusicList();
@@ -35,11 +37,19 @@ class BGMPlayerManager {
         this.audio.addEventListener('play', () => {
             this.isPlaying = true;
             this.updatePlayPauseButton();
+            // 播放音乐时暂停滴答声
+            this.pauseTickSound();
+            // 触发自定义事件，通知UI更新
+            window.dispatchEvent(new CustomEvent('musicPlayStateChanged'));
         });
         
         this.audio.addEventListener('pause', () => {
             this.isPlaying = false;
             this.updatePlayPauseButton();
+            // 暂停音乐时恢复滴答声
+            this.resumeTickSound();
+            // 触发自定义事件，通知UI更新
+            window.dispatchEvent(new CustomEvent('musicPlayStateChanged'));
         });
         
         // 监听时间更新，用于更新进度条
@@ -51,14 +61,98 @@ class BGMPlayerManager {
         this.audio.addEventListener('error', (e) => {
             console.error('音乐文件加载失败:', e);
             this.showError('音乐加载失败');
+            // 加载失败时也恢复滴答声
+            this.resumeTickSound();
         });
+    }
+    
+    // 暂停滴答声
+    pauseTickSound() {
+        console.log('pauseTickSound 被调用', {
+            hasManager: !!this.tickSoundManager,
+            currentEnabled: this.tickSoundManager?.enabled,
+            alreadyRecorded: this.tickSoundWasEnabled
+        });
+        
+        if (this.tickSoundManager) {
+            // 只在第一次记录状态，避免重复调用时覆盖
+            if (this.tickSoundWasEnabled === undefined) {
+                this.tickSoundWasEnabled = this.tickSoundManager.enabled;
+                console.log('📝 首次记录滴答声状态 tickSoundWasEnabled =', this.tickSoundWasEnabled);
+            } else {
+                console.log('⚠️ 已经记录过状态，不覆盖。当前记录值 =', this.tickSoundWasEnabled);
+            }
+            
+            // 如果滴答声开启，关闭它
+            if (this.tickSoundManager.enabled) {
+                this.tickSoundManager.enabled = false;
+                if (this.tickSoundManager.audio) {
+                    this.tickSoundManager.audio.pause();
+                    this.tickSoundManager.audio.currentTime = 0;
+                }
+                console.log('🔇 滴答声已关闭');
+            } else {
+                console.log('⚠️ 滴答声已经是关闭状态');
+            }
+        }
+    }
+    
+    // 恢复滴答声
+    resumeTickSound() {
+        console.log('resumeTickSound 被调用', {
+            hasManager: !!this.tickSoundManager,
+            wasEnabled: this.tickSoundWasEnabled,
+            currentEnabled: this.tickSoundManager?.enabled,
+            hasAudio: !!this.tickSoundManager?.audio,
+            isLoaded: this.tickSoundManager?.isLoaded
+        });
+        
+        if (this.tickSoundManager && this.tickSoundWasEnabled) {
+            // 如果音乐播放前滴答声是开启的，重新开启并立即播放一次
+            this.tickSoundManager.enabled = true;
+            console.log('✅ 滴答声 enabled 已设置为 true');
+            
+            // 立即播放一次滴答声，不等待下一个时钟周期
+            if (this.tickSoundManager.audio && this.tickSoundManager.isLoaded) {
+                console.log('🎵 尝试立即播放滴答声...');
+                try {
+                    this.tickSoundManager.audio.currentTime = 0;
+                    const playPromise = this.tickSoundManager.audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise
+                            .then(() => {
+                                console.log('✅ 滴答声播放成功');
+                            })
+                            .catch(error => {
+                                console.warn('❌ 滴答声恢复播放失败:', error);
+                            });
+                    } else {
+                        console.log('✅ 滴答声播放调用完成（旧浏览器API）');
+                    }
+                } catch (error) {
+                    console.warn('❌ 滴答声恢复播放异常:', error);
+                }
+            } else {
+                console.warn('⚠️ 无法播放滴答声 - audio:', !!this.tickSoundManager.audio, 'isLoaded:', this.tickSoundManager.isLoaded);
+            }
+            console.log('滴答声已恢复并播放');
+        } else {
+            console.log('⚠️ 不恢复滴答声 - hasManager:', !!this.tickSoundManager, 'wasEnabled:', this.tickSoundWasEnabled);
+        }
+        
+        // 重置标志，以便下次播放音乐时能重新记录状态
+        this.tickSoundWasEnabled = undefined;
+        console.log('🔄 重置 tickSoundWasEnabled 标志');
     }
     
     // 加载音乐列表
     async loadMusicList() {
         try {
             // 方法1: 尝试从 music-list.json 加载（自动生成的索引文件）
-            const response = await fetch('assets/bgm/music-list.json');
+            const response = await fetch('assets/bgm/music-list.json').catch(e => {
+                console.log('Fetch failed (可能是 CORS 问题):', e.message);
+                return { ok: false };
+            });
             if (response.ok) {
                 const data = await response.json();
                 if (data.music && Array.isArray(data.music) && data.music.length > 0) {
@@ -66,13 +160,12 @@ class BGMPlayerManager {
                         name: this.extractMusicName(file),
                         file: `assets/bgm/${file}`
                     }));
-                    console.log('从 music-list.json 加载了', this.musicList.length, '首音乐');
                     this.renderMusicList();
                     return;
                 }
             }
         } catch (error) {
-            console.log('无法加载 music-list.json，尝试其他方法:', error.message);
+            console.log('无法加载 music-list.json，使用默认音乐列表:', error.message);
         }
 
         // 方法2: 检查是否在 Capacitor 环境（Android/iOS 应用）
@@ -89,14 +182,30 @@ class BGMPlayerManager {
             }
         }
 
-        // 方法3: 尝试扫描常见的音乐文件（探测方式）
-        await this.probeMusicFiles();
+        // 方法3: 使用默认音乐列表（适用于 file:// 协议）
+        this.useDefaultMusicList();
         
         if (this.musicList.length === 0) {
             console.log('未找到音乐文件，请将音乐文件放入 assets/bgm/ 目录');
         }
         
         this.renderMusicList();
+    }
+
+    // 使用默认音乐列表
+    useDefaultMusicList() {
+        // 从已知存在的文件开始（基于项目文件树）
+        const knownMusicFiles = [
+            'The Mass.mp3',
+            'Victory.mp3'
+        ];
+        
+        this.musicList = knownMusicFiles.map(file => ({
+            name: this.extractMusicName(file),
+            file: `assets/bgm/${file}`
+        }));
+        
+        console.log('使用默认音乐列表，共', this.musicList.length, '首音乐');
     }
 
     // 从文件名提取音乐名称
@@ -200,38 +309,10 @@ class BGMPlayerManager {
         }
     }
     
-    // 渲染音乐列表
+    // 渲染音乐列表（保留方法但不执行，因为不再有右下角播放器）
     renderMusicList() {
-        const musicListElement = document.getElementById('musicList');
-        if (!musicListElement) return;
-        
-        musicListElement.innerHTML = '';
-        
-        if (this.musicList.length === 0) {
-            musicListElement.innerHTML = '<div class="no-music">暂无音乐文件</div>';
-            return;
-        }
-        
-        this.musicList.forEach((track, index) => {
-            const trackElement = document.createElement('div');
-            trackElement.className = 'music-track';
-            if (index === this.currentTrackIndex) {
-                trackElement.classList.add('active');
-            }
-            
-            trackElement.innerHTML = `
-                <div class="track-info">
-                    <span class="track-icon">♪</span>
-                    <span class="track-name">${track.name}</span>
-                </div>
-            `;
-            
-            trackElement.addEventListener('click', () => {
-                this.playTrack(index);
-            });
-            
-            musicListElement.appendChild(trackElement);
-        });
+        // 触发自定义事件，通知音乐列表已更新
+        window.dispatchEvent(new CustomEvent('musicListUpdated'));
     }
     
     // 播放指定曲目
@@ -244,6 +325,9 @@ class BGMPlayerManager {
         this.audio.src = this.currentTrack.file;
         this.audio.load();
         
+        // 在开始播放前立即暂停滴答声
+        this.pauseTickSound();
+        
         const playPromise = this.audio.play();
         
         if (playPromise !== undefined) {
@@ -252,10 +336,14 @@ class BGMPlayerManager {
                     this.enabled = true;
                     this.updateCurrentTrackDisplay();
                     this.renderMusicList(); // 更新高亮
+                    // 触发自定义事件，通知曲目已更改
+                    window.dispatchEvent(new CustomEvent('musicTrackChanged'));
                 })
                 .catch(error => {
                     console.warn('音乐播放失败:', error);
                     this.showError('播放失败');
+                    // 播放失败时恢复滴答声
+                    this.resumeTickSound();
                 });
         }
     }
@@ -302,6 +390,8 @@ class BGMPlayerManager {
         this.enabled = false;
         this.isPlaying = false;
         this.updatePlayPauseButton();
+        // 停止音乐时恢复滴答声
+        this.resumeTickSound();
     }
     
     // 上一曲
@@ -343,69 +433,26 @@ class BGMPlayerManager {
     
     // 更新当前播放曲目显示
     updateCurrentTrackDisplay() {
-        const trackNameElement = document.getElementById('currentTrackName');
-        if (trackNameElement && this.currentTrack) {
-            trackNameElement.textContent = this.currentTrack.name;
-        }
+        // 不再更新右下角播放器的显示，因为已移除
+        // 只保留方法以防其他地方调用
     }
     
     // 更新播放/暂停按钮
     updatePlayPauseButton() {
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        if (!playPauseBtn) return;
-        
-        if (this.isPlaying) {
-            playPauseBtn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="4" width="4" height="16"></rect>
-                    <rect x="14" y="4" width="4" height="16"></rect>
-                </svg>
-            `;
-            playPauseBtn.title = '暂停';
-        } else {
-            playPauseBtn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-            `;
-            playPauseBtn.title = '播放';
-        }
+        // 不再更新右下角播放器的按钮，因为已移除
+        // 只保留方法以防其他地方调用
     }
     
     // 更新循环按钮
     updateLoopButton() {
-        const loopBtn = document.getElementById('loopBtn');
-        if (!loopBtn) return;
-        
-        if (this.isLooping) {
-            loopBtn.classList.add('active');
-        } else {
-            loopBtn.classList.remove('active');
-        }
+        // 不再更新右下角播放器的按钮，因为已移除
+        // 只保留方法以防其他地方调用
     }
     
     // 更新进度条
     updateProgressBar() {
-        const progressBar = document.getElementById('progressBar');
-        const currentTimeElement = document.getElementById('currentTime');
-        const durationElement = document.getElementById('duration');
-        
-        if (!progressBar) return;
-        
-        const currentTime = this.audio.currentTime;
-        const duration = this.audio.duration;
-        
-        if (!isNaN(duration)) {
-            const progress = (currentTime / duration) * 100;
-            progressBar.style.width = progress + '%';
-            
-            if (currentTimeElement) {
-                currentTimeElement.textContent = this.formatTime(currentTime);
-            }
-            if (durationElement) {
-                durationElement.textContent = this.formatTime(duration);
-            }
-        }
+        // 不再更新右下角播放器的进度条，因为已移除
+        // 只保留方法以防其他地方调用
     }
     
     // 格式化时间显示
@@ -424,19 +471,9 @@ class BGMPlayerManager {
         }
     }
     
-    // 显示错误提示
+    // 显示错误提示（简化版）
     showError(message) {
-        const trackNameElement = document.getElementById('currentTrackName');
-        if (trackNameElement) {
-            const originalText = trackNameElement.textContent;
-            trackNameElement.textContent = message;
-            trackNameElement.style.color = '#e74c3c';
-            
-            setTimeout(() => {
-                trackNameElement.textContent = originalText || '未选择音乐';
-                trackNameElement.style.color = '';
-            }, 2000);
-        }
+        console.error('BGM Player Error:', message);
     }
     
     // 获取当前设置
