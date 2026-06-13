@@ -2,7 +2,7 @@
 .pomodoro-container {
     position: fixed;
     top: 20px;
-    right: 82px;
+    right: 80px;
     z-index: 1000;
 }
 
@@ -49,29 +49,9 @@
     50% { box-shadow: 0 0 0 10px rgba(78, 205, 196, 0); }
 }
 
-/* 状态指示器 */
+/* 状态指示器 - 隐藏 */
 .pomodoro-status-indicator {
-    position: absolute;
-    bottom: -5px;
-    right: -5px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    border: 2px solid rgba(30, 30, 30, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 8px;
-    transition: all 0.3s ease;
-}
-
-.pomodoro-status-indicator.working {
-    background: #ff6b6b;
-}
-
-.pomodoro-status-indicator.breaking {
-    background: #4ecdc4;
+    display: none;
 }
 
 .pomodoro-panel {

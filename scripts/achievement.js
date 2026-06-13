@@ -651,37 +651,79 @@ class AchievementSystem {
             
             let progress = 0;
             let current = 0;
+            let progressHtml = '';
             
             switch (achievement.category) {
                 case 'pomodoro':
                     current = this.data.totalPomodoros;
+                    progress = Math.min((current / achievement.requirement) * 100, 100);
+                    progressHtml = `
+                        <div class="achievement-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="progress-text">${current} / ${achievement.requirement} 个番茄钟</div>
+                        </div>
+                    `;
                     break;
                 case 'studyTime':
                     current = this.data.totalStudyTime;
+                    progress = Math.min((current / achievement.requirement) * 100, 100);
+                    const currentHours = (current / 60).toFixed(1);
+                    const requiredHours = (achievement.requirement / 60).toFixed(1);
+                    progressHtml = `
+                        <div class="achievement-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="progress-text">${currentHours} / ${requiredHours} 小时</div>
+                        </div>
+                    `;
                     break;
                 case 'streak':
                     current = this.data.currentStreak;
+                    progress = Math.min((current / achievement.requirement) * 100, 100);
+                    progressHtml = `
+                        <div class="achievement-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="progress-text">${current} / ${achievement.requirement} 天</div>
+                        </div>
+                    `;
                     break;
                 case 'daily':
                     current = this.data.todayStudyTime;
+                    progress = Math.min((current / achievement.requirement) * 100, 100);
+                    const currentMin = current;
+                    const requiredMin = achievement.requirement;
+                    progressHtml = `
+                        <div class="achievement-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="progress-text">${currentMin} / ${requiredMin} 分钟 ${achievement.repeatable ? '(可重复)' : ''}</div>
+                        </div>
+                    `;
+                    break;
+                case 'special':
+                    // 特殊成就显示说明
+                    if (!achievement.unlocked) {
+                        progressHtml = `
+                            <div class="achievement-hint">
+                                <div class="hint-text">💡 ${achievement.description}</div>
+                            </div>
+                        `;
+                    }
                     break;
             }
-            
-            progress = Math.min((current / achievement.requirement) * 100, 100);
             
             card.innerHTML = `
                 <div class="achievement-icon">${achievement.icon}</div>
                 <div class="achievement-info">
                     <div class="achievement-name">${achievement.name}</div>
                     <div class="achievement-desc">${achievement.description}</div>
-                    ${!achievement.unlocked && achievement.category !== 'special' ? `
-                        <div class="achievement-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progress}%"></div>
-                            </div>
-                            <div class="progress-text">${current} / ${achievement.requirement}</div>
-                        </div>
-                    ` : ''}
+                    ${progressHtml}
                 </div>
                 ${achievement.unlocked ? '<div class="achievement-check">✓</div>' : ''}
             `;
