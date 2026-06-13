@@ -68,6 +68,25 @@
     visibility: visible;
 }
 
+/* 内容容器，添加遮罩确保可读性 */
+.achievement-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    z-index: 0;
+}
+
+/* 确保所有内容在遮罩之上 */
+.achievement-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
 /* 面板头部 */
 .achievement-header {
     display: flex;
@@ -110,7 +129,7 @@
     display: flex;
     gap: 20px;
     padding: 30px 40px;
-    background: rgba(15, 15, 15, 0.5);
+    background: rgba(0, 0, 0, 0.3);
     justify-content: center;
     max-width: 1200px;
     margin: 0 auto;
@@ -349,7 +368,7 @@
 /* 面板底部 */
 .achievement-footer {
     padding: 20px 40px;
-    background: rgba(15, 15, 15, 0.8);
+    background: rgba(0, 0, 0, 0.4);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: center;

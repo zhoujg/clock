@@ -308,6 +308,7 @@ class AchievementSystem {
             panel.classList.toggle('active');
             if (panel.classList.contains('active')) {
                 this.updateDisplay();
+                this.syncBackgroundWithMainPage();
             }
         });
         
@@ -331,6 +332,26 @@ class AchievementSystem {
                 this.filterAchievements(tab.dataset.tab);
             });
         });
+    }
+    
+    // 同步主页面背景
+    syncBackgroundWithMainPage() {
+        const panel = document.getElementById('achievementPanel');
+        const bodyBgColor = getComputedStyle(document.body).backgroundColor;
+        const bodyBgImage = getComputedStyle(document.body).backgroundImage;
+        
+        // 如果有背景图片
+        if (bodyBgImage && bodyBgImage !== 'none') {
+            panel.style.backgroundImage = bodyBgImage;
+            panel.style.backgroundSize = 'cover';
+            panel.style.backgroundPosition = 'center';
+            panel.style.backgroundAttachment = 'fixed';
+            panel.style.backgroundColor = 'transparent';
+        } else {
+            // 只有背景色
+            panel.style.backgroundImage = 'none';
+            panel.style.backgroundColor = bodyBgColor || 'rgba(20, 20, 20, 0.98)';
+        }
     }
     
     // 加载数据
