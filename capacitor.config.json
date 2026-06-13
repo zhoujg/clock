@@ -1,0 +1,15 @@
+{
+  "appId": "com.zhoumoxin.clock",
+  "appName": "周墨欣时钟",
+  "webDir": "www",
+  "server": {
+    "url": "https://neihou.cn/clock/",
+    "cleartext": true,
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#1a1a1a",
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true
+  }
+}

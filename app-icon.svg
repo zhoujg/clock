@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆形 -->
+  <circle cx="256" cy="256" r="256" fill="#1a1a1a"/>
+  
+  <!-- 时钟外圈 -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#ffffff" stroke-width="8"/>
+  
+  <!-- 时钟刻度 -->
+  <line x1="256" y1="66" x2="256" y2="86" stroke="#ffffff" stroke-width="4"/>
+  <line x1="446" y1="256" x2="426" y2="256" stroke="#ffffff" stroke-width="4"/>
+  <line x1="256" y1="446" x2="256" y2="426" stroke="#ffffff" stroke-width="4"/>
+  <line x1="66" y1="256" x2="86" y2="256" stroke="#ffffff" stroke-width="4"/>
+  
+  <!-- 时针 -->
+  <line x1="256" y1="256" x2="256" y2="150" stroke="#2980b9" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- 分针 -->
+  <line x1="256" y1="256" x2="320" y2="180" stroke="#27ae60" stroke-width="6" stroke-linecap="round"/>
+  
+  <!-- 秒针 -->
+  <line x1="256" y1="256" x2="350" y2="256" stroke="#e74c3c" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- 中心圆点 -->
+  <circle cx="256" cy="256" r="12" fill="#ffffff"/>
+  
+  <!-- 装饰小圆点 -->
+  <circle cx="256" cy="256" r="6" fill="#1a1a1a"/>
+</svg>

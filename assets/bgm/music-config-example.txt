@@ -1,0 +1,44 @@
+// 音乐配置示例
+// 将此内容添加到 scripts/bgmPlayer.js 的 loadMusicList() 方法中
+
+async loadMusicList() {
+    // 预定义的音乐列表
+    this.musicList = [
+        // 轻音乐
+        { name: '晨曦', file: 'assets/bgm/morning_light.mp3' },
+        { name: '午后时光', file: 'assets/bgm/afternoon.mp3' },
+        { name: '静谧夜晚', file: 'assets/bgm/peaceful_night.mp3' },
+        
+        // 钢琴曲
+        { name: '钢琴独奏', file: 'assets/bgm/piano_solo.mp3' },
+        { name: '月光奏鸣曲', file: 'assets/bgm/moonlight_sonata.mp3' },
+        
+        // 自然音效
+        { name: '雨声', file: 'assets/bgm/rain.mp3' },
+        { name: '森林之声', file: 'assets/bgm/forest.mp3' },
+        { name: '海浪', file: 'assets/bgm/ocean_waves.mp3' },
+        { name: '溪流', file: 'assets/bgm/stream.mp3' },
+        
+        // 白噪音
+        { name: '咖啡厅', file: 'assets/bgm/cafe_ambience.mp3' },
+        { name: '白噪音', file: 'assets/bgm/white_noise.mp3' },
+        { name: '粉红噪音', file: 'assets/bgm/pink_noise.mp3' },
+        
+        // Lo-fi
+        { name: 'Lofi Study Beat', file: 'assets/bgm/lofi_study.mp3' },
+        { name: 'Chill Vibes', file: 'assets/bgm/chill_vibes.mp3' }
+    ];
+    
+    this.renderMusicList();
+}
+
+// 配置说明：
+// name: 显示在播放列表中的音乐名称（可以使用中文）
+// file: 音乐文件的路径，相对于 index.html
+//       文件必须放在 assets/bgm/ 目录下
+
+// 支持的格式：
+// - .mp3 (推荐，兼容性最好)
+// - .wav (无损音质，文件较大)
+// - .ogg (开源格式)
+// - .m4a (Apple 格式)

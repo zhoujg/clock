@@ -7,6 +7,14 @@
 - **翻转时钟动画**：采用现代翻转效果展示时间（时:分:秒）
 - **日期显示**：实时显示当前日期和星期
 - **励志语录**：随机显示中英文励志名言
+- **BGM 音乐播放器** 🎵：
+  - 自动扫描音乐文件，无需手动配置
+  - 播放/暂停、上一曲/下一曲控制
+  - 单曲循环模式
+  - 音量调节和进度控制
+  - 支持 MP3、WAV、OGG、M4A、FLAC、AAC 格式
+  - 可展开/收起的浮动界面
+  - [快速开始 →](./BGM_QUICK_START.md)
 - **学习成就系统** ⭐：
   - 等级和经验值系统
   - 28种成就徽章
@@ -27,12 +35,16 @@
 clock/
 ├── clock.html              # 主页面
 ├── assets/                 # 资源文件
+│   ├── bgm/               # 音乐文件目录 🎵
+│   │   ├── README.md      # 音乐目录说明
+│   │   └── music-list.json # 自动生成的音乐索引
 │   ├── quotes.txt         # 励志语录数据
 │   └── slow-tick.mp3      # 滴答声音文件
 ├── scripts/               # JavaScript 文件
 │   ├── app.js            # 主应用逻辑
 │   ├── animation.js      # 动画效果
 │   ├── background.js     # 背景控制
+│   ├── bgmPlayer.js      # BGM 音乐播放器 🎵
 │   ├── flip.min.js       # 翻转时钟库
 │   ├── particle.js       # 粒子效果
 │   ├── pomodoro.js       # 番茄钟功能
@@ -40,11 +52,14 @@ clock/
 │   ├── quotes-data.js    # 语录数据处理
 │   ├── quotes.js         # 语录显示
 │   ├── storage.js        # 本地存储
-│   └── tickSound.js      # 声音控制
+│   ├── tickSound.js      # 声音控制
+│   ├── generate-music-list.js  # 音乐索引生成（Node.js）
+│   └── generate-music-list.sh  # 音乐索引生成（Shell）
 └── styles/               # CSS 样式文件
     ├── main.css          # 主样式
     ├── controls.css      # 控制面板样式
     ├── animation.css     # 动画样式
+    ├── bgmPlayer.css     # BGM 播放器样式 🎵
     ├── pomodoro.css      # 番茄钟样式
     ├── achievement.css   # 成就系统样式 ⭐
     └── flip.min.css      # 翻转时钟样式
@@ -58,8 +73,41 @@ clock/
    - 选择背景颜色或上传背景图片
    - 开启/关闭动画线条
    - 开启/关闭滴答声音
+4. **使用 BGM 音乐播放器**：
+   - 将音乐文件放入 `assets/bgm/` 目录
+   - 运行 `./scripts/generate-music-list.sh` 生成索引
+   - 点击右下角音乐图标 🎵 开始播放
+   - [详细说明 →](./BGM_QUICK_START.md)
 
 ## 🎨 功能说明
+
+### BGM 音乐播放器 🎵
+
+点击右下角音乐图标即可展开播放器：
+
+**自动扫描**
+- 无需手动修改代码
+- 自动读取 `assets/bgm/` 目录下的音乐
+- 支持多种音频格式（MP3, WAV, OGG, M4A, FLAC, AAC）
+
+**播放控制**
+- 播放/暂停、上一曲/下一曲
+- 单曲循环模式
+- 进度条显示和跳转
+- 音量调节（0-100%）
+
+**快速开始**
+```bash
+# 1. 添加音乐文件
+cp ~/Music/*.mp3 assets/bgm/
+
+# 2. 生成索引
+./scripts/generate-music-list.sh
+
+# 3. 刷新页面开始使用
+```
+
+详细说明请查看 [BGM_QUICK_START.md](./BGM_QUICK_START.md)
 
 ### 成就系统 ⭐
 
@@ -110,6 +158,29 @@ clock/
 - Vanilla JavaScript
 - Canvas API（用于动画效果）
 - LocalStorage API（用于数据持久化）
+
+## 📱 安卓应用
+
+本项目已配置为 **WebView 应用**，直接加载在线网页：https://neihou.cn/clock/
+
+**优势**：更新网站内容，应用立即生效，无需重新发布应用！
+
+### 快速开始
+```bash
+# 打开 Android Studio
+npm run android:open
+
+# 在 Android Studio 中构建 APK
+```
+
+### 详细说明
+- **WebView 配置** → 查看 [WEBVIEW_CONFIG.md](./WEBVIEW_CONFIG.md)
+- **快速开始** → 查看 [QUICK_START.md](./QUICK_START.md)
+- **完整指南** → 查看 [ANDROID_BUILD_GUIDE.md](./ANDROID_BUILD_GUIDE.md)
+- **图标和启动画面** → 查看 [ANDROID_ICON_SPLASH_UPDATE.md](./ANDROID_ICON_SPLASH_UPDATE.md)
+- **图标缓存问题修复** → 查看 [ICON_SPLASH_CACHE_FIX.md](./ICON_SPLASH_CACHE_FIX.md)
+- **图标不显示修复** → 查看 [ICON_FIX_GUIDE.md](./ICON_FIX_GUIDE.md)
+- **快速修复** → 查看 [QUICK_FIX.md](./QUICK_FIX.md)
 
 ## 📝 许可证
 

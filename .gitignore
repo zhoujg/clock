@@ -1,0 +1,32 @@
+# Capacitor
+android/
+ios/
+
+# Web directory (built from source)
+www/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# BGM music files (users should add their own)
+assets/bgm/*.mp3
+assets/bgm/*.wav
+assets/bgm/*.ogg
+assets/bgm/*.m4a
+# Keep configuration and documentation files
+!assets/bgm/*.md
+!assets/bgm/*.txt
+!assets/bgm/.gitkeep

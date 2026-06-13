@@ -84,6 +84,7 @@ class App {
         this.animationManager = new AnimationManager('animationCanvas');
         this.quoteManager = new QuoteManager();
         this.tickSoundManager = new TickSoundManager();
+        this.bgmPlayerManager = new BGMPlayerManager();
         this.achievementSystem = new AchievementSystem();
         this.pomodoroTimer = new PomodoroTimer(clockManager, this.achievementSystem);
         
@@ -94,6 +95,7 @@ class App {
         this.initializeColorPanel();
         this.initializeImageInput();
         this.initializeDateDisplay();
+        this.initializeBGMPlayer();
         
         // 最后加载保存的设置（这会更新状态显示）
         this.loadSavedSettings();
@@ -235,6 +237,75 @@ class App {
         });
     }
 
+    initializeBGMPlayer() {
+        const bgmPlayer = document.getElementById('bgmPlayer');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
+        const collapseBtn = document.getElementById('collapseBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const loopBtn = document.getElementById('loopBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const progressContainer = document.getElementById('progressContainer');
+
+        // 切换展开/收起
+        musicToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            bgmPlayer.classList.toggle('collapsed');
+        });
+
+        collapseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            bgmPlayer.classList.add('collapsed');
+        });
+
+        // 播放/暂停
+        playPauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.bgmPlayerManager.togglePlay();
+            this.saveCurrentSettings();
+        });
+
+        // 上一曲
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.bgmPlayerManager.playPrevious();
+            this.saveCurrentSettings();
+        });
+
+        // 下一曲
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.bgmPlayerManager.playNext();
+            this.saveCurrentSettings();
+        });
+
+        // 循环
+        loopBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.bgmPlayerManager.toggleLoop();
+            this.saveCurrentSettings();
+        });
+
+        // 音量调节
+        volumeSlider.addEventListener('input', (e) => {
+            this.bgmPlayerManager.setVolume(e.target.value);
+            this.saveCurrentSettings();
+        });
+
+        // 进度条点击
+        progressContainer.addEventListener('click', (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const percent = ((e.clientX - rect.left) / rect.width) * 100;
+            this.bgmPlayerManager.setProgress(percent);
+        });
+
+        // 阻止播放器点击冒泡
+        bgmPlayer.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+
     // 加载保存的设置
     loadSavedSettings() {
         const settings = this.settingsStorage.load();
@@ -262,6 +333,11 @@ class App {
             this.tickSoundManager.toggle();
         }
 
+        // 恢复BGM播放器设置
+        if (settings.bgmPlayer) {
+            this.bgmPlayerManager.restoreSettings(settings.bgmPlayer);
+        }
+
         // 加载设置后更新状态显示
         this.updateAnimationStatus();
         this.updateTickSoundStatus();
@@ -273,7 +349,8 @@ class App {
             backgroundColor: this.backgroundManager.currentBackground,
             backgroundImage: document.body.style.backgroundImage.replace(/url\(['"]?([^'"]+)['"]?\)/, '$1') || null,
             animationEnabled: this.animationManager.enabled,
-            tickSoundEnabled: this.tickSoundManager.enabled
+            tickSoundEnabled: this.tickSoundManager.enabled,
+            bgmPlayer: this.bgmPlayerManager.getSettings()
         };
         
         this.settingsStorage.save(settings);
