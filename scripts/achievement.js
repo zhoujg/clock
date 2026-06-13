@@ -214,71 +214,9 @@ class AchievementSystem {
         this.container = document.createElement('div');
         this.container.className = 'achievement-container';
         this.container.innerHTML = `
-            <div class="achievement-toggle" id="achievementToggle" title="成就系统">
+            <div class="achievement-toggle" id="achievementToggle" title="学习成就">
                 🏆
                 <span class="achievement-badge" id="achievementBadge">0</span>
-            </div>
-            <div class="achievement-panel" id="achievementPanel">
-                <div class="achievement-header">
-                    <span class="achievement-title">🏆 学习成就</span>
-                    <button class="achievement-close" id="achievementClose">×</button>
-                </div>
-                
-                <div class="achievement-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon">⭐</div>
-                        <div class="stat-content">
-                            <div class="stat-label">等级</div>
-                            <div class="stat-value" id="levelDisplay">1</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✨</div>
-                        <div class="stat-content">
-                            <div class="stat-label">经验值</div>
-                            <div class="stat-value" id="expDisplay">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🔥</div>
-                        <div class="stat-content">
-                            <div class="stat-label">连续天数</div>
-                            <div class="stat-value" id="streakDisplay">0</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="achievement-exp-bar">
-                    <div class="exp-bar-fill" id="expBarFill"></div>
-                    <div class="exp-bar-text" id="expBarText">0 / 100</div>
-                </div>
-                
-                <div class="achievement-tabs">
-                    <button class="achievement-tab active" data-tab="all">全部</button>
-                    <button class="achievement-tab" data-tab="pomodoro">番茄钟</button>
-                    <button class="achievement-tab" data-tab="studyTime">学习时长</button>
-                    <button class="achievement-tab" data-tab="streak">连续学习</button>
-                    <button class="achievement-tab" data-tab="special">特殊</button>
-                </div>
-                
-                <div class="achievement-list" id="achievementList">
-                    <!-- 成就卡片将动态生成 -->
-                </div>
-                
-                <div class="achievement-footer">
-                    <div class="footer-stat">
-                        <span>今日学习:</span>
-                        <span id="todayStudyTime">0分钟</span>
-                    </div>
-                    <div class="footer-stat">
-                        <span>累计学习:</span>
-                        <span id="totalStudyTime">0小时</span>
-                    </div>
-                    <div class="footer-stat">
-                        <span>已解锁:</span>
-                        <span id="unlockedCount">0/28</span>
-                    </div>
-                </div>
             </div>
             
             <!-- 成就通知 -->
@@ -299,59 +237,12 @@ class AchievementSystem {
     // 绑定事件
     bindEvents() {
         const toggle = document.getElementById('achievementToggle');
-        const panel = document.getElementById('achievementPanel');
-        const close = document.getElementById('achievementClose');
         
+        // 点击跳转到成就页面
         toggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            toggle.classList.toggle('active');
-            panel.classList.toggle('active');
-            if (panel.classList.contains('active')) {
-                this.updateDisplay();
-                this.syncBackgroundWithMainPage();
-            }
+            window.location.href = 'achievement.html';
         });
-        
-        close.addEventListener('click', (e) => {
-            e.stopPropagation();
-            panel.classList.remove('active');
-            toggle.classList.remove('active');
-        });
-        
-        panel.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-        
-        // 标签页切换
-        const tabs = document.querySelectorAll('.achievement-tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                e.stopPropagation();
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                this.filterAchievements(tab.dataset.tab);
-            });
-        });
-    }
-    
-    // 同步主页面背景
-    syncBackgroundWithMainPage() {
-        const panel = document.getElementById('achievementPanel');
-        const bodyBgColor = getComputedStyle(document.body).backgroundColor;
-        const bodyBgImage = getComputedStyle(document.body).backgroundImage;
-        
-        // 如果有背景图片
-        if (bodyBgImage && bodyBgImage !== 'none') {
-            panel.style.backgroundImage = bodyBgImage;
-            panel.style.backgroundSize = 'cover';
-            panel.style.backgroundPosition = 'center';
-            panel.style.backgroundAttachment = 'fixed';
-            panel.style.backgroundColor = 'transparent';
-        } else {
-            // 只有背景色
-            panel.style.backgroundImage = 'none';
-            panel.style.backgroundColor = bodyBgColor || 'rgba(20, 20, 20, 0.98)';
-        }
     }
     
     // 加载数据
@@ -616,141 +507,9 @@ class AchievementSystem {
     
     // 更新显示
     updateDisplay() {
-        // 更新统计数据
-        document.getElementById('levelDisplay').textContent = this.data.level;
-        document.getElementById('expDisplay').textContent = this.data.exp;
-        document.getElementById('streakDisplay').textContent = this.data.currentStreak;
-        
-        // 更新经验条
-        const expNeeded = this.getExpForNextLevel();
-        const expPercent = (this.data.exp / expNeeded) * 100;
-        document.getElementById('expBarFill').style.width = `${expPercent}%`;
-        document.getElementById('expBarText').textContent = `${this.data.exp} / ${expNeeded}`;
-        
-        // 更新底部统计
-        document.getElementById('todayStudyTime').textContent = `${this.data.todayStudyTime}分钟`;
-        document.getElementById('totalStudyTime').textContent = `${(this.data.totalStudyTime / 60).toFixed(1)}小时`;
-        
-        // 更新解锁数量
-        const totalAchievements = Object.keys(this.achievements).length;
+        // 更新徽章数量
         const unlockedCount = this.data.unlockedAchievements.length;
-        document.getElementById('unlockedCount').textContent = `${unlockedCount}/${totalAchievements}`;
         document.getElementById('achievementBadge').textContent = unlockedCount;
-        
-        // 更新成就列表
-        this.filterAchievements('all');
-    }
-    
-    // 筛选成就
-    filterAchievements(category) {
-        const list = document.getElementById('achievementList');
-        list.innerHTML = '';
-        
-        // 同步成就解锁状态
-        Object.values(this.achievements).forEach(achievement => {
-            if (this.data.unlockedAchievements.includes(achievement.id)) {
-                achievement.unlocked = true;
-            }
-        });
-        
-        // 筛选成就
-        const filtered = Object.values(this.achievements).filter(achievement => {
-            return category === 'all' || achievement.category === category;
-        });
-        
-        // 排序：已解锁的在前面
-        filtered.sort((a, b) => {
-            if (a.unlocked && !b.unlocked) return -1;
-            if (!a.unlocked && b.unlocked) return 1;
-            return 0;
-        });
-        
-        // 生成成就卡片
-        filtered.forEach(achievement => {
-            const card = document.createElement('div');
-            card.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
-            
-            let progress = 0;
-            let current = 0;
-            let progressHtml = '';
-            
-            switch (achievement.category) {
-                case 'pomodoro':
-                    current = this.data.totalPomodoros;
-                    progress = Math.min((current / achievement.requirement) * 100, 100);
-                    progressHtml = `
-                        <div class="achievement-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progress}%"></div>
-                            </div>
-                            <div class="progress-text">${current} / ${achievement.requirement} 个番茄钟</div>
-                        </div>
-                    `;
-                    break;
-                case 'studyTime':
-                    current = this.data.totalStudyTime;
-                    progress = Math.min((current / achievement.requirement) * 100, 100);
-                    const currentHours = (current / 60).toFixed(1);
-                    const requiredHours = (achievement.requirement / 60).toFixed(1);
-                    progressHtml = `
-                        <div class="achievement-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progress}%"></div>
-                            </div>
-                            <div class="progress-text">${currentHours} / ${requiredHours} 小时</div>
-                        </div>
-                    `;
-                    break;
-                case 'streak':
-                    current = this.data.currentStreak;
-                    progress = Math.min((current / achievement.requirement) * 100, 100);
-                    progressHtml = `
-                        <div class="achievement-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progress}%"></div>
-                            </div>
-                            <div class="progress-text">${current} / ${achievement.requirement} 天</div>
-                        </div>
-                    `;
-                    break;
-                case 'daily':
-                    current = this.data.todayStudyTime;
-                    progress = Math.min((current / achievement.requirement) * 100, 100);
-                    const currentMin = current;
-                    const requiredMin = achievement.requirement;
-                    progressHtml = `
-                        <div class="achievement-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progress}%"></div>
-                            </div>
-                            <div class="progress-text">${currentMin} / ${requiredMin} 分钟 ${achievement.repeatable ? '(可重复)' : ''}</div>
-                        </div>
-                    `;
-                    break;
-                case 'special':
-                    // 特殊成就显示说明
-                    if (!achievement.unlocked) {
-                        progressHtml = `
-                            <div class="achievement-hint">
-                                <div class="hint-text">💡 ${achievement.description}</div>
-                            </div>
-                        `;
-                    }
-                    break;
-            }
-            
-            card.innerHTML = `
-                <div class="achievement-icon">${achievement.icon}</div>
-                <div class="achievement-info">
-                    <div class="achievement-name">${achievement.name}</div>
-                    <div class="achievement-desc">${achievement.description}</div>
-                    ${progressHtml}
-                </div>
-                ${achievement.unlocked ? '<div class="achievement-check">✓</div>' : ''}
-            `;
-            
-            list.appendChild(card);
-        });
     }
     
     // 获取统计数据（供外部调用）
