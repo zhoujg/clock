@@ -229,6 +229,7 @@ class BGMPlayerManager {
         // 如果其他方法都失败了，显示空列表
         this.musicList = [];
         console.log('未找到音乐文件，请将音乐文件放入 assets/bgm/ 目录');
+        console.log('提示：如果服务器禁止目录浏览，请运行 generate-music-list.sh 生成 music-list.json');
     }
 
     // 从文件名提取音乐名称
@@ -292,6 +293,29 @@ class BGMPlayerManager {
 
     // 探测音乐文件（尝试加载可能存在的文件）
     async probeMusicFiles() {
+        // 首先尝试读取 music-list.json（如果存在）
+        try {
+            const response = await fetch('assets/bgm/music-list.json');
+            if (response.ok) {
+                const data = await response.json();
+                // 支持新格式 {music: [...]} 和旧格式 [...]
+                const musicFiles = Array.isArray(data) ? data : (data.music || []);
+                
+                if (musicFiles.length > 0) {
+                    this.musicList = musicFiles.map(filename => ({
+                        name: this.extractMusicName(filename),
+                        file: `assets/bgm/${filename}`
+                    }));
+                    // 按名称排序
+                    this.musicList.sort((a, b) => a.name.localeCompare(b.name));
+                    console.log(`✅ 从 music-list.json 加载了 ${this.musicList.length} 首音乐`);
+                    return;
+                }
+            }
+        } catch (error) {
+            console.log('未找到 music-list.json，尝试读取目录...');
+        }
+
         // 尝试通过 fetch 获取 bgm 目录的文件列表
         // 注意：这需要服务器支持目录列表，否则会失败
         try {
@@ -324,6 +348,7 @@ class BGMPlayerManager {
                 this.musicList = musicFiles;
                 // 按名称排序
                 this.musicList.sort((a, b) => a.name.localeCompare(b.name));
+                console.log(`✅ 从目录读取了 ${this.musicList.length} 首音乐`);
             }
         } catch (error) {
             console.log('无法读取 bgm 目录列表:', error.message);

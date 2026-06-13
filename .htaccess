@@ -1,0 +1,102 @@
+# Apache 配置文件
+# 用于部署在子目录时的资源访问配置
+
+# 启用符号链接跟随
+Options +FollowSymLinks
+
+# 禁用目录浏览（安全性考虑）
+Options -Indexes
+
+# 设置默认文档
+DirectoryIndex index.html
+
+# 设置默认字符集为 UTF-8
+AddDefaultCharset UTF-8
+
+# 启用重写引擎
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /clock/
+    
+    # 如果请求的不是文件也不是目录，重定向到 index.html
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.html [L]
+</IfModule>
+
+# MIME 类型设置
+<IfModule mod_mime.c>
+    # HTML
+    AddType text/html .html
+    AddType text/css .css
+    AddType application/javascript .js
+    
+    # 图片
+    AddType image/svg+xml .svg
+    AddType image/png .png
+    AddType image/jpeg .jpg .jpeg
+    AddType image/gif .gif
+    AddType image/webp .webp
+    
+    # 音频
+    AddType audio/mpeg .mp3
+    AddType audio/wav .wav
+    AddType audio/ogg .ogg
+    AddType audio/mp4 .m4a
+    AddType audio/flac .flac
+    AddType audio/aac .aac
+    
+    # JSON
+    AddType application/json .json
+</IfModule>
+
+# 响应头设置
+<IfModule mod_headers.c>
+    # 允许跨域资源共享（CORS）- 针对音频文件
+    <FilesMatch "\.(mp3|wav|ogg|m4a|flac|aac)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+    
+    # 安全响应头
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    
+    # 确保 UTF-8 编码
+    <FilesMatch "\.(html|css|js|json)$">
+        Header set Content-Type "text/html; charset=utf-8" env=HTML
+        Header set Content-Type "text/css; charset=utf-8" env=CSS
+        Header set Content-Type "application/javascript; charset=utf-8" env=JS
+        Header set Content-Type "application/json; charset=utf-8" env=JSON
+    </FilesMatch>
+</IfModule>
+
+# 缓存控制
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # 图片
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # 音频
+    ExpiresByType audio/mpeg "access plus 1 month"
+    ExpiresByType audio/wav "access plus 1 month"
+    
+    # CSS 和 JavaScript
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    
+    # HTML
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Gzip 压缩
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>

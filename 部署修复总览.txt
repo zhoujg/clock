@@ -1,0 +1,73 @@
+═══════════════════════════════════════════════════════════
+           云服务器部署问题修复总览
+═══════════════════════════════════════════════════════════
+
+📋 问题清单
+─────────────────────────────────────────────────────────
+❌ GET https://neihou.cn/clock/none 404 (Not Found)
+❌ GET https://neihou.cn/clock/assets/bgm/ 403 (Forbidden)
+❌ GET https://neihou.cn/favicon.svg 404 (Not Found)
+❌ 音乐列表无法加载
+
+✅ 修复方案
+─────────────────────────────────────────────────────────
+1. 修复 Favicon 路径 (index.html)
+   /favicon.svg → ./favicon.svg
+
+2. 引入音乐索引文件 (assets/bgm/music-list.json)
+   解决服务器禁止目录浏览的问题
+
+3. 优化音乐加载逻辑 (scripts/bgmPlayer.js)
+   优先使用索引文件，保留目录浏览作为备选
+
+4. 创建自动化工具
+   - generate-music-list.sh (生成音乐索引)
+   - deploy.sh (一键部署)
+
+📦 新增文件
+─────────────────────────────────────────────────────────
+✨ assets/bgm/music-list.json       音乐索引文件
+✨ scripts/generate-music-list.sh   音乐索引生成脚本
+✨ deploy.sh                         自动部署脚本
+✨ .htaccess                         Apache 配置
+✨ nginx.conf                        Nginx 配置示例
+
+📚 DEPLOY_GUIDE.md                  详细部署指南
+📚 MUSIC_DEPLOYMENT.md              音乐功能说明
+📚 DEPLOYMENT_SUMMARY.md            技术实现细节
+📚 DEPLOY_CHECKLIST.md              部署检查清单
+📚 部署问题修复说明.md               中文说明文档
+
+🚀 快速部署
+─────────────────────────────────────────────────────────
+$ ./scripts/generate-music-list.sh
+$ ./deploy.sh user@neihou.cn /var/www/html/clock
+
+✅ 验证部署
+─────────────────────────────────────────────────────────
+1. 访问: https://neihou.cn/clock/
+2. 检查 Favicon 显示正确
+3. 点击音乐按钮，查看列表（应显示 3 首）
+4. 播放音乐测试
+5. 浏览器控制台无 404 错误
+
+🎵 添加新音乐
+─────────────────────────────────────────────────────────
+1. cp new-song.mp3 assets/bgm/
+2. ./scripts/generate-music-list.sh
+3. scp assets/bgm/* user@server:/path/to/clock/assets/bgm/
+4. 刷新页面
+
+⚠️  重要提示
+─────────────────────────────────────────────────────────
+每次添加/删除音乐文件后，必须重新生成 music-list.json
+
+📖 详细文档
+─────────────────────────────────────────────────────────
+DEPLOY_GUIDE.md         - 完整部署指南
+MUSIC_DEPLOYMENT.md     - 音乐功能详解
+DEPLOYMENT_SUMMARY.md   - 技术细节
+DEPLOY_CHECKLIST.md     - 检查清单
+部署问题修复说明.md      - 中文快速参考
+
+═══════════════════════════════════════════════════════════
