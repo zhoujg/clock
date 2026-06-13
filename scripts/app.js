@@ -86,10 +86,14 @@ class App {
         this.tickSoundManager = new TickSoundManager();
         this.bgmPlayerManager = new BGMPlayerManager(this.tickSoundManager); // 传递滴答声管理器
         this.achievementSystem = new AchievementSystem();
-        this.pomodoroTimer = new PomodoroTimer(clockManager, this.achievementSystem);
+        this.forestSystem = new ForestSystem(this.achievementSystem);
+        this.pomodoroTimer = new PomodoroTimer(clockManager, this.achievementSystem, this.forestSystem);
         
         // 设置时钟管理器的滴答声引用
         clockManager.setTickSoundManager(this.tickSoundManager);
+        
+        // 设置动画管理器的 BGM 播放器引用，用于音乐可视化
+        this.animationManager.setBGMPlayer(this.bgmPlayerManager);
         
         this.initializeControls();
         this.initializeColorPanel();

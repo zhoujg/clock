@@ -27,10 +27,27 @@ class Particle {
         this.index = index;
         // 是否处于自由移动状态
         this.isFreeFalling = false;
+        // 音乐可视化相关
+        this.baseRadius = 2.5;
+        this.musicScale = 1.0;
+        this.musicScaleTarget = 1.0;
     }
 
     // 更新位置 - 在目标位置和随机移动之间切换
-    update(isScattering, time) {
+    update(isScattering, time, audioData = null) {
+        // 更新音乐缩放效果
+        if (audioData) {
+            // 根据音频强度调整目标缩放
+            // 使用整体音量作为基础，低频提供额外的脉冲感
+            const pulseStrength = audioData.overall * 0.6 + audioData.bass * 0.4;
+            this.musicScaleTarget = 1.0 + pulseStrength * 1.5;
+        } else {
+            this.musicScaleTarget = 1.0;
+        }
+        
+        // 平滑过渡缩放值
+        this.musicScale += (this.musicScaleTarget - this.musicScale) * 0.3;
+        
         if (isScattering) {
             // 散开状态：自由移动
             if (!this.isFreeFalling) {
@@ -80,8 +97,12 @@ class Particle {
 
     draw(ctx) {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        // 根据音乐强度调整粒子大小
+        const currentRadius = this.baseRadius * this.musicScale;
+        ctx.arc(this.x, this.y, currentRadius, 0, Math.PI * 2);
+        // 也可以根据音乐强度调整透明度
+        const alpha = 0.6 + (this.musicScale - 1.0) * 0.4;
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1.0, alpha)})`;
         ctx.fill();
     }
 }

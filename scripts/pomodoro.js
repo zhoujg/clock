@@ -1,6 +1,6 @@
 // 番茄钟管理器
 class PomodoroTimer {
-    constructor(clockManager, achievementSystem) {
+    constructor(clockManager, achievementSystem, forestSystem) {
         // 默认时间设置（分钟）
         this.workDuration = 25;
         this.shortBreakDuration = 5;
@@ -18,6 +18,9 @@ class PomodoroTimer {
         
         // 成就系统引用
         this.achievementSystem = achievementSystem;
+        
+        // 森林系统引用
+        this.forestSystem = forestSystem;
         
         // DOM 元素
         this.container = null;
@@ -285,6 +288,12 @@ class PomodoroTimer {
         this.toggle.classList.add(this.currentMode === 'work' ? 'running-work' : 'running-break');
         this.statusIndicator.className = 'pomodoro-status-indicator ' + (this.currentMode === 'work' ? 'working' : 'breaking');
         
+        // 开始种树（只在工作模式或自定义模式下）
+        if ((this.currentMode === 'work' || this.isCustomMode) && this.forestSystem) {
+            const duration = this.isCustomMode ? this.customDuration : this.workDuration;
+            this.forestSystem.startPlanting(duration);
+        }
+        
         // 自动收起面板
         setTimeout(() => {
             this.panel.classList.remove('active');
@@ -293,6 +302,11 @@ class PomodoroTimer {
         this.intervalId = setInterval(() => {
             this.timeRemaining--;
             this.updateDisplay();
+            
+            // 更新森林进度
+            if ((this.currentMode === 'work' || this.isCustomMode) && this.forestSystem) {
+                this.forestSystem.updateTreeProgress(this.timeRemaining);
+            }
             
             if (this.timeRemaining <= 0) {
                 this.complete();
@@ -308,11 +322,18 @@ class PomodoroTimer {
         this.startBtn.style.display = 'flex';
         this.pauseBtn.style.display = 'none';
         
+        // 暂停不算放弃，不处理森林
+        
         // 切换回正常时钟模式
         this.clockManager.switchToNormalMode();
     }
     
     reset() {
+        // 如果正在运行，放弃种树
+        if (this.isRunning && (this.currentMode === 'work' || this.isCustomMode) && this.forestSystem) {
+            this.forestSystem.abandonPlanting();
+        }
+        
         this.pause();
         this.setMode(this.currentMode);
     }
@@ -327,6 +348,11 @@ class PomodoroTimer {
         
         // 如果是自定义模式，完成后不自动切换
         if (this.isCustomMode) {
+            // 完成种树
+            if (this.forestSystem) {
+                this.forestSystem.completePlanting();
+            }
+            
             this.showNotification();
             this.panel.classList.add('active');
             // 清空输入框
@@ -341,6 +367,11 @@ class PomodoroTimer {
         if (this.currentMode === 'work') {
             this.completedSessions++;
             this.sessionCount.textContent = this.completedSessions;
+            
+            // 完成种树
+            if (this.forestSystem) {
+                this.forestSystem.completePlanting();
+            }
             
             // 触发成就系统
             if (this.achievementSystem) {

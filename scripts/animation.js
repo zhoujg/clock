@@ -10,6 +10,7 @@ class AnimationManager {
         this.scatteringDuration = 60000; // 散开状态持续60秒
         this.rabbitDuration = 3000; // 兔子形态静止3秒
         this.lastStateChange = Date.now();
+        this.bgmPlayer = null; // BGM 播放器引用，用于获取音频数据
         
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
@@ -170,9 +171,12 @@ class AnimationManager {
             this.lastStateChange = now;
         }
 
+        // 获取音频数据（如果有 BGM 播放器）
+        const audioData = this.bgmPlayer ? this.bgmPlayer.getAudioData() : null;
+
         // 更新和绘制粒子
         this.particles.forEach(particle => {
-            particle.update(this.isScattering, this.time);
+            particle.update(this.isScattering, this.time, audioData);
             particle.draw(this.ctx);
         });
 
@@ -195,5 +199,10 @@ class AnimationManager {
             this.lastStateChange = Date.now();
             this.animate();
         }
+    }
+    
+    // 设置 BGM 播放器引用
+    setBGMPlayer(bgmPlayer) {
+        this.bgmPlayer = bgmPlayer;
     }
 }

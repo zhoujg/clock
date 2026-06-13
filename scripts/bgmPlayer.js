@@ -21,6 +21,12 @@ class BGMPlayerManager {
         this.audio = new Audio();
         this.audio.volume = this.volume;
         
+        // 初始化 Web Audio API 用于音频分析
+        this.audioContext = null;
+        this.analyser = null;
+        this.dataArray = null;
+        this.sourceNode = null;
+        
         // 监听播放结束事件
         this.audio.addEventListener('ended', () => {
             if (this.isLooping) {
@@ -37,6 +43,8 @@ class BGMPlayerManager {
         this.audio.addEventListener('play', () => {
             this.isPlaying = true;
             this.updatePlayPauseButton();
+            // 初始化音频分析器
+            this.initAudioAnalyser();
             // 播放音乐时暂停滴答声
             this.pauseTickSound();
             // 触发自定义事件，通知UI更新
@@ -66,22 +74,79 @@ class BGMPlayerManager {
         });
     }
     
+    // 初始化音频分析器
+    initAudioAnalyser() {
+        if (this.analyser) return; // 已初始化
+        
+        try {
+            // 创建音频上下文
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // 创建分析器节点
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 256; // 频率分辨率
+            
+            const bufferLength = this.analyser.frequencyBinCount;
+            this.dataArray = new Uint8Array(bufferLength);
+            
+            // 连接音频源到分析器
+            if (!this.sourceNode) {
+                this.sourceNode = this.audioContext.createMediaElementSource(this.audio);
+                this.sourceNode.connect(this.analyser);
+                this.analyser.connect(this.audioContext.destination);
+            }
+            
+            console.log('🎵 音频分析器初始化成功');
+        } catch (error) {
+            console.error('音频分析器初始化失败:', error);
+        }
+    }
+    
+    // 获取音频频率数据
+    getAudioData() {
+        if (!this.analyser || !this.isPlaying) {
+            return null;
+        }
+        
+        this.analyser.getByteFrequencyData(this.dataArray);
+        
+        // 计算低频、中频、高频的平均值
+        const third = Math.floor(this.dataArray.length / 3);
+        let bass = 0, mid = 0, treble = 0;
+        
+        for (let i = 0; i < third; i++) {
+            bass += this.dataArray[i];
+        }
+        for (let i = third; i < third * 2; i++) {
+            mid += this.dataArray[i];
+        }
+        for (let i = third * 2; i < this.dataArray.length; i++) {
+            treble += this.dataArray[i];
+        }
+        
+        bass /= third;
+        mid /= third;
+        treble /= third;
+        
+        // 计算整体音量（0-1）
+        const overall = (bass + mid + treble) / 3 / 255;
+        
+        return {
+            bass: bass / 255,
+            mid: mid / 255,
+            treble: treble / 255,
+            overall: overall,
+            raw: this.dataArray
+        };
+    }
+    
     // 暂停滴答声
     pauseTickSound() {
-        console.log('pauseTickSound 被调用', {
-            hasManager: !!this.tickSoundManager,
-            currentEnabled: this.tickSoundManager?.enabled,
-            alreadyRecorded: this.tickSoundWasEnabled
-        });
-        
         if (this.tickSoundManager) {
             // 只在第一次记录状态，避免重复调用时覆盖
             if (this.tickSoundWasEnabled === undefined) {
                 this.tickSoundWasEnabled = this.tickSoundManager.enabled;
-                console.log('📝 首次记录滴答声状态 tickSoundWasEnabled =', this.tickSoundWasEnabled);
-            } else {
-                console.log('⚠️ 已经记录过状态，不覆盖。当前记录值 =', this.tickSoundWasEnabled);
-            }
+            } 
             
             // 如果滴答声开启，关闭它
             if (this.tickSoundManager.enabled) {
@@ -90,59 +155,37 @@ class BGMPlayerManager {
                     this.tickSoundManager.audio.pause();
                     this.tickSoundManager.audio.currentTime = 0;
                 }
-                console.log('🔇 滴答声已关闭');
-            } else {
-                console.log('⚠️ 滴答声已经是关闭状态');
-            }
+            } 
         }
     }
     
     // 恢复滴答声
-    resumeTickSound() {
-        console.log('resumeTickSound 被调用', {
-            hasManager: !!this.tickSoundManager,
-            wasEnabled: this.tickSoundWasEnabled,
-            currentEnabled: this.tickSoundManager?.enabled,
-            hasAudio: !!this.tickSoundManager?.audio,
-            isLoaded: this.tickSoundManager?.isLoaded
-        });
-        
+    resumeTickSound() {        
         if (this.tickSoundManager && this.tickSoundWasEnabled) {
             // 如果音乐播放前滴答声是开启的，重新开启并立即播放一次
             this.tickSoundManager.enabled = true;
-            console.log('✅ 滴答声 enabled 已设置为 true');
             
             // 立即播放一次滴答声，不等待下一个时钟周期
             if (this.tickSoundManager.audio && this.tickSoundManager.isLoaded) {
-                console.log('🎵 尝试立即播放滴答声...');
                 try {
                     this.tickSoundManager.audio.currentTime = 0;
                     const playPromise = this.tickSoundManager.audio.play();
                     if (playPromise !== undefined) {
                         playPromise
-                            .then(() => {
-                                console.log('✅ 滴答声播放成功');
-                            })
                             .catch(error => {
                                 console.warn('❌ 滴答声恢复播放失败:', error);
                             });
-                    } else {
-                        console.log('✅ 滴答声播放调用完成（旧浏览器API）');
-                    }
+                    } 
                 } catch (error) {
                     console.warn('❌ 滴答声恢复播放异常:', error);
                 }
             } else {
                 console.warn('⚠️ 无法播放滴答声 - audio:', !!this.tickSoundManager.audio, 'isLoaded:', this.tickSoundManager.isLoaded);
             }
-            console.log('滴答声已恢复并播放');
-        } else {
-            console.log('⚠️ 不恢复滴答声 - hasManager:', !!this.tickSoundManager, 'wasEnabled:', this.tickSoundWasEnabled);
-        }
+        } 
         
         // 重置标志，以便下次播放音乐时能重新记录状态
         this.tickSoundWasEnabled = undefined;
-        console.log('🔄 重置 tickSoundWasEnabled 标志');
     }
     
     // 加载音乐列表
@@ -152,7 +195,6 @@ class BGMPlayerManager {
             try {
                 await this.loadMusicFromCapacitor();
                 if (this.musicList.length > 0) {
-                    console.log('从 Capacitor 文件系统加载了', this.musicList.length, '首音乐');
                     this.renderMusicList();
                     return;
                 }
@@ -165,7 +207,6 @@ class BGMPlayerManager {
         try {
             await this.probeMusicFiles();
             if (this.musicList.length > 0) {
-                console.log('通过文件探测加载了', this.musicList.length, '首音乐');
                 this.renderMusicList();
                 return;
             }
@@ -185,24 +226,23 @@ class BGMPlayerManager {
 
     // 使用默认音乐列表
     useDefaultMusicList() {
-        // 从已知存在的文件开始（基于项目文件树）
-        const knownMusicFiles = [
-            'The Mass.mp3',
-            'Victory.mp3'
-        ];
-        
-        this.musicList = knownMusicFiles.map(file => ({
-            name: this.extractMusicName(file),
-            file: `assets/bgm/${file}`
-        }));
-        
-        console.log('使用默认音乐列表，共', this.musicList.length, '首音乐');
+        // 如果其他方法都失败了，显示空列表
+        this.musicList = [];
+        console.log('未找到音乐文件，请将音乐文件放入 assets/bgm/ 目录');
     }
 
     // 从文件名提取音乐名称
     extractMusicName(filename) {
+        // 先解码 URL 编码（如 %20 -> 空格）
+        try {
+            filename = decodeURIComponent(filename);
+        } catch (e) {
+            // 如果解码失败，使用原始文件名
+            console.warn('文件名解码失败:', filename, e);
+        }
+        
         // 移除文件扩展名
-        let name = filename.replace(/\.(mp3|wav|ogg|m4a|flac|aac)$/i, '');
+        let name = filename.replace(/\.(mp3|wav|ogg|m4a|flac|aac|mpga)$/i, '');
         
         // 将下划线和连字符替换为空格
         name = name.replace(/[_-]/g, ' ');
@@ -230,7 +270,7 @@ class BGMPlayerManager {
                 directory: 'APPLICATION'
             });
 
-            const musicExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'];
+            const musicExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac', '.mpga'];
             const musicFiles = result.files
                 .filter(file => {
                     const ext = file.name.toLowerCase().match(/\.[^.]+$/);
@@ -245,8 +285,6 @@ class BGMPlayerManager {
 
             // 按名称排序
             this.musicList.sort((a, b) => a.name.localeCompare(b.name));
-            
-            console.log('从 Capacitor 加载的音乐文件:', musicFiles);
         } catch (error) {
             console.error('Capacitor 文件读取失败:', error);
         }
@@ -254,82 +292,44 @@ class BGMPlayerManager {
 
     // 探测音乐文件（尝试加载可能存在的文件）
     async probeMusicFiles() {
-        // 先尝试读取 assets/bgm 目录下的所有文件
-        // 这里我们使用一个技巧：尝试读取目录的 index 页面（如果服务器支持目录列表）
-        // 或者使用已知的文件列表
-        
-        const knownFiles = [
-            'The Mass.mp3',
-            'Victory.mp3'
-        ];
-        
-        // 常见的音乐文件名模式（作为补充）
-        const commonPatterns = [
-            'music1', 'music2', 'music3', 'music4', 'music5',
-            'music6', 'music7', 'music8', 'music9', 'music10',
-            'bgm1', 'bgm2', 'bgm3', 'bgm4', 'bgm5',
-            'track1', 'track2', 'track3', 'track4', 'track5',
-            'ambient', 'chill', 'focus', 'relax', 'calm',
-            'piano', 'nature', 'rain', 'ocean', 'forest',
-            'lofi', 'jazz', 'classical', 'meditation', 'study',
-            'work', 'sleep', 'morning', 'evening', 'night'
-        ];
-        
-        const extensions = ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac'];
-        
-        const probePromises = [];
-        
-        // 首先检查已知存在的文件
-        for (const filename of knownFiles) {
-            const filepath = `assets/bgm/${filename}`;
-            probePromises.push(
-                this.checkFileExists(filepath).then(exists => {
-                    if (exists) {
-                        return {
-                            name: this.extractMusicName(filename),
-                            file: filepath
-                        };
-                    }
-                    return null;
-                })
-            );
-        }
-        
-        // 然后探测常见模式的文件
-        for (const pattern of commonPatterns) {
-            for (const ext of extensions) {
-                const filename = `${pattern}.${ext}`;
-                const filepath = `assets/bgm/${filename}`;
-                
-                probePromises.push(
-                    this.checkFileExists(filepath).then(exists => {
-                        if (exists) {
-                            return {
-                                name: this.extractMusicName(filename),
-                                file: filepath
-                            };
-                        }
-                        return null;
-                    })
-                );
+        // 尝试通过 fetch 获取 bgm 目录的文件列表
+        // 注意：这需要服务器支持目录列表，否则会失败
+        try {
+            const response = await fetch('assets/bgm/');
+            if (!response.ok) {
+                throw new Error('无法访问 bgm 目录');
             }
+            
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // 查找所有链接
+            const links = Array.from(doc.querySelectorAll('a'));
+            const musicExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac', '.mpga'];
+            
+            const musicFiles = links
+                .map(link => link.getAttribute('href'))
+                .filter(href => {
+                    if (!href) return false;
+                    const lower = href.toLowerCase();
+                    return musicExtensions.some(ext => lower.endsWith(ext));
+                })
+                .map(filename => ({
+                    name: this.extractMusicName(filename),
+                    file: `assets/bgm/${filename}`
+                }));
+            
+            if (musicFiles.length > 0) {
+                this.musicList = musicFiles;
+                // 按名称排序
+                this.musicList.sort((a, b) => a.name.localeCompare(b.name));
+            }
+        } catch (error) {
+            console.log('无法读取 bgm 目录列表:', error.message);
+            // 如果目录列表失败，musicList 保持为空
+            this.musicList = [];
         }
-        
-        const results = await Promise.all(probePromises);
-        const foundFiles = results.filter(item => item !== null);
-        
-        // 去重（因为已知文件可能也在常见模式中）
-        const uniqueFiles = new Map();
-        foundFiles.forEach(file => {
-            uniqueFiles.set(file.file, file);
-        });
-        
-        this.musicList = Array.from(uniqueFiles.values());
-        
-        // 按名称排序
-        this.musicList.sort((a, b) => a.name.localeCompare(b.name));
-        
-        console.log('通过文件探测找到的音乐:', this.musicList.map(m => m.file));
     }
 
     // 检查文件是否存在

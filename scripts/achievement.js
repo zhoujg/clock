@@ -233,10 +233,10 @@ class AchievementSystem {
         const toggle = document.getElementById('achievementToggle');
         
         if (toggle) {
-            // 点击跳转到成就页面
+            // 点击显示成就模态框
             toggle.addEventListener('click', (e) => {
                 e.stopPropagation();
-                window.location.href = 'achievement.html';
+                this.showAchievementModal();
             });
         }
     }
@@ -520,5 +520,302 @@ class AchievementSystem {
             unlockedCount: this.data.unlockedAchievements.length,
             totalAchievements: Object.keys(this.achievements).length
         };
+    }
+    
+    // ===== 成就模态框方法 =====
+    
+    // 显示成就模态框
+    showAchievementModal() {
+        // 创建模态框（如果不存在）
+        if (!document.getElementById('achievementModal')) {
+            this.createAchievementModal();
+        }
+        
+        // 渲染内容
+        this.renderAchievementContent();
+        
+        // 显示模态框
+        const modal = document.getElementById('achievementModal');
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    }
+    
+    // 创建成就模态框
+    createAchievementModal() {
+        const modal = document.createElement('div');
+        modal.id = 'achievementModal';
+        modal.className = 'achievement-modal';
+        modal.innerHTML = `
+            <div class="achievement-modal-content">
+                <div class="achievement-modal-header">
+                    <h1 class="achievement-modal-title">
+                        <span class="title-icon">🏆</span>
+                        我的荣誉殿堂
+                        <span class="title-icon">🏆</span>
+                    </h1>
+                    <button class="achievement-modal-close" id="achievementModalClose">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <p class="achievement-modal-subtitle">每一次努力都值得被记录！</p>
+                
+                <!-- 个人统计卡片 -->
+                <div class="modal-stats-container">
+                    <div class="modal-stat-card modal-level-card">
+                        <div class="modal-stat-icon-large">⭐</div>
+                        <div class="modal-stat-info">
+                            <div class="modal-stat-label">当前等级</div>
+                            <div class="modal-stat-value-large" id="modalLevelDisplay">1</div>
+                            <div class="modal-stat-sublabel">继续加油！</div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-stat-card modal-exp-card">
+                        <div class="modal-stat-icon-large">✨</div>
+                        <div class="modal-stat-info">
+                            <div class="modal-stat-label">经验值</div>
+                            <div class="modal-stat-value-large" id="modalExpDisplay">0</div>
+                            <div class="modal-stat-sublabel" id="modalExpNeeded">/ 100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-stat-card modal-streak-card">
+                        <div class="modal-stat-icon-large">🔥</div>
+                        <div class="modal-stat-info">
+                            <div class="modal-stat-label">连续天数</div>
+                            <div class="modal-stat-value-large" id="modalStreakDisplay">0</div>
+                            <div class="modal-stat-sublabel">坚持就是胜利！</div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-stat-card modal-study-card">
+                        <div class="modal-stat-icon-large">📚</div>
+                        <div class="modal-stat-info">
+                            <div class="modal-stat-label">累计学习</div>
+                            <div class="modal-stat-value-large" id="modalTotalStudyDisplay">0</div>
+                            <div class="modal-stat-sublabel">小时</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 经验进度条 -->
+                <div class="modal-exp-progress-section">
+                    <div class="modal-exp-label-row">
+                        <span class="modal-exp-label-left">Lv.<span id="modalCurrentLevel">1</span></span>
+                        <span class="modal-exp-label-center" id="modalExpText">0 / 100</span>
+                        <span class="modal-exp-label-right">Lv.<span id="modalNextLevel">2</span></span>
+                    </div>
+                    <div class="modal-exp-bar-container">
+                        <div class="modal-exp-bar-fill" id="modalExpBarFill"></div>
+                        <div class="modal-exp-bar-shine"></div>
+                    </div>
+                </div>
+                
+                <!-- 今日学习进度 -->
+                <div class="modal-today-section">
+                    <h2 class="modal-section-title">📅 今日学习</h2>
+                    <div class="modal-today-stats">
+                        <div class="modal-today-item">
+                            <span class="modal-today-label">学习时长</span>
+                            <span class="modal-today-value" id="modalTodayTime">0 分钟</span>
+                        </div>
+                        <div class="modal-today-item">
+                            <span class="modal-today-label">完成番茄钟</span>
+                            <span class="modal-today-value" id="modalTodayPomodoros">0 个</span>
+                        </div>
+                        <div class="modal-today-item">
+                            <span class="modal-today-label">解锁成就</span>
+                            <span class="modal-today-value" id="modalTodayAchievements">0 个</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 成就分类标签 -->
+                <div class="modal-achievement-nav">
+                    <button class="modal-nav-btn active" data-category="all">
+                        <span class="modal-nav-icon">🎯</span>
+                        <span class="modal-nav-text">全部</span>
+                        <span class="modal-nav-count" id="modalCountAll">0</span>
+                    </button>
+                    <button class="modal-nav-btn" data-category="pomodoro">
+                        <span class="modal-nav-icon">🍅</span>
+                        <span class="modal-nav-text">番茄钟</span>
+                        <span class="modal-nav-count" id="modalCountPomodoro">0</span>
+                    </button>
+                    <button class="modal-nav-btn" data-category="studyTime">
+                        <span class="modal-nav-icon">⏰</span>
+                        <span class="modal-nav-text">时长</span>
+                        <span class="modal-nav-count" id="modalCountStudyTime">0</span>
+                    </button>
+                    <button class="modal-nav-btn" data-category="streak">
+                        <span class="modal-nav-icon">🔥</span>
+                        <span class="modal-nav-text">连续</span>
+                        <span class="modal-nav-count" id="modalCountStreak">0</span>
+                    </button>
+                    <button class="modal-nav-btn" data-category="special">
+                        <span class="modal-nav-icon">⭐</span>
+                        <span class="modal-nav-text">特殊</span>
+                        <span class="modal-nav-count" id="modalCountSpecial">0</span>
+                    </button>
+                </div>
+                
+                <!-- 成就展示区 -->
+                <div class="modal-achievements-grid" id="modalAchievementsGrid">
+                    <!-- 成就卡片将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // 绑定关闭事件
+        const closeBtn = document.getElementById('achievementModalClose');
+        closeBtn.addEventListener('click', () => this.hideAchievementModal());
+        
+        // 点击背景关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.hideAchievementModal();
+            }
+        });
+        
+        // 绑定分类切换
+        const navBtns = modal.querySelectorAll('.modal-nav-btn');
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const category = btn.dataset.category;
+                this.filterAchievements(category);
+            });
+        });
+    }
+    
+    // 渲染成就内容
+    renderAchievementContent() {
+        const stats = this.getStats();
+        const expNeeded = this.getExpForNextLevel();
+        const expPercent = (stats.exp / expNeeded) * 100;
+        
+        // 更新统计卡片
+        document.getElementById('modalLevelDisplay').textContent = stats.level;
+        document.getElementById('modalExpDisplay').textContent = stats.exp;
+        document.getElementById('modalExpNeeded').textContent = `/ ${expNeeded}`;
+        document.getElementById('modalStreakDisplay').textContent = stats.currentStreak;
+        document.getElementById('modalTotalStudyDisplay').textContent = (stats.totalStudyTime / 60).toFixed(1);
+        
+        // 更新经验进度条
+        document.getElementById('modalCurrentLevel').textContent = stats.level;
+        document.getElementById('modalNextLevel').textContent = stats.level + 1;
+        document.getElementById('modalExpText').textContent = `${stats.exp} / ${expNeeded}`;
+        document.getElementById('modalExpBarFill').style.width = `${expPercent}%`;
+        
+        // 更新今日统计
+        document.getElementById('modalTodayTime').textContent = `${stats.todayStudyTime} 分钟`;
+        
+        // 计算今日完成的番茄钟（简化处理）
+        const todayPomodoros = Math.floor(stats.todayStudyTime / 25);
+        document.getElementById('modalTodayPomodoros').textContent = `${todayPomodoros} 个`;
+        
+        // 计算今日解锁成就（简化处理）
+        document.getElementById('modalTodayAchievements').textContent = '0 个';
+        
+        // 更新分类计数
+        const categories = {
+            all: 0,
+            pomodoro: 0,
+            studyTime: 0,
+            streak: 0,
+            special: 0,
+            daily: 0
+        };
+        
+        Object.values(this.achievements).forEach(achievement => {
+            if (achievement.unlocked) {
+                categories.all++;
+                categories[achievement.category]++;
+            }
+        });
+        
+        document.getElementById('modalCountAll').textContent = categories.all;
+        document.getElementById('modalCountPomodoro').textContent = categories.pomodoro;
+        document.getElementById('modalCountStudyTime').textContent = categories.studyTime;
+        document.getElementById('modalCountStreak').textContent = categories.streak;
+        document.getElementById('modalCountSpecial').textContent = categories.special + categories.daily;
+        
+        // 渲染成就卡片
+        this.filterAchievements('all');
+    }
+    
+    // 筛选成就
+    filterAchievements(category) {
+        const grid = document.getElementById('modalAchievementsGrid');
+        const achievements = Object.values(this.achievements);
+        
+        const filtered = category === 'all' 
+            ? achievements 
+            : achievements.filter(a => a.category === category || (category === 'special' && a.category === 'daily'));
+        
+        grid.innerHTML = filtered.map((achievement, index) => {
+            const isUnlocked = achievement.unlocked;
+            const progress = this.getAchievementProgress(achievement);
+            const progressPercent = Math.min((progress / achievement.requirement) * 100, 100);
+            
+            return `
+                <div class="modal-achievement-card ${isUnlocked ? 'unlocked' : 'locked'}" 
+                     style="animation-delay: ${Math.min(index * 0.05, 2)}s;">
+                    <div class="modal-achievement-icon">${achievement.icon}</div>
+                    <div class="modal-achievement-info">
+                        <div class="modal-achievement-name">${achievement.name}</div>
+                        <div class="modal-achievement-desc">${achievement.description}</div>
+                        ${!isUnlocked ? `
+                            <div class="modal-achievement-progress">
+                                <div class="modal-achievement-progress-bar">
+                                    <div class="modal-achievement-progress-fill" style="width: ${progressPercent}%"></div>
+                                </div>
+                                <div class="modal-achievement-progress-text">${progress} / ${achievement.requirement}</div>
+                            </div>
+                        ` : '<div class="modal-achievement-unlocked">✓ 已解锁</div>'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // 获取成就进度
+    getAchievementProgress(achievement) {
+        switch (achievement.category) {
+            case 'pomodoro':
+                return this.data.totalPomodoros;
+            case 'studyTime':
+                return this.data.totalStudyTime;
+            case 'streak':
+                return this.data.currentStreak;
+            case 'daily':
+                return this.data.todayStudyTime;
+            case 'special':
+                if (achievement.id === 'perfectWeek') {
+                    return this.data.weekStudyDays.length;
+                }
+                return 0;
+            default:
+                return 0;
+        }
+    }
+    
+    // 隐藏成就模态框
+    hideAchievementModal() {
+        const modal = document.getElementById('achievementModal');
+        if (!modal) return;
+        
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
     }
 }

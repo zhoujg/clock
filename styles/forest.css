@@ -1,0 +1,887 @@
+/* 森林系统样式 */
+.forest-container {
+    position: fixed;
+    top: 20px;
+    left: 140px;
+    z-index: 1000;
+}
+
+.forest-toggle {
+    width: 50px;
+    height: 50px;
+    background: rgba(76, 175, 80, 0.15);
+    border: 2px solid rgba(76, 175, 80, 0.3);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.forest-toggle:hover {
+    background: rgba(76, 175, 80, 0.25);
+    border-color: rgba(76, 175, 80, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.forest-toggle.active {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.6);
+}
+
+.forest-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* 森林面板 */
+.forest-panel {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 380px;
+    max-height: 600px;
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.forest-panel.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.forest-panel .panel-content {
+    padding: 15px;
+    overflow-y: auto;
+    max-height: 530px;
+}
+
+/* 统计数据 */
+.forest-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.2);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+/* 当前成长的树 */
+.current-tree {
+    background: rgba(76, 175, 80, 0.1);
+    border: 2px solid rgba(76, 175, 80, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.current-tree-header {
+    font-size: 14px;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.tree-growing {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.tree-icon {
+    font-size: 48px;
+    animation: treeGrow 2s ease-in-out infinite;
+}
+
+@keyframes treeGrow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.tree-info {
+    flex: 1;
+}
+
+.tree-type {
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.tree-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.tree-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.tree-time {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tree-tip {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    padding: 8px;
+    background: rgba(76, 175, 80, 0.05);
+    border-radius: 6px;
+}
+
+/* 查看森林按钮 */
+.forest-view-section {
+    margin-bottom: 20px;
+}
+
+.forest-view-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.forest-view-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.forest-view-btn:active {
+    transform: translateY(0);
+}
+
+/* 最近种植 */
+.recent-trees-header {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+}
+
+.recent-trees-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.no-trees {
+    text-align: center;
+    padding: 30px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+}
+
+.tree-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.tree-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.tree-item.dead {
+    opacity: 0.6;
+}
+
+.tree-item-icon {
+    font-size: 32px;
+}
+
+.tree-item-info {
+    flex: 1;
+}
+
+.tree-item-name {
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 3px;
+}
+
+.tree-item-time {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.tree-item-status {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.tree-item-status.completed {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+}
+
+.tree-item-status.dead {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+}
+
+/* 森林通知 */
+.forest-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(30, 30, 30, 0.95);
+    border-radius: 15px;
+    padding: 25px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.forest-notification.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.forest-notification.success {
+    border: 2px solid rgba(76, 175, 80, 0.5);
+}
+
+.forest-notification.failed {
+    border: 2px solid rgba(244, 67, 54, 0.5);
+}
+
+.forest-notification .notification-icon {
+    font-size: 48px;
+}
+
+.forest-notification .notification-text {
+    flex: 1;
+}
+
+.notification-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.notification-desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .forest-container {
+        left: 80px;
+    }
+    
+    .forest-panel {
+        width: 320px;
+        max-height: 500px;
+    }
+    
+    .forest-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* 首页成长树苗显示 */
+.growing-tree-display {
+    position: fixed;
+    bottom: 8%;
+    right: 5%;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.growing-tree-display.show {
+    opacity: 1;
+}
+
+.tree-growing-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.tree-icon-large {
+    font-size: 80px;
+    animation: treeGrowPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 4px 10px rgba(76, 175, 80, 0.3));
+    transition: font-size 0.5s ease, transform 0.3s ease;
+}
+
+@keyframes treeGrowPulse {
+    0%, 100% { 
+        transform: scale(1) rotate(-2deg);
+    }
+    50% { 
+        transform: scale(1.08) rotate(2deg);
+    }
+}
+
+.tree-growth-info {
+    text-align: center;
+    min-width: 120px;
+}
+
+.tree-type-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tree-progress-mini {
+    width: 120px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.tree-progress-mini-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
+    border-radius: 5px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    animation: progressGlow 2s ease-in-out infinite;
+}
+
+@keyframes progressGlow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.9);
+    }
+}
+
+/* 树苗成长阶段 */
+.tree-icon-large.stage-seed {
+    font-size: 60px;
+}
+
+.tree-icon-large.stage-sprout {
+    font-size: 70px;
+}
+
+.tree-icon-large.stage-young {
+    font-size: 80px;
+}
+
+.tree-icon-large.stage-mature {
+    font-size: 90px;
+}
+
+.tree-icon-large.stage-full {
+    font-size: 100px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1400px) {
+    .growing-tree-display {
+        right: 3%;
+    }
+}
+
+@media (max-width: 1200px) {
+    .growing-tree-display {
+        right: 2%;
+    }
+    
+    .tree-icon-large {
+        font-size: 70px;
+    }
+    
+    .tree-icon-large.stage-full {
+        font-size: 85px;
+    }
+}
+
+@media (max-width: 768px) {
+    .growing-tree-display {
+        bottom: 5%;
+        right: 3%;
+    }
+    
+    .tree-growing-animation {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .tree-icon-large {
+        font-size: 50px;
+    }
+    
+    .tree-icon-large.stage-full {
+        font-size: 60px;
+    }
+    
+    .tree-progress-mini {
+        width: 100px;
+    }
+}
+
+/* 完成动画 */
+@keyframes treeCompleteAnimation {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.3) rotate(-10deg);
+    }
+    50% {
+        transform: scale(1.5) rotate(10deg);
+    }
+    75% {
+        transform: scale(1.3) rotate(-5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+.tree-icon-large.complete {
+    animation: treeCompleteAnimation 1s ease-in-out;
+}
+
+/* 枯萎动画 */
+@keyframes treeWitherAnimation {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.8) rotate(20deg);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(0.6) rotate(45deg);
+        opacity: 0.3;
+        filter: grayscale(1);
+    }
+}
+
+.tree-icon-large.wither {
+    animation: treeWitherAnimation 0.8s ease-in-out forwards;
+}
+
+
+/* ===== 森林模态框样式 ===== */
+
+.forest-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.forest-modal.show {
+    opacity: 1;
+}
+
+.forest-modal-content {
+    background: linear-gradient(135deg, #1a4d2e 0%, #0d2818 100%);
+    border-radius: 20px;
+    max-width: 1200px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.forest-modal.show .forest-modal-content {
+    transform: scale(1);
+}
+
+/* 滚动条样式 */
+.forest-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.forest-modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.forest-modal-content::-webkit-scrollbar-thumb {
+    background: rgba(76, 175, 80, 0.5);
+    border-radius: 4px;
+}
+
+.forest-modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(76, 175, 80, 0.7);
+}
+
+/* 模态框头部 */
+.forest-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.forest-modal-title {
+    font-size: 36px;
+    margin: 0;
+    background: linear-gradient(135deg, #4CAF50, #8BC34A);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.title-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 4px rgba(76, 175, 80, 0.5));
+}
+
+.forest-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    padding: 0;
+}
+
+.forest-modal-close:hover {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: rgba(244, 67, 54, 0.5);
+    transform: rotate(90deg);
+}
+
+.forest-modal-subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* 统计卡片 */
+.forest-modal-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.modal-stat-card {
+    background: rgba(76, 175, 80, 0.15);
+    border: 2px solid rgba(76, 175, 80, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.modal-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+.modal-stat-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 10px;
+}
+
+.modal-stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+/* 森林网格 */
+.forest-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 20px;
+}
+
+.modal-tree-card {
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-tree-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(76, 175, 80, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-tree-card:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+.modal-tree-card:hover::before {
+    opacity: 1;
+}
+
+.modal-tree-card.healthy {
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+.modal-tree-card.dead {
+    opacity: 0.5;
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+.modal-tree-card.dead:hover {
+    box-shadow: 0 10px 30px rgba(244, 67, 54, 0.2);
+}
+
+.modal-tree-emoji {
+    font-size: 48px;
+    margin-bottom: 10px;
+    animation: sway 3s ease-in-out infinite;
+}
+
+.modal-tree-card.dead .modal-tree-emoji {
+    animation: none;
+    filter: grayscale(0.8);
+}
+
+.modal-tree-name {
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.modal-tree-date {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+}
+
+/* 空森林提示 */
+.forest-modal-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.forest-modal-empty .empty-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.forest-modal-empty h2 {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.forest-modal-empty p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .forest-modal-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .forest-modal-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .forest-modal-content {
+        padding: 20px;
+        max-height: 95vh;
+    }
+    
+    .forest-modal-title {
+        font-size: 24px;
+    }
+    
+    .title-icon {
+        font-size: 24px;
+    }
+    
+    .forest-modal-stats {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .forest-modal-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+    }
+    
+    .modal-tree-emoji {
+        font-size: 36px;
+    }
+    
+    .modal-tree-name {
+        font-size: 11px;
+    }
+}

@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="styles/bgmPlayer.css" />
     <link rel="stylesheet" href="styles/pomodoro.css" />
     <link rel="stylesheet" href="styles/achievement.css" />
+    <link rel="stylesheet" href="styles/forest.css" />
 </head>
 <body>
     <!-- 控制面板 -->
@@ -156,6 +157,19 @@
             <span data-key="seconds" data-transform="pad(00)" data-view="flip"></span>
         </div>
     </div>
+    
+    <!-- 成长中的树苗显示 -->
+    <div class="growing-tree-display" id="growingTreeDisplay" style="display: none;">
+        <div class="tree-growing-animation">
+            <div class="tree-icon-large" id="treeIconLarge">🌱</div>
+            <div class="tree-growth-info">
+                <div class="tree-type-name" id="treeTypeName">小树苗</div>
+                <div class="tree-progress-mini">
+                    <div class="tree-progress-mini-fill" id="treeProgressMiniFill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 励志语显示区域 -->
     <div class="quote-container">
@@ -195,6 +209,7 @@
     <script src="scripts/tickSound.js"></script>
     <script src="scripts/bgmPlayer.js"></script>
     <script src="scripts/achievement.js"></script>
+    <script src="scripts/forest.js"></script>
     <script src="scripts/pomodoro.js"></script>
     <script src="scripts/app.js"></script>
 </body>
