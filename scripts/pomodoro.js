@@ -1,6 +1,6 @@
 // 番茄钟管理器
 class PomodoroTimer {
-    constructor(clockManager) {
+    constructor(clockManager, achievementSystem) {
         // 默认时间设置（分钟）
         this.workDuration = 25;
         this.shortBreakDuration = 5;
@@ -15,6 +15,9 @@ class PomodoroTimer {
         
         // 时钟管理器引用
         this.clockManager = clockManager;
+        
+        // 成就系统引用
+        this.achievementSystem = achievementSystem;
         
         // DOM 元素
         this.container = null;
@@ -328,6 +331,11 @@ class PomodoroTimer {
         if (this.currentMode === 'work') {
             this.completedSessions++;
             this.sessionCount.textContent = this.completedSessions;
+            
+            // 触发成就系统
+            if (this.achievementSystem) {
+                this.achievementSystem.onPomodoroComplete(this.workDuration);
+            }
             
             // 每完成4个工作周期后，进入长休息
             if (this.completedSessions % 4 === 0) {

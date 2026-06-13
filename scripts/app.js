@@ -84,7 +84,8 @@ class App {
         this.animationManager = new AnimationManager('animationCanvas');
         this.quoteManager = new QuoteManager();
         this.tickSoundManager = new TickSoundManager();
-        this.pomodoroTimer = new PomodoroTimer(clockManager);
+        this.achievementSystem = new AchievementSystem();
+        this.pomodoroTimer = new PomodoroTimer(clockManager, this.achievementSystem);
         
         // 设置时钟管理器的滴答声引用
         clockManager.setTickSoundManager(this.tickSoundManager);
