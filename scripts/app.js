@@ -159,9 +159,22 @@ class App {
             e.stopPropagation();
             settingsToggle.classList.toggle('active');
             settingsPanel.classList.toggle('active');
-            // 关闭音乐面板
+            // 关闭其他面板
             musicPanel.classList.remove('active');
             musicBtn.classList.remove('active');
+            // 关闭番茄钟面板
+            const pomodoroPanel = document.getElementById('pomodoroPanel');
+            if (pomodoroPanel) {
+                pomodoroPanel.classList.remove('active');
+            }
+        });
+
+        // 设置面板关闭按钮
+        const settingsPanelCloseBtn = document.getElementById('settingsPanelCloseBtn');
+        settingsPanelCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsPanel.classList.remove('active');
+            settingsToggle.classList.remove('active');
         });
 
         // 音乐按钮切换
@@ -169,9 +182,14 @@ class App {
             e.stopPropagation();
             musicBtn.classList.toggle('active');
             musicPanel.classList.toggle('active');
-            // 关闭设置面板
+            // 关闭其他面板
             settingsPanel.classList.remove('active');
             settingsToggle.classList.remove('active');
+            // 关闭番茄钟面板
+            const pomodoroPanel = document.getElementById('pomodoroPanel');
+            if (pomodoroPanel) {
+                pomodoroPanel.classList.remove('active');
+            }
             // 渲染音乐列表到面板
             this.renderMusicPanelList();
             // 更新控制按钮状态

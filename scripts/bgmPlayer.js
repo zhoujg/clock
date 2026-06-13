@@ -147,28 +147,7 @@ class BGMPlayerManager {
     
     // 加载音乐列表
     async loadMusicList() {
-        try {
-            // 方法1: 尝试从 music-list.json 加载（自动生成的索引文件）
-            const response = await fetch('assets/bgm/music-list.json').catch(e => {
-                console.log('Fetch failed (可能是 CORS 问题):', e.message);
-                return { ok: false };
-            });
-            if (response.ok) {
-                const data = await response.json();
-                if (data.music && Array.isArray(data.music) && data.music.length > 0) {
-                    this.musicList = data.music.map(file => ({
-                        name: this.extractMusicName(file),
-                        file: `assets/bgm/${file}`
-                    }));
-                    this.renderMusicList();
-                    return;
-                }
-            }
-        } catch (error) {
-            console.log('无法加载 music-list.json，使用默认音乐列表:', error.message);
-        }
-
-        // 方法2: 检查是否在 Capacitor 环境（Android/iOS 应用）
+        // 方法1: 检查是否在 Capacitor 环境（Android/iOS 应用）
         if (window.Capacitor) {
             try {
                 await this.loadMusicFromCapacitor();
@@ -182,7 +161,19 @@ class BGMPlayerManager {
             }
         }
 
-        // 方法3: 使用默认音乐列表（适用于 file:// 协议）
+        // 方法2: 在 Web 环境中尝试探测音乐文件
+        try {
+            await this.probeMusicFiles();
+            if (this.musicList.length > 0) {
+                console.log('通过文件探测加载了', this.musicList.length, '首音乐');
+                this.renderMusicList();
+                return;
+            }
+        } catch (error) {
+            console.log('文件探测失败:', error.message);
+        }
+
+        // 方法3: 使用已知存在的默认音乐列表
         this.useDefaultMusicList();
         
         if (this.musicList.length === 0) {
@@ -240,18 +231,22 @@ class BGMPlayerManager {
             });
 
             const musicExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'];
-            const musicFiles = result.files.filter(file => {
-                const ext = file.name.toLowerCase().match(/\.[^.]+$/);
-                return ext && musicExtensions.includes(ext[0]);
-            });
+            const musicFiles = result.files
+                .filter(file => {
+                    const ext = file.name.toLowerCase().match(/\.[^.]+$/);
+                    return ext && musicExtensions.includes(ext[0]);
+                })
+                .map(file => file.name || file); // 兼容不同的返回格式
 
-            this.musicList = musicFiles.map(file => ({
-                name: this.extractMusicName(file.name),
-                file: `assets/bgm/${file.name}`
+            this.musicList = musicFiles.map(filename => ({
+                name: this.extractMusicName(filename),
+                file: `assets/bgm/${filename}`
             }));
 
             // 按名称排序
             this.musicList.sort((a, b) => a.name.localeCompare(b.name));
+            
+            console.log('从 Capacitor 加载的音乐文件:', musicFiles);
         } catch (error) {
             console.error('Capacitor 文件读取失败:', error);
         }
@@ -259,20 +254,48 @@ class BGMPlayerManager {
 
     // 探测音乐文件（尝试加载可能存在的文件）
     async probeMusicFiles() {
-        // 常见的音乐文件名模式
+        // 先尝试读取 assets/bgm 目录下的所有文件
+        // 这里我们使用一个技巧：尝试读取目录的 index 页面（如果服务器支持目录列表）
+        // 或者使用已知的文件列表
+        
+        const knownFiles = [
+            'The Mass.mp3',
+            'Victory.mp3'
+        ];
+        
+        // 常见的音乐文件名模式（作为补充）
         const commonPatterns = [
             'music1', 'music2', 'music3', 'music4', 'music5',
+            'music6', 'music7', 'music8', 'music9', 'music10',
             'bgm1', 'bgm2', 'bgm3', 'bgm4', 'bgm5',
             'track1', 'track2', 'track3', 'track4', 'track5',
             'ambient', 'chill', 'focus', 'relax', 'calm',
             'piano', 'nature', 'rain', 'ocean', 'forest',
-            'lofi', 'jazz', 'classical', 'meditation'
+            'lofi', 'jazz', 'classical', 'meditation', 'study',
+            'work', 'sleep', 'morning', 'evening', 'night'
         ];
         
-        const extensions = ['mp3', 'wav', 'ogg', 'm4a'];
+        const extensions = ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac'];
         
         const probePromises = [];
         
+        // 首先检查已知存在的文件
+        for (const filename of knownFiles) {
+            const filepath = `assets/bgm/${filename}`;
+            probePromises.push(
+                this.checkFileExists(filepath).then(exists => {
+                    if (exists) {
+                        return {
+                            name: this.extractMusicName(filename),
+                            file: filepath
+                        };
+                    }
+                    return null;
+                })
+            );
+        }
+        
+        // 然后探测常见模式的文件
         for (const pattern of commonPatterns) {
             for (const ext of extensions) {
                 const filename = `${pattern}.${ext}`;
@@ -293,10 +316,20 @@ class BGMPlayerManager {
         }
         
         const results = await Promise.all(probePromises);
-        this.musicList = results.filter(item => item !== null);
+        const foundFiles = results.filter(item => item !== null);
+        
+        // 去重（因为已知文件可能也在常见模式中）
+        const uniqueFiles = new Map();
+        foundFiles.forEach(file => {
+            uniqueFiles.set(file.file, file);
+        });
+        
+        this.musicList = Array.from(uniqueFiles.values());
         
         // 按名称排序
         this.musicList.sort((a, b) => a.name.localeCompare(b.name));
+        
+        console.log('通过文件探测找到的音乐:', this.musicList.map(m => m.file));
     }
 
     // 检查文件是否存在

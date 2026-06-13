@@ -51,10 +51,15 @@ class PomodoroTimer {
                 <span class="pomodoro-status-indicator" id="statusIndicator"></span>
             </div>
             <div class="pomodoro-panel" id="pomodoroPanel">
-                <div class="pomodoro-header">
-                    <span class="pomodoro-title">🍅 番茄钟</span>
-                    <button class="pomodoro-close" id="pomodoroClose">×</button>
+                <div class="panel-header">
+                    <span>🍅 番茄钟</span>
+                    <button class="panel-close-btn" id="pomodoroClose" title="关闭">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
                 </div>
+                <div class="panel-content">
                 <div class="pomodoro-modes">
                     <button class="mode-btn active" data-mode="work">
                         <span>工作</span>
@@ -103,6 +108,7 @@ class PomodoroTimer {
                     <span id="sessionCount">0</span>
                     <span> 个番茄</span>
                 </div>
+                </div>
             </div>
         `;
         
@@ -131,6 +137,25 @@ class PomodoroTimer {
             e.preventDefault();
             this.toggle.classList.toggle('active');
             panel.classList.toggle('active');
+            
+            // 关闭其他面板
+            const settingsPanel = document.getElementById('settingsPanel');
+            const settingsToggle = document.getElementById('settingsToggle');
+            const musicPanel = document.getElementById('musicPanel');
+            const musicBtn = document.getElementById('musicBtn');
+            
+            if (settingsPanel) {
+                settingsPanel.classList.remove('active');
+            }
+            if (settingsToggle) {
+                settingsToggle.classList.remove('active');
+            }
+            if (musicPanel) {
+                musicPanel.classList.remove('active');
+            }
+            if (musicBtn) {
+                musicBtn.classList.remove('active');
+            }
         });
         
         close.addEventListener('click', (e) => {

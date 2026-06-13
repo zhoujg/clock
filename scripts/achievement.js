@@ -211,38 +211,34 @@ class AchievementSystem {
     
     // 创建UI
     createUI() {
-        this.container = document.createElement('div');
-        this.container.className = 'achievement-container';
-        this.container.innerHTML = `
-            <div class="achievement-toggle" id="achievementToggle" title="学习成就">
-                🏆
-                <span class="achievement-badge" id="achievementBadge">0</span>
-            </div>
-            
-            <!-- 成就通知 -->
-            <div class="achievement-notification" id="achievementNotification">
-                <div class="notification-content">
-                    <div class="notification-icon" id="notificationIcon">🏆</div>
-                    <div class="notification-text">
-                        <div class="notification-title">成就解锁！</div>
-                        <div class="notification-desc" id="notificationDesc"></div>
-                    </div>
+        // 创建成就通知（按钮已在 HTML 中）
+        const notification = document.createElement('div');
+        notification.className = 'achievement-notification';
+        notification.id = 'achievementNotification';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <div class="notification-icon" id="notificationIcon">🏆</div>
+                <div class="notification-text">
+                    <div class="notification-title">成就解锁！</div>
+                    <div class="notification-desc" id="notificationDesc"></div>
                 </div>
             </div>
         `;
         
-        document.body.appendChild(this.container);
+        document.body.appendChild(notification);
     }
     
     // 绑定事件
     bindEvents() {
         const toggle = document.getElementById('achievementToggle');
         
-        // 点击跳转到成就页面
-        toggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            window.location.href = 'achievement.html';
-        });
+        if (toggle) {
+            // 点击跳转到成就页面
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.location.href = 'achievement.html';
+            });
+        }
     }
     
     // 加载数据

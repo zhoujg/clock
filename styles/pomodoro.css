@@ -2,7 +2,7 @@
 .pomodoro-container {
     position: fixed;
     top: 20px;
-    right: 130px;
+    right: 170px;
     z-index: 1000;
 }
 
@@ -73,12 +73,12 @@
     backdrop-filter: blur(20px);
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px) scale(0.95);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
 }
 
 .pomodoro-panel.active {
@@ -87,41 +87,13 @@
     transform: translateY(0) scale(1);
 }
 
-.pomodoro-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.pomodoro-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-}
-
-.pomodoro-close {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.pomodoro-close:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.9);
-}
+/* 番茄钟面板中的panel-header样式已由controls.css统一定义 */
 
 /* 自定义时长区域 */
+.pomodoro-panel .panel-content {
+    padding: 20px;
+}
+
 .pomodoro-custom {
     margin-bottom: 15px;
 }
@@ -309,21 +281,24 @@
 @media (max-width: 768px) {
     .pomodoro-container {
         top: 15px;
-        right: 75px;
+        right: 150px;
     }
     
     .pomodoro-toggle {
-        width: 50px !important;
-        height: 50px !important;
-        min-width: 50px;
-        min-height: 50px;
-        max-width: 50px;
-        max-height: 50px;
-        font-size: 26px;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px;
+        min-height: 40px;
+        max-width: 40px;
+        max-height: 40px;
+        font-size: 20px;
     }
     
     .pomodoro-panel {
         width: 240px;
+    }
+    
+    .pomodoro-panel .panel-content {
         padding: 14px;
     }
     
@@ -333,24 +308,35 @@
     }
 }
 
+/* 平板纵屏优化 (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .pomodoro-container {
+        top: 15px;
+        right: 170px;
+    }
+}
+
 @media (max-width: 480px) {
     .pomodoro-container {
         top: 15px;
-        right: 75px;
+        right: 160px;
     }
     
     .pomodoro-toggle {
-        width: 50px !important;
-        height: 50px !important;
-        min-width: 50px;
-        min-height: 50px;
-        max-width: 50px;
-        max-height: 50px;
-        font-size: 26px;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px;
+        min-height: 40px;
+        max-width: 40px;
+        max-height: 40px;
+        font-size: 20px;
     }
     
     .pomodoro-panel {
         width: 220px;
+    }
+    
+    .pomodoro-panel .panel-content {
         padding: 12px;
     }
 }
@@ -359,7 +345,7 @@
 @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
     .pomodoro-container {
         top: 8px;
-        right: 105px;
+        right: 145px;
     }
     
     .pomodoro-toggle {
@@ -374,25 +360,16 @@
     
     .pomodoro-panel {
         width: 220px;
-        padding: 10px;
         top: 45px;
         max-height: calc(100vh - 60px);
         overflow-y: auto;
     }
     
-    .pomodoro-header {
-        margin-bottom: 10px;
+    .pomodoro-panel .panel-content {
+        padding: 10px;
     }
     
-    .pomodoro-title {
-        font-size: 13px;
-    }
-    
-    .pomodoro-close {
-        width: 24px;
-        height: 24px;
-        font-size: 16px;
-    }
+
     
     .pomodoro-custom {
         margin-bottom: 10px;
@@ -460,7 +437,7 @@
 @media (max-width: 700px) and (max-height: 400px) and (orientation: landscape) {
     .pomodoro-container {
         top: 6px;
-        right: 92px;
+        right: 128px;
     }
     
     .pomodoro-toggle {
@@ -475,25 +452,16 @@
     
     .pomodoro-panel {
         width: 200px;
-        padding: 8px;
         top: 40px;
         max-height: calc(100vh - 50px);
         overflow-y: auto;
     }
     
-    .pomodoro-header {
-        margin-bottom: 8px;
+    .pomodoro-panel .panel-content {
+        padding: 8px;
     }
     
-    .pomodoro-title {
-        font-size: 12px;
-    }
-    
-    .pomodoro-close {
-        width: 22px;
-        height: 22px;
-        font-size: 14px;
-    }
+
     
     .pomodoro-custom {
         margin-bottom: 8px;
