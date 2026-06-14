@@ -205,8 +205,85 @@ class AchievementSystem {
                 requirement: 240,
                 category: 'special',
                 unlocked: false
+            },
+            
+            // 每日三个故事成就
+            firstStory: {
+                id: 'firstStory',
+                name: '故事开端',
+                description: '完成第一个每日故事',
+                icon: '📖',
+                requirement: 1,
+                category: 'stories',
+                unlocked: false
+            },
+            perfectDay: {
+                id: 'perfectDay',
+                name: '完美一天',
+                description: '完成当天所有三个故事',
+                icon: '🎯',
+                requirement: 1,
+                category: 'stories',
+                unlocked: false
+            },
+            storyWeek: {
+                id: 'storyWeek',
+                name: '故事之周',
+                description: '连续7天完成所有三个故事',
+                icon: '📚',
+                requirement: 7,
+                category: 'stories',
+                unlocked: false
+            },
+            storyMaster: {
+                id: 'storyMaster',
+                name: '故事大师',
+                description: '累计完成30个故事',
+                icon: '🏆',
+                requirement: 30,
+                category: 'stories',
+                unlocked: false
+            },
+            storyLegend: {
+                id: 'storyLegend',
+                name: '故事传奇',
+                description: '累计完成100个故事',
+                icon: '👑',
+                requirement: 100,
+                category: 'stories',
+                unlocked: false
             }
         };
+    }
+    
+    // 检查每日三个故事成就（由 DailyStories 系统调用）
+    checkStoriesAchievements(stats) {
+        const { todayCompleted, perfectDays, totalStories } = stats;
+        
+        // 检查"故事开端"
+        if (totalStories >= 1 && !this.achievements.firstStory.unlocked) {
+            this.unlockAchievement(this.achievements.firstStory);
+        }
+        
+        // 检查"完美一天"
+        if (todayCompleted === 3 && !this.achievements.perfectDay.unlocked) {
+            this.unlockAchievement(this.achievements.perfectDay);
+        }
+        
+        // 检查"故事之周"
+        if (perfectDays >= 7 && !this.achievements.storyWeek.unlocked) {
+            this.unlockAchievement(this.achievements.storyWeek);
+        }
+        
+        // 检查"故事大师"
+        if (totalStories >= 30 && !this.achievements.storyMaster.unlocked) {
+            this.unlockAchievement(this.achievements.storyMaster);
+        }
+        
+        // 检查"故事传奇"
+        if (totalStories >= 100 && !this.achievements.storyLegend.unlocked) {
+            this.unlockAchievement(this.achievements.storyLegend);
+        }
     }
     
     // 创建UI
@@ -657,6 +734,11 @@ class AchievementSystem {
                         <span class="modal-nav-text">连续</span>
                         <span class="modal-nav-count" id="modalCountStreak">0</span>
                     </button>
+                    <button class="modal-nav-btn" data-category="stories">
+                        <span class="modal-nav-icon">📖</span>
+                        <span class="modal-nav-text">故事</span>
+                        <span class="modal-nav-count" id="modalCountStories">0</span>
+                    </button>
                     <button class="modal-nav-btn" data-category="special">
                         <span class="modal-nav-icon">⭐</span>
                         <span class="modal-nav-text">特殊</span>
@@ -731,6 +813,7 @@ class AchievementSystem {
             pomodoro: 0,
             studyTime: 0,
             streak: 0,
+            stories: 0,
             special: 0,
             daily: 0
         };
@@ -746,6 +829,7 @@ class AchievementSystem {
         document.getElementById('modalCountPomodoro').textContent = categories.pomodoro;
         document.getElementById('modalCountStudyTime').textContent = categories.studyTime;
         document.getElementById('modalCountStreak').textContent = categories.streak;
+        document.getElementById('modalCountStories').textContent = categories.stories;
         document.getElementById('modalCountSpecial').textContent = categories.special + categories.daily;
         
         // 渲染成就卡片

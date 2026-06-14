@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 集成测试</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .test-section h2 {
+            margin-top: 0;
+            color: #ffd700;
+            border-bottom: 2px solid rgba(255,215,0,0.3);
+            padding-bottom: 10px;
+        }
+        
+        .test-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 8px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .test-button.main {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            font-size: 1.1em;
+            padding: 15px 30px;
+        }
+        
+        .result {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.4);
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .warning { color: #fbbf24; }
+        .info { color: #60a5fa; }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .status-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .status-item.success { border-color: #4ade80; }
+        .status-item.error { border-color: #f87171; }
+        .status-item.warning { border-color: #fbbf24; }
+        
+        .instructions {
+            background: rgba(255,215,0,0.1);
+            border: 2px solid rgba(255,215,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding: 8px 0;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← 返回主页</a>
+    
+    <div class="container">
+        <h1>🧪 Phase 2 集成测试</h1>
+        
+        <div class="test-section">
+            <h2>🔍 系统状态检查</h2>
+            <button class="test-button main" onclick="runFullCheck()">运行完整检查</button>
+            <div class="status-grid" id="statusGrid"></div>
+            <div id="checkResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎯 故事系统测试</h2>
+            <button class="test-button" onclick="testStoriesPanel()">测试故事面板</button>
+            <button class="test-button" onclick="testStoryCreation()">创建测试故事</button>
+            <div id="storiesResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🍅 番茄钟系统测试</h2>
+            <button class="test-button" onclick="testPomodoroPanel()">测试番茄钟面板</button>
+            <button class="test-button" onclick="testPomodoroTimer()">测试计时器</button>
+            <div id="pomodoroResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔗 集成功能测试</h2>
+            <button class="test-button" onclick="testLinkFunction()">测试关联功能</button>
+            <button class="test-button" onclick="testDataUpdate()">测试数据更新</button>
+            <button class="test-button" onclick="simulateWorkflow()">模拟完整流程</button>
+            <div id="integrationResult" class="result"></div>
+        </div>
+        
+        <div class="instructions">
+            <h3>💡 使用说明</h3>
+            <div class="step">1. 首先运行"运行完整检查"查看系统状态</div>
+            <div class="step">2. 如果发现问题，查看控制台的详细错误信息</div>
+            <div class="step">3. 测试各个模块的功能</div>
+            <div class="step">4. 最后运行"模拟完整流程"验证集成</div>
+            <div class="step">5. 如果测试通过，返回主页正常使用</div>
+        </div>
+    </div>
+
+    <script>
+        // 检查主窗口系统（如果是在新窗口打开）
+        let mainApp, mainStories;
+        
+        if (window.opener && !window.opener.closed) {
+            mainApp = window.opener.app;
+            mainStories = window.opener.dailyStoriesManager;
+            console.log('🔍 检测到主窗口，使用主窗口的系统');
+        } else if (window.app && window.dailyStoriesManager) {
+            mainApp = window.app;
+            mainStories = window.dailyStoriesManager;
+            console.log('🔍 使用当前窗口的系统');
+        }
+        
+        function log(message, type = 'info') {
+            console.log(message);
+            return `<span class="${type}">${message}</span>\n`;
+        }
+        
+        function updateResult(elementId, content) {
+            document.getElementById(elementId).innerHTML = content;
+        }
+        
+        function updateStatus(id, title, status, type) {
+            const statusGrid = document.getElementById('statusGrid');
+            let statusItem = document.getElementById(id);
+            
+            if (!statusItem) {
+                statusItem = document.createElement('div');
+                statusItem.id = id;
+                statusItem.className = 'status-item';
+                statusGrid.appendChild(statusItem);
+            }
+            
+            statusItem.className = `status-item ${type}`;
+            statusItem.innerHTML = `
+                <div style="font-size: 2em; margin-bottom: 5px;">
+                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️'}
+                </div>
+                <div style="font-weight: bold;">${title}</div>
+                <div style="font-size: 0.9em; opacity: 0.8;">${status}</div>
+            `;
+        }
+        
+        function runFullCheck() {
+            let result = log('🔧 开始系统检查...\n', 'info');
+            
+            // 检查主要系统
+            const appExists = !!(mainApp || window.app);
+            const storiesExists = !!(mainStories || window.dailyStoriesManager);
+            
+            result += log(`App系统: ${appExists ? '✅ 存在' : '❌ 不存在'}`, appExists ? 'success' : 'error');
+            result += log(`Stories系统: ${storiesExists ? '✅ 存在' : '❌ 不存在'}`, storiesExists ? 'success' : 'error');
+            
+            updateStatus('app', 'App系统', appExists ? '正常' : '缺失', appExists ? 'success' : 'error');
+            updateStatus('stories', '故事系统', storiesExists ? '正常' : '缺失', storiesExists ? 'success' : 'error');
+            
+            if (appExists) {
+                const app = mainApp || window.app;
+                const pomodoroExists = !!app.pomodoroTimer;
+                const achievementExists = !!app.achievementSystem;
+                const forestExists = !!app.forestSystem;
+                
+                result += log(`番茄钟系统: ${pomodoroExists ? '✅ 存在' : '❌ 不存在'}`, pomodoroExists ? 'success' : 'error');
+                result += log(`成就系统: ${achievementExists ? '✅ 存在' : '❌ 不存在'}`, achievementExists ? 'success' : 'error');
+                result += log(`森林系统: ${forestExists ? '✅ 存在' : '❌ 不存在'}`, forestExists ? 'success' : 'error');
+                
+                updateStatus('pomodoro', '番茄钟', pomodoroExists ? '正常' : '缺失', pomodoroExists ? 'success' : 'error');
+                updateStatus('achievement', '成就系统', achievementExists ? '正常' : '缺失', achievementExists ? 'success' : 'error');
+                updateStatus('forest', '森林系统', forestExists ? '正常' : '缺失', forestExists ? 'success' : 'error');
+            }
+            
+            // 检查DOM元素
+            const pomodoroToggle = document.getElementById('pomodoroToggle');
+            const pomodoroPanel = document.getElementById('pomodoroPanel');
+            const storiesToggle = document.getElementById('storiesToggle');
+            const storiesPanel = document.getElementById('storiesPanel');
+            
+            result += log(`\nDOM元素检查:`, 'info');
+            result += log(`番茄钟按钮: ${pomodoroToggle ? '✅ 存在' : '❌ 不存在'}`, pomodoroToggle ? 'success' : 'error');
+            result += log(`番茄钟面板: ${pomodoroPanel ? '✅ 存在' : '❌ 不存在'}`, pomodoroPanel ? 'success' : 'error');
+            result += log(`故事按钮: ${storiesToggle ? '✅ 存在' : '❌ 不存在'}`, storiesToggle ? 'success' : 'error');
+            result += log(`故事面板: ${storiesPanel ? '✅ 存在' : '❌ 不存在'}`, storiesPanel ? 'success' : 'error');
+            
+            // 检查系统引用
+            if (storiesExists && appExists) {
+                const stories = mainStories || window.dailyStoriesManager;
+                const app = mainApp || window.app;
+                
+                result += log(`\n系统引用检查:`, 'info');
+                
+                const pomodoroRef = app.pomodoroTimer.dailyStories === stories;
+                const storiesHasPomodoro = !!stories.pomodoroTimer;
+                const storiesHasAchievement = !!stories.achievementSystem;
+                const storiesHasForest = !!stories.forestSystem;
+                
+                result += log(`番茄钟→故事: ${pomodoroRef ? '✅ 已设置' : '❌ 未设置'}`, pomodoroRef ? 'success' : 'error');
+                result += log(`故事→番茄钟: ${storiesHasPomodoro ? '✅ 已设置' : '❌ 未设置'}`, storiesHasPomodoro ? 'success' : 'error');
+                result += log(`故事→成就: ${storiesHasAchievement ? '✅ 已设置' : '❌ 未设置'}`, storiesHasAchievement ? 'success' : 'error');
+                result += log(`故事→森林: ${storiesHasForest ? '✅ 已设置' : '❌ 未设置'}`, storiesHasForest ? 'success' : 'error');
+                
+                updateStatus('refs', '系统引用', 
+                    pomodoroRef && storiesHasPomodoro ? '完整' : '不完整',
+                    pomodoroRef && storiesHasPomodoro ? 'success' : 'warning');
+            }
+            
+            result += log(`\n✅ 检查完成！`, 'success');
+            updateResult('checkResult', result);
+        }
+        
+        function testStoriesPanel() {
+            let result = log('🎯 测试故事面板...\n', 'info');
+            
+            const toggle = document.getElementById('storiesToggle');
+            const panel = document.getElementById('storiesPanel');
+            
+            if (toggle && panel) {
+                result += log('✅ 故事面板元素存在', 'success');
+                
+                // 测试打开
+                toggle.click();
+                setTimeout(() => {
+                    const isOpen = panel.classList.contains('active');
+                    result += log(`点击测试: ${isOpen ? '✅ 面板已打开' : '❌ 面板未打开'}`, isOpen ? 'success' : 'error');
+                    updateResult('storiesResult', result);
+                }, 100);
+            } else {
+                result += log('❌ 故事面板元素缺失', 'error');
+                updateResult('storiesResult', result);
+            }
+        }
+        
+        function testStoryCreation() {
+            let result = log('📝 测试故事创建...\n', 'info');
+            
+            const stories = mainStories || window.dailyStoriesManager;
+            if (stories) {
+                // 创建测试故事
+                stories.stories[0].title = '测试任务';
+                stories.stories[0].story = '这是一个测试故事，用于验证系统功能';
+                stories.stories[0].value = '学习';
+                
+                stories.saveTodayStories();
+                stories.updateUI();
+                
+                result += log('✅ 测试故事已创建', 'success');
+                result += log(`   标题: ${stories.stories[0].title}`, 'info');
+                result += log(`   价值观: ${stories.stories[0].value}`, 'info');
+            } else {
+                result += log('❌ 故事系统不可用', 'error');
+            }
+            
+            updateResult('storiesResult', result);
+        }
+        
+        function testPomodoroPanel() {
+            let result = log('🍅 测试番茄钟面板...\n', 'info');
+            
+            const toggle = document.getElementById('pomodoroToggle');
+            const panel = document.getElementById('pomodoroPanel');
+            
+            if (toggle && panel) {
+                result += log('✅ 番茄钟面板元素存在', 'success');
+                
+                // 测试打开
+                toggle.click();
+                setTimeout(() => {
+                    const isOpen = panel.classList.contains('active');
+                    result += log(`点击测试: ${isOpen ? '✅ 面板已打开' : '❌ 面板未打开'}`, isOpen ? 'success' : 'error');
+                    updateResult('pomodoroResult', result);
+                }, 100);
+            } else {
+                result += log('❌ 番茄钟面板元素缺失', 'error');
+                updateResult('pomodoroResult', result);
+            }
+        }
+        
+        function testPomodoroTimer() {
+            let result = log('⏰ 测试番茄钟计时器...\n', 'info');
+            
+            const app = mainApp || window.app;
+            if (app && app.pomodoroTimer) {
+                const timer = app.pomodoroTimer;
+                
+                result += log('✅ 番茄钟对象存在', 'success');
+                result += log(`当前模式: ${timer.currentMode}`, 'info');
+                result += log(`是否运行: ${timer.isRunning ? '是' : '否'}`, timer.isRunning ? 'warning' : 'success');
+                result += log(`剩余时间: ${Math.floor(timer.timeRemaining / 60)}:${String(timer.timeRemaining % 60).padStart(2, '0')}`, 'info');
+                
+                // 检查关键方法
+                const hasStart = typeof timer.start === 'function';
+                const hasPause = typeof timer.pause === 'function';
+                const hasReset = typeof timer.reset === 'function';
+                
+                result += log(`start方法: ${hasStart ? '✅ 存在' : '❌ 缺失'}`, hasStart ? 'success' : 'error');
+                result += log(`pause方法: ${hasPause ? '✅ 存在' : '❌ 缺失'}`, hasPause ? 'success' : 'error');
+                result += log(`reset方法: ${hasReset ? '✅ 存在' : '❌ 缺失'}`, hasReset ? 'success' : 'error');
+            } else {
+                result += log('❌ 番茄钟对象不存在', 'error');
+            }
+            
+            updateResult('pomodoroResult', result);
+        }
+        
+        function testLinkFunction() {
+            let result = log('🔗 测试关联功能...\n', 'info');
+            
+            const stories = mainStories || window.dailyStoriesManager;
+            if (stories) {
+                // 检查方法存在
+                const hasLink = typeof stories.linkToPomodoro === 'function';
+                const hasCallback = typeof stories.onPomodoroComplete === 'function';
+                
+                result += log(`linkToPomodoro方法: ${hasLink ? '✅ 存在' : '❌ 缺失'}`, hasLink ? 'success' : 'error');
+                result += log(`onPomodoroComplete方法: ${hasCallback ? '✅ 存在' : '❌ 缺失'}`, hasCallback ? 'success' : 'error');
+                
+                // 测试关联
+                if (hasLink && stories.stories[0].title) {
+                    try {
+                        stories.linkToPomodoro(0);
+                        result += log('✅ 关联功能调用成功', 'success');
+                    } catch (error) {
+                        result += log(`❌ 关联功能调用失败: ${error.message}`, 'error');
+                    }
+                } else {
+                    result += log('⚠️ 需要先创建测试故事', 'warning');
+                }
+            } else {
+                result += log('❌ 故事系统不可用', 'error');
+            }
+            
+            updateResult('integrationResult', result);
+        }
+        
+        function testDataUpdate() {
+            let result = log('📊 测试数据更新...\n', 'info');
+            
+            const stories = mainStories || window.dailyStoriesManager;
+            if (stories && typeof stories.onPomodoroComplete === 'function') {
+                const story = stories.stories[0];
+                const initialCount = story.pomodoroCount || 0;
+                const initialTime = story.timeSpent || 0;
+                
+                result += log(`更新前 - 番茄钟: ${initialCount}个, 时间: ${initialTime}分钟`, 'info');
+                
+                // 模拟完成
+                stories.onPomodoroComplete(25);
+                
+                const newCount = story.pomodoroCount || 0;
+                const newTime = story.timeSpent || 0;
+                
+                result += log(`更新后 - 番茄钟: ${newCount}个, 时间: ${newTime}分钟`, 'info');
+                
+                const countIncreased = newCount > initialCount;
+                const timeIncreased = newTime > initialTime;
+                
+                result += log(`数据更新: ${countIncreased && timeIncreased ? '✅ 成功' : '❌ 失败'}`, 
+                    countIncreased && timeIncreased ? 'success' : 'error');
+            } else {
+                result += log('❌ 回调功能不可用', 'error');
+            }
+            
+            updateResult('integrationResult', result);
+        }
+        
+        function simulateWorkflow() {
+            let result = log('🎬 模拟完整工作流程...\n', 'info');
+            
+            const stories = mainStories || window.dailyStoriesManager;
+            const app = mainApp || window.app;
+            
+            if (stories && app && app.pomodoroTimer) {
+                result += log('1. 创建故事...', 'info');
+                stories.stories[0].title = '完整流程测试';
+                stories.stories[0].story = '测试从创建故事到完成番茄钟的完整流程';
+                stories.stories[0].value = '效率';
+                stories.saveTodayStories();
+                
+                result += log('2. 关联番茄钟...', 'info');
+                try {
+                    stories.linkToPomodoro(0);
+                    result += log('✅ 关联成功', 'success');
+                } catch (error) {
+                    result += log(`❌ 关联失败: ${error.message}`, 'error');
+                }
+                
+                result += log('3. 模拟番茄钟完成...', 'info');
+                stories.onPomodoroComplete(25);
+                
+                result += log('4. 检查结果...', 'info');
+                const story = stories.stories[0];
+                result += log(`   标题: ${story.title}`, 'info');
+                result += log(`   番茄钟数量: ${story.pomodoroCount || 0}`, 'info');
+                result += log(`   花费时间: ${story.timeSpent || 0}分钟`, 'info');
+                result += log(`   是否完成: ${story.completed ? '是' : '否'}`, 'info');
+                
+                result += log('✅ 完整流程测试完成！', 'success');
+            } else {
+                result += log('❌ 系统未完全初始化', 'error');
+            }
+            
+            updateResult('integrationResult', result);
+        }
+        
+        // 页面加载时自动运行检查
+        window.onload = function() {
+            setTimeout(runFullCheck, 1000);
+        };
+    </script>
+</body>
+</html>

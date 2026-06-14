@@ -1,6 +1,6 @@
 // 番茄钟管理器
 class PomodoroTimer {
-    constructor(clockManager, achievementSystem, forestSystem) {
+    constructor(clockManager, achievementSystem, forestSystem, dailyStories = null) {
         // 默认时间设置（分钟）
         this.workDuration = 25;
         this.shortBreakDuration = 5;
@@ -21,6 +21,9 @@ class PomodoroTimer {
         
         // 森林系统引用
         this.forestSystem = forestSystem;
+        
+        // 每日三个故事系统引用（可选）
+        this.dailyStories = dailyStories;
         
         // DOM 元素
         this.container = null;
@@ -62,34 +65,45 @@ class PomodoroTimer {
         const panel = document.getElementById('pomodoroPanel');
         const close = document.getElementById('pomodoroClose');
         
-        this.toggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            this.toggle.classList.toggle('active');
-            panel.classList.toggle('active');
-            
-            // 关闭其他面板
-            const settingsPanel = document.getElementById('settingsPanel');
-            const settingsToggle = document.getElementById('settingsToggle');
-            
-            if (settingsPanel) {
-                settingsPanel.classList.remove('active');
-            }
-            if (settingsToggle) {
-                settingsToggle.classList.remove('active');
-            }
-        });
+        // 确保按钮元素存在再绑定事件
+        if (this.toggle) {
+            this.toggle.addEventListener('click', (e) => {
+                console.log('🍅 番茄钟按钮被点击'); // 调试日志
+                e.stopPropagation();
+                e.preventDefault();
+                this.toggle.classList.toggle('active');
+                panel.classList.toggle('active');
+                
+                // 关闭其他面板
+                const settingsPanel = document.getElementById('settingsPanel');
+                const settingsToggle = document.getElementById('settingsToggle');
+                
+                if (settingsPanel) {
+                    settingsPanel.classList.remove('active');
+                }
+                if (settingsToggle) {
+                    settingsToggle.classList.remove('active');
+                }
+            });
+        } else {
+            console.error('❌ 番茄钟切换按钮未找到');
+        }
         
-        close.addEventListener('click', (e) => {
-            e.stopPropagation();
-            panel.classList.remove('active');
-            this.toggle.classList.remove('active');
-        });
+        // 关闭按钮事件
+        if (close) {
+            close.addEventListener('click', (e) => {
+                e.stopPropagation();
+                panel.classList.remove('active');
+                this.toggle.classList.remove('active');
+            });
+        }
         
         // 阻止面板内点击冒泡
-        panel.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
+        if (panel) {
+            panel.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
         
         // 控制按钮
         this.startBtn.addEventListener('click', (e) => {
@@ -295,6 +309,11 @@ class PomodoroTimer {
             // 触发成就系统
             if (this.achievementSystem) {
                 this.achievementSystem.onPomodoroComplete(this.workDuration);
+            }
+            
+            // 通知每日三个故事系统
+            if (this.dailyStories && this.dailyStories.onPomodoroComplete) {
+                this.dailyStories.onPomodoroComplete(this.workDuration);
             }
             
             // 每完成4个工作周期后，进入长休息

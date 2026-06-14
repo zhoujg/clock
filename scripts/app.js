@@ -87,7 +87,10 @@ class App {
         this.bgmPlayerManager = new BGMPlayerManager(this.tickSoundManager, this.quoteManager); // 传递滴答声管理器和谚语管理器
         this.achievementSystem = new AchievementSystem();
         this.forestSystem = new ForestSystem(this.achievementSystem);
-        this.pomodoroTimer = new PomodoroTimer(clockManager, this.achievementSystem, this.forestSystem);
+        
+        // 先创建一个占位的番茄钟（不传 dailyStories）
+        this.pomodoroTimer = new PomodoroTimer(clockManager, this.achievementSystem, this.forestSystem, null);
+        
         this.picsumManager = new PicsumManager(this.backgroundManager, this.settingsStorage);
         
         // 设置时钟管理器的滴答声引用
@@ -104,8 +107,39 @@ class App {
         this.initializeDateDisplay();
         this.initializeBGMPlayer();
         
+        // 延迟设置 dailyStories 引用
+        this.initializeIntegratedSystems();
+        
         // 最后加载保存的设置（这会更新状态显示）
         this.loadSavedSettings();
+    }
+    
+    // 初始化集成系统（设置 dailyStories 引用）
+    initializeIntegratedSystems() {
+        // 等待 dailyStoriesManager 创建完成
+        setTimeout(() => {
+            if (window.dailyStoriesManager) {
+                console.log('✅ 设置系统引用...');
+                
+                // 设置番茄钟的 dailyStories 引用
+                this.pomodoroTimer.dailyStories = window.dailyStoriesManager;
+                console.log('✅ 番茄钟→故事系统引用已设置');
+                
+                // 设置 dailyStories 的系统引用
+                if (window.dailyStoriesManager.setSystemReferences) {
+                    window.dailyStoriesManager.setSystemReferences(
+                        this.achievementSystem,
+                        this.forestSystem,
+                        this.pomodoroTimer
+                    );
+                    console.log('✅ 故事系统引用已设置');
+                } else {
+                    console.warn('⚠️ dailyStories.setSystemReferences 方法不存在');
+                }
+            } else {
+                console.error('❌ dailyStoriesManager 未初始化');
+            }
+        }, 500);
     }
 
     initializeDateDisplay() {
