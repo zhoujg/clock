@@ -676,6 +676,11 @@ class App {
         // 加载设置后更新状态显示
         this.updateAnimationStatus();
         this.updateTickSoundStatus();
+        
+        // 触发智能颜色调整
+        if (window.smartColorManager) {
+            setTimeout(() => window.smartColorManager.refresh(), 300);
+        }
     }
 
     // 保存当前设置
