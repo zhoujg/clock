@@ -215,7 +215,6 @@ class WeatherModule {
             if (cached && this.isLocationCacheValid(cached)) {
                 this.adcode = cached.adcode;
                 this.city = cached.city;
-                console.log('使用缓存的位置信息:', this.city);
                 return;
             }
             
@@ -234,8 +233,6 @@ class WeatherModule {
                     city: this.city,
                     timestamp: Date.now()
                 });
-                
-                console.log('获取到当前位置:', this.city, 'adcode:', this.adcode);
             } else {
                 throw new Error('IP定位失败: ' + (data.info || '未知错误'));
             }
@@ -308,9 +305,7 @@ class WeatherModule {
                 };
                 
                 this.saveWeatherCache(this.weatherData);
-                this.displayWeather(this.weatherData);
-                
-                console.log('获取天气成功:', this.weatherData);
+                this.displayWeather(this.weatherData);                
             } else {
                 throw new Error('天气数据格式错误: ' + (data.info || '未知错误'));
             }

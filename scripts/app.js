@@ -213,8 +213,6 @@ class App {
 
         // 点击其他地方关闭所有面板
         document.addEventListener('click', (e) => {
-            // 排除音乐播放器容器内的点击
-            const bgmPlayerContainer = document.getElementById('bgmPlayerContainer');
             const backgroundPanel = document.getElementById('backgroundPanel');
             
             if (!e.target.closest('.controls') && 
@@ -225,13 +223,6 @@ class App {
                 if (backgroundPanel) {
                     backgroundPanel.classList.remove('active');
                 }
-            }
-            
-            // 点击播放器外部区域时收起播放器
-            if (bgmPlayerContainer && 
-                !e.target.closest('.bgm-player-container') && 
-                bgmPlayerContainer.classList.contains('expanded')) {
-                bgmPlayerContainer.classList.remove('expanded');
             }
         });
     }
@@ -543,29 +534,76 @@ class App {
     }
 
     initializeBGMPlayer() {
-        // 音乐播放器容器的展开/收起逻辑
-        const bgmPlayerContainer = document.getElementById('bgmPlayerContainer');
-        
-        if (bgmPlayerContainer) {
-            // 点击播放器容器切换展开/收起状态
-            bgmPlayerContainer.addEventListener('click', (e) => {
-                // 如果当前是收起状态，点击展开
-                if (!bgmPlayerContainer.classList.contains('expanded')) {
-                    e.stopPropagation();
-                    bgmPlayerContainer.classList.add('expanded');
-                }
-                // 如果已经展开，不做处理（让内部元素的点击正常工作）
-            });
-        }
-        
-        // 绑定浮动播放器的控制按钮
+        // 音乐播放器模态框
+        const musicBtn = document.getElementById('musicBtn');
+        const musicModal = document.getElementById('musicModal');
+        const musicModalClose = document.getElementById('musicModalClose');
         const playPauseBtn = document.getElementById('playPauseBtn');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const loopBtn = document.getElementById('loopBtn');
         const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
         const progressContainer = document.getElementById('progressContainer');
+        const musicFavoriteBtn = document.getElementById('musicFavoriteBtn');
         
+        // 打开模态框
+        if (musicBtn) {
+            musicBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                musicModal.style.display = 'flex';
+                // 延迟添加 show 类以触发动画
+                setTimeout(() => {
+                    musicModal.classList.add('show');
+                }, 10);
+                
+                // 根据播放状态添加 class
+                if (this.bgmPlayerManager.isPlaying) {
+                    musicModal.classList.add('playing');
+                }
+            });
+        }
+        
+        // 关闭模态框
+        if (musicModalClose) {
+            musicModalClose.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.closeMusicModal();
+            });
+        }
+        
+        // 点击背景关闭
+        if (musicModal) {
+            musicModal.addEventListener('click', (e) => {
+                if (e.target === musicModal) {
+                    this.closeMusicModal();
+                }
+            });
+        }
+        
+        // 标签页切换
+        const musicTabs = document.querySelectorAll('.music-tab');
+        musicTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tabName = tab.dataset.tab;
+                
+                // 切换激活状态
+                musicTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // 切换内容
+                if (tabName === 'favorites') {
+                    this.bgmPlayerManager.showingFavorites = true;
+                    this.bgmPlayerManager.showFavoritesList();
+                } else {
+                    this.bgmPlayerManager.showingFavorites = false;
+                    this.bgmPlayerManager.renderMusicList();
+                }
+            });
+        });
+        
+        // 绑定浮动播放器的控制按钮
         if (playPauseBtn) {
             playPauseBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -600,7 +638,11 @@ class App {
         
         if (volumeSlider) {
             volumeSlider.addEventListener('input', (e) => {
-                this.bgmPlayerManager.setVolume(e.target.value);
+                const volume = parseInt(e.target.value);
+                this.bgmPlayerManager.setVolume(volume);
+                if (volumeValue) {
+                    volumeValue.textContent = volume + '%';
+                }
                 this.saveCurrentSettings();
             });
         }
@@ -614,8 +656,98 @@ class App {
             });
         }
         
+        // 收藏按钮
+        if (musicFavoriteBtn) {
+            musicFavoriteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isFavorited = this.bgmPlayerManager.favoriteCurrentTrack();
+                
+                // 显示提示信息
+                if (isFavorited) {
+                    this.showNotification('❤️ 已收藏', 'success');
+                } else {
+                    this.showNotification('💔 已取消收藏', 'info');
+                }
+            });
+        }
+        
+        // 监听音乐播放状态变化，更新唱片旋转动画
+        window.addEventListener('musicPlayStateChanged', () => {
+            if (musicModal) {
+                if (this.bgmPlayerManager.isPlaying) {
+                    musicModal.classList.add('playing');
+                } else {
+                    musicModal.classList.remove('playing');
+                }
+            }
+        });
+        
+        // 监听音乐切换事件，更新收藏按钮和收藏数量显示
+        window.addEventListener('musicTrackChanged', () => {
+            this.bgmPlayerManager.updateFavoriteButton();
+            this.updateFavoritesCount();
+        });
+        
+        // 监听音乐列表更新事件，更新收藏数量显示
+        window.addEventListener('musicListUpdated', () => {
+            this.updateFavoritesCount();
+        });
+        
         // 初始加载音乐列表
         this.loadJamendoMusicForFloatingPlayer();
+    }
+    
+    // 关闭音乐模态框
+    closeMusicModal() {
+        const musicModal = document.getElementById('musicModal');
+        if (musicModal) {
+            musicModal.classList.remove('show');
+            setTimeout(() => {
+                musicModal.style.display = 'none';
+            }, 300);
+        }
+    }
+    
+    // 更新收藏数量显示
+    updateFavoritesCount() {
+        const favoritesCountBadge = document.getElementById('favoritesCountBadge');
+        if (favoritesCountBadge) {
+            const count = this.bgmPlayerManager.getFavoritesCount();
+            favoritesCountBadge.textContent = count;
+        }
+    }
+    
+    // 显示通知消息
+    showNotification(message, type = 'info') {
+        // 创建通知元素
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: rgba(30, 30, 35, 0.95);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            font-weight: 500;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // 3秒后自动移除
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
     }
     
     // 为浮动播放器加载音乐

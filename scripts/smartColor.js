@@ -35,7 +35,6 @@ class SmartColorManager {
     // 切换调试模式
     toggleDebugMode() {
         this.debugMode = !this.debugMode;
-        console.log(`🐛 调试模式: ${this.debugMode ? '开启' : '关闭'}`);
         
         if (!this.debugMode && this.debugOverlay) {
             this.debugOverlay.remove();
@@ -145,7 +144,6 @@ class SmartColorManager {
             if (bgImage && bgImage !== 'none') {
                 const imageUrl = this.extractImageUrl(bgImage);
                 if (imageUrl) {
-                    console.log('🖼️ 检测到背景图片:', imageUrl.substring(0, 100));
                     const brightness = await this.analyzeImageBrightness(imageUrl);
                     this.adjustTextColor(brightness);
                     this.drawDebugOverlay(); // 绘制调试覆盖层
@@ -156,7 +154,6 @@ class SmartColorManager {
             // 如果是纯色背景，分析背景颜色
             const bgColor = bodyStyle.backgroundColor;
             if (bgColor) {
-                console.log('🎨 检测到纯色背景:', bgColor);
                 const brightness = this.analyzeColorBrightness(bgColor);
                 this.adjustTextColor(brightness);
             }
@@ -225,8 +222,6 @@ class SmartColorManager {
                         const sampleWidth = Math.floor(viewportWidth * region.width);
                         const sampleHeight = Math.floor(viewportHeight * region.height);
                         
-                        console.log(`🔍 采样区域 ${i + 1}: x=${sampleX}, y=${sampleY}, w=${sampleWidth}, h=${sampleHeight}`);
-                        
                         const imageData = ctx.getImageData(sampleX, sampleY, sampleWidth, sampleHeight);
                         const brightness = this.calculateBrightness(imageData);
                         brightnessValues.push(brightness);
@@ -234,7 +229,6 @@ class SmartColorManager {
                     }
                     
                     const avgBrightness = totalBrightness / this.sampleRegions.length;
-                    console.log(`💡 各区域亮度: [${brightnessValues.map(v => v.toFixed(1)).join('%, ')}%], 平均: ${avgBrightness.toFixed(1)}%`);
                     
                     resolve(avgBrightness);
                     
@@ -273,9 +267,6 @@ class SmartColorManager {
         }
         
         const avgBrightness = pixelCount > 0 ? (totalBrightness / pixelCount) / 255 * 100 : 50;
-        
-        // 添加调试信息
-        console.log(`📊 采样像素数: ${pixelCount}, 平均亮度: ${avgBrightness.toFixed(1)}%`);
         
         return avgBrightness;
     }
@@ -339,8 +330,6 @@ class SmartColorManager {
         // 总是应用新颜色（即使模式没变，也确保更新）
         this.currentMode = newMode;
         this.applyColors(textColor, shadowColor, borderColor);
-        
-        console.log(`🎨 智能颜色调整: 背景亮度=${brightness.toFixed(1)}%, 模式=${newMode}, 文字=${newMode === 'dark' ? '浅色' : '深色'}`);
     }
     
     // 应用颜色到所有元素
@@ -415,9 +404,7 @@ class SmartColorManager {
                 text-shadow: 0 2px 8px ${panelShadowColor} !important;
             }
         `;
-        document.head.appendChild(style);
-        
-        console.log(`🎴 时钟卡片颜色调整: 模式=${this.currentMode}, 背景=${panelBgColor}`);
+        document.head.appendChild(style);        
     }
     
     // 调整天气组件颜色
@@ -425,11 +412,8 @@ class SmartColorManager {
         // 使用正确的选择器
         const weatherDisplay = document.querySelector('.weather-display');
         if (!weatherDisplay) {
-            console.log('⚠️ 天气组件未找到');
             return;
         }
-        
-        console.log('🌤️ 调整天气组件颜色');
         
         // 调整天气容器背景（根据模式调整透明度和模糊效果）
         if (this.currentMode === 'dark') {
@@ -447,7 +431,6 @@ class SmartColorManager {
         if (tempElement) {
             tempElement.style.color = textColor;
             tempElement.style.textShadow = `0 2px 8px ${shadowColor}`;
-            console.log('  ✓ 温度颜色已更新');
         }
         
         // 天气描述
@@ -455,7 +438,6 @@ class SmartColorManager {
         if (descElement) {
             descElement.style.color = textColor;
             descElement.style.textShadow = `0 1px 6px ${shadowColor}`;
-            console.log('  ✓ 描述颜色已更新');
         }
         
         // 天气图标
@@ -464,7 +446,6 @@ class SmartColorManager {
             iconElement.style.filter = this.currentMode === 'dark' 
                 ? 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5))' 
                 : 'drop-shadow(0 2px 8px rgba(255, 255, 255, 0.8))';
-            console.log('  ✓ 图标滤镜已更新');
         }
     }
     
@@ -472,11 +453,8 @@ class SmartColorManager {
     adjustMusicPlayerColors(textColor, shadowColor, borderColor) {
         const playerContainer = document.querySelector('.bgm-player-container');
         if (!playerContainer) {
-            console.log('⚠️ 音乐播放器未找到');
             return;
         }
-        
-        console.log('🎵 调整音乐播放器颜色');
         
         // 使用不透明的纯色背景
         if (this.currentMode === 'dark') {
@@ -612,9 +590,7 @@ class SmartColorManager {
                 playerHeader.style.background = 'rgba(40, 40, 45, 0.5)';
                 playerHeader.style.borderBottomColor = 'rgba(60, 60, 65, 0.7)';
             }
-        }
-        
-        console.log('  ✓ 音乐播放器颜色已更新');
+        }        
     }
     
     // 手动触发重新分析（供外部调用）

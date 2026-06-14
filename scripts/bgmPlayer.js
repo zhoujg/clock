@@ -17,6 +17,11 @@ class BGMPlayerManager {
         this.jamendoAPI = new JamendoAPI();
         this.musicSource = 'jamendo'; // 只支持 'jamendo' 在线音乐
         
+        // 收藏功能
+        this.favorites = [];
+        this.showingFavorites = false; // 是否显示收藏列表
+        this.loadFavorites();
+        
         this.initializeAudio();
         this.loadMusicList();
     }
@@ -52,9 +57,7 @@ class BGMPlayerManager {
             // 只为本地音乐初始化音频分析器（避免 CORS 问题）
             if (this.musicSource === 'local') {
                 this.initAudioAnalyser();
-            } else {
-                console.log('🎵 在线音乐不启用可视化（避免 CORS 问题）');
-            }
+            } 
             
             // 播放音乐时暂停滴答声
             this.pauseTickSound();
@@ -111,7 +114,6 @@ class BGMPlayerManager {
                     this.sourceNode = this.audioContext.createMediaElementSource(this.audio);
                     this.sourceNode.connect(this.analyser);
                     this.analyser.connect(this.audioContext.destination);
-                    console.log('🎵 音频分析器初始化成功（带可视化）');
                 } catch (corsError) {
                     console.warn('⚠️ CORS 限制，无法创建音频分析器。音乐可以播放，但无法进行可视化分析。', corsError);
                     // CORS 错误时，清除分析器相关对象，让音乐正常播放
@@ -277,12 +279,6 @@ class BGMPlayerManager {
     
     // 播放指定曲目
     playTrack(index) {
-        console.log('🎵 playTrack 调用:', {
-            index,
-            musicListLength: this.musicList.length,
-            isValidIndex: index >= 0 && index < this.musicList.length
-        });
-        
         if (index < 0 || index >= this.musicList.length) {
             console.warn('❌ 无效的曲目索引:', index);
             return;
@@ -291,13 +287,6 @@ class BGMPlayerManager {
         this.currentTrackIndex = index;
         this.currentTrack = this.musicList[index];
         
-        console.log('🎵 准备播放:', {
-            name: this.currentTrack.name,
-            artist: this.currentTrack.artist,
-            file: this.currentTrack.file,
-            source: this.currentTrack.source
-        });
-        
         // 检查文件URL是否有效
         if (!this.currentTrack.file) {
             console.error('❌ 音频文件URL为空！', this.currentTrack);
@@ -305,7 +294,47 @@ class BGMPlayerManager {
             return;
         }
         
+        // 🎯 优化：显示加载状态
+        this.showLoadingState();
+        
+        // 🎯 优化：记录开始加载时间，用于性能监控
+        const loadStartTime = Date.now();
+        console.log('🎵 开始加载音乐:', this.currentTrack.name, '| URL:', this.currentTrack.file);
+        
         this.audio.src = this.currentTrack.file;
+        
+        // 🎯 优化：监听 loadstart 事件
+        const onLoadStart = () => {
+            console.log('⏳ 音频开始加载...');
+        };
+        
+        // 🎯 优化：监听 canplay 事件（有足够数据可以播放）
+        const onCanPlay = () => {
+            const loadTime = Date.now() - loadStartTime;
+            console.log(`✅ 音频可以播放了！加载耗时: ${loadTime}ms`);
+            this.hideLoadingState();
+            // 移除一次性事件监听器
+            this.audio.removeEventListener('loadstart', onLoadStart);
+            this.audio.removeEventListener('canplay', onCanPlay);
+            this.audio.removeEventListener('error', onLoadError);
+        };
+        
+        // 🎯 优化：监听加载错误
+        const onLoadError = () => {
+            const loadTime = Date.now() - loadStartTime;
+            console.error(`❌ 音频加载失败！耗时: ${loadTime}ms`);
+            this.hideLoadingState();
+            // 移除一次性事件监听器
+            this.audio.removeEventListener('loadstart', onLoadStart);
+            this.audio.removeEventListener('canplay', onCanPlay);
+            this.audio.removeEventListener('error', onLoadError);
+        };
+        
+        // 添加一次性事件监听器
+        this.audio.addEventListener('loadstart', onLoadStart, { once: true });
+        this.audio.addEventListener('canplay', onCanPlay, { once: true });
+        this.audio.addEventListener('error', onLoadError, { once: true });
+        
         this.audio.load();
         
         // 在开始播放前立即暂停滴答声
@@ -316,7 +345,6 @@ class BGMPlayerManager {
         if (playPromise !== undefined) {
             playPromise
                 .then(() => {
-                    console.log('✅ 音乐开始播放:', this.currentTrack.name);
                     this.enabled = true;
                     this.updateCurrentTrackDisplay();
                     this.renderMusicList(); // 更新高亮
@@ -331,6 +359,7 @@ class BGMPlayerManager {
                         source: this.currentTrack.source
                     });
                     this.showError('播放失败: ' + error.message);
+                    this.hideLoadingState();
                     // 播放失败时恢复滴答声和谚语
                     this.resumeTickSound();
                     this.showQuote();
@@ -555,6 +584,19 @@ class BGMPlayerManager {
         console.error('BGM Player Error:', message);
     }
     
+    // 🎯 新增：显示加载状态
+    showLoadingState() {
+        const currentTrackName = document.getElementById('currentTrackName');
+        if (currentTrackName) {
+            currentTrackName.innerHTML = '<span style="opacity: 0.6;">⏳ 加载中...</span>';
+        }
+    }
+    
+    // 🎯 新增：隐藏加载状态
+    hideLoadingState() {
+        // 加载完成后会调用 updateCurrentTrackDisplay() 更新显示
+    }
+    
     // 获取当前设置
     getSettings() {
         return {
@@ -595,21 +637,29 @@ class BGMPlayerManager {
     /**
      * 切换音乐源（已废弃，仅保留在线音乐）
      * @param {string} source - 只支持 'jamendo'
+     * @param {boolean} autoPlay - 是否自动播放，默认 true
      */
-    async switchMusicSource(source) {
+    async switchMusicSource(source, autoPlay = true) {
         if (source !== 'jamendo') {
             console.error('只支持在线音乐 (jamendo)');
             return;
         }
         
-        // 停止当前播放
-        this.stop();
+        // 记录当前是否在播放
+        const wasPlaying = this.isPlaying;
+        
+        // 🔧 不要立即停止播放，让当前音乐继续播放
+        // this.stop();
         
         this.musicSource = 'jamendo';
-        console.log('🎵 使用在线音乐源');
         
-        // 重新加载音乐列表
+        // 重新加载音乐列表（异步操作）
         await this.loadJamendoMusic();
+        
+        // 🔧 音乐加载完成后，如果之前在播放或要求自动播放，则播放第一首
+        if ((wasPlaying || autoPlay) && this.musicList.length > 0) {
+            this.playTrack(0);
+        }
         
         // 触发列表更新事件
         window.dispatchEvent(new CustomEvent('musicListUpdated'));
@@ -620,13 +670,19 @@ class BGMPlayerManager {
      * @param {Object} options - 查询选项
      * @param {number} options.limit - 返回曲目数量
      * @param {string} options.tags - 音乐标签
+     * @param {boolean} options.autoPlay - 是否自动播放第一首，默认 false
      */
     async loadJamendoMusic(options = {}) {
+        const { autoPlay = false, ...apiOptions } = options;
+        
+        // 🔍 日志：记录加载操作
+        console.log('🎵 loadJamendoMusic 被调用，选项:', options);
+        
         try {
             // 每次加载时清除缓存，确保获取新的音乐
             this.jamendoAPI.clearCache();
             
-            const tracks = await this.jamendoAPI.getRandomTracks(options);
+            const tracks = await this.jamendoAPI.getRandomTracks(apiOptions);
             
             if (tracks.length === 0) {
                 console.warn('⚠️ 未获取到 Jamendo 音乐');
@@ -641,6 +697,11 @@ class BGMPlayerManager {
             // 触发列表更新事件
             this.renderMusicList();
             
+            // 如果需要自动播放，播放第一首
+            if (autoPlay && this.musicList.length > 0) {
+                this.playTrack(0);
+            }
+            
         } catch (error) {
             console.error('❌ 加载 Jamendo 音乐失败:', error);
             this.showError('加载在线音乐失败');
@@ -654,23 +715,27 @@ class BGMPlayerManager {
      * 按标签加载 Jamendo 音乐
      * @param {string} tag - 音乐标签
      * @param {number} limit - 返回曲目数量
+     * @param {boolean} autoPlay - 是否自动播放，默认 true
      */
-    async loadJamendoByTag(tag, limit = 20) {
-        await this.loadJamendoMusic({ tags: tag, limit });
+    async loadJamendoByTag(tag, limit = 20, autoPlay = true) {
+        await this.loadJamendoMusic({ tags: tag, limit, autoPlay });
     }
     
     /**
      * 搜索 Jamendo 音乐
      * @param {string} query - 搜索关键词
      * @param {Object} options - 搜索选项
+     * @param {boolean} options.autoPlay - 是否自动播放，默认 true
      */
     async searchJamendoMusic(query, options = {}) {
+        const { autoPlay = true, ...searchOptions } = options;
+        
         try {
             console.log('🔍 搜索 Jamendo 音乐:', query);
             
             const tracks = await this.jamendoAPI.searchTracks({
                 query,
-                ...options
+                ...searchOptions
             });
             
             if (tracks.length === 0) {
@@ -683,10 +748,13 @@ class BGMPlayerManager {
             this.musicList = tracks;
             this.currentTrackIndex = -1;
             
-            console.log(`✅ 搜索到 ${tracks.length} 首音乐`);
-            
             // 触发列表更新事件
             this.renderMusicList();
+            
+            // 如果需要自动播放，播放第一首
+            if (autoPlay && this.musicList.length > 0) {
+                this.playTrack(0);
+            }
             
         } catch (error) {
             console.error('❌ 搜索音乐失败:', error);
@@ -715,13 +783,315 @@ class BGMPlayerManager {
      * 播放随机 Jamendo 音乐
      */
     async playRandomJamendo(options = {}) {
-        await this.switchMusicSource('jamendo');
-        await this.loadJamendoMusic(options);
-        
-        if (this.musicList.length > 0) {
-            // 随机选择一首开始播放
-            const randomIndex = Math.floor(Math.random() * this.musicList.length);
-            this.playTrack(randomIndex);
+        // switchMusicSource 已经会自动播放
+        await this.switchMusicSource('jamendo', true);
+    }
+    
+    // ========== 收藏功能 ==========
+    
+    /**
+     * 加载收藏的音乐
+     */
+    loadFavorites() {
+        try {
+            const data = localStorage.getItem('musicFavorites');
+            this.favorites = data ? JSON.parse(data) : [];
+            console.log('✅ 加载收藏音乐:', this.favorites.length, '首');
+        } catch (error) {
+            console.error('❌ 加载收藏音乐失败:', error);
+            this.favorites = [];
         }
+    }
+    
+    /**
+     * 保存收藏的音乐
+     */
+    saveFavorites() {
+        try {
+            localStorage.setItem('musicFavorites', JSON.stringify(this.favorites));
+            console.log('✅ 保存收藏音乐:', this.favorites.length, '首');
+        } catch (error) {
+            console.error('❌ 保存收藏音乐失败:', error);
+        }
+    }
+    
+    /**
+     * 收藏当前播放的音乐
+     * @returns {boolean} true=已收藏, false=取消收藏
+     */
+    favoriteCurrentTrack() {
+        if (!this.currentTrack) {
+            console.warn('⚠️ 当前没有播放的音乐');
+            return false;
+        }
+        
+        // 检查是否已收藏（通过音乐ID或文件URL判断）
+        const trackId = this.currentTrack.id || this.currentTrack.file;
+        const existingIndex = this.favorites.findIndex(
+            fav => (fav.id && fav.id === trackId) || fav.file === this.currentTrack.file
+        );
+        
+        if (existingIndex >= 0) {
+            // 已收藏，取消收藏
+            this.favorites.splice(existingIndex, 1);
+            this.saveFavorites();
+            this.updateFavoriteButton();
+            console.log('💔 取消收藏:', this.currentTrack.name);
+            
+            // 如果正在显示收藏列表，刷新列表
+            if (this.showingFavorites) {
+                this.showFavoritesList();
+            }
+            
+            return false;
+        } else {
+            // 未收藏，添加收藏
+            const favoriteTrack = {
+                id: this.currentTrack.id,
+                name: this.currentTrack.name,
+                artist: this.currentTrack.artist,
+                file: this.currentTrack.file,
+                duration: this.currentTrack.duration,
+                image: this.currentTrack.image,
+                license: this.currentTrack.license,
+                source: this.currentTrack.source,
+                addedAt: Date.now()
+            };
+            
+            this.favorites.unshift(favoriteTrack); // 添加到开头
+            this.saveFavorites();
+            this.updateFavoriteButton();
+            console.log('❤️ 收藏音乐:', this.currentTrack.name);
+            
+            return true;
+        }
+    }
+    
+    /**
+     * 检查当前音乐是否已收藏
+     * @returns {boolean}
+     */
+    isCurrentTrackFavorited() {
+        if (!this.currentTrack) return false;
+        
+        const trackId = this.currentTrack.id || this.currentTrack.file;
+        return this.favorites.some(
+            fav => (fav.id && fav.id === trackId) || fav.file === this.currentTrack.file
+        );
+    }
+    
+    /**
+     * 更新收藏按钮状态
+     */
+    updateFavoriteButton() {
+        const favoriteBtn = document.getElementById('musicFavoriteBtn');
+        if (!favoriteBtn) return;
+        
+        if (this.isCurrentTrackFavorited()) {
+            favoriteBtn.classList.add('favorited');
+            favoriteBtn.title = '取消收藏';
+        } else {
+            favoriteBtn.classList.remove('favorited');
+            favoriteBtn.title = '收藏';
+        }
+    }
+    
+    /**
+     * 切换显示收藏列表
+     */
+    toggleFavoritesList() {
+        this.showingFavorites = !this.showingFavorites;
+        
+        if (this.showingFavorites) {
+            this.showFavoritesList();
+        } else {
+            this.showNormalList();
+        }
+        
+        this.updateShowFavoritesButton();
+    }
+    
+    /**
+     * 显示收藏列表
+     */
+    showFavoritesList() {
+        this.showingFavorites = true;
+        const musicListContainer = document.getElementById('musicListContainer');
+        if (!musicListContainer) return;
+        
+        if (this.favorites.length === 0) {
+            musicListContainer.innerHTML = '<div class="no-music">暂无收藏的音乐<br><span style="font-size: 11px; opacity: 0.6;">播放喜欢的音乐时点击❤️收藏</span></div>';
+            return;
+        }
+        
+        musicListContainer.innerHTML = '';
+        this.favorites.forEach((track, index) => {
+            const trackElement = document.createElement('div');
+            trackElement.className = 'music-track favorite-track';
+            
+            // 检查是否是当前播放的音乐
+            const isCurrentTrack = this.currentTrack && 
+                ((track.id && track.id === this.currentTrack.id) || 
+                 track.file === this.currentTrack.file);
+            
+            if (isCurrentTrack) {
+                trackElement.classList.add('active');
+            }
+            
+            trackElement.innerHTML = `
+                <div class="track-info">
+                    <span class="track-icon">❤️</span>
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="track-name">${track.name}</div>
+                        ${track.artist ? `<div class="music-artist">${track.artist}</div>` : ''}
+                    </div>
+                    <button class="track-remove-btn" data-index="${index}" title="移除收藏">×</button>
+                </div>
+            `;
+            
+            // 点击播放
+            trackElement.querySelector('.track-info').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.playFavoriteTrack(index);
+            });
+            
+            // 点击移除收藏
+            trackElement.querySelector('.track-remove-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.removeFavorite(index);
+            });
+            
+            musicListContainer.appendChild(trackElement);
+        });
+        
+        // 触发自定义事件
+        window.dispatchEvent(new CustomEvent('musicListUpdated'));
+    }
+    
+    /**
+     * 显示正常音乐列表
+     */
+    showNormalList() {
+        this.showingFavorites = false;
+        this.renderMusicList();
+    }
+    
+    /**
+     * 播放收藏的音乐
+     * @param {number} index - 收藏列表中的索引
+     */
+    playFavoriteTrack(index) {
+        if (index < 0 || index >= this.favorites.length) {
+            console.warn('❌ 无效的收藏索引:', index);
+            return;
+        }
+        
+        const track = this.favorites[index];
+        
+        // 设置为当前播放曲目
+        this.currentTrack = track;
+        this.currentTrackIndex = -1; // 收藏列表没有对应的索引
+        
+        // 检查文件URL是否有效
+        if (!track.file) {
+            console.error('❌ 音频文件URL为空！', track);
+            this.showError('音频文件URL无效');
+            return;
+        }
+        
+        // 🎯 优化：显示加载状态
+        this.showLoadingState();
+        
+        // 🎯 优化：记录开始加载时间
+        const loadStartTime = Date.now();
+        console.log('🎵 开始加载收藏音乐:', track.name, '| URL:', track.file);
+        
+        this.audio.src = track.file;
+        
+        // 🎯 优化：监听加载事件
+        const onCanPlay = () => {
+            const loadTime = Date.now() - loadStartTime;
+            console.log(`✅ 收藏音乐可以播放了！加载耗时: ${loadTime}ms`);
+            this.hideLoadingState();
+        };
+        
+        this.audio.addEventListener('canplay', onCanPlay, { once: true });
+        
+        this.audio.load();
+        
+        // 在开始播放前立即暂停滴答声
+        this.pauseTickSound();
+        
+        const playPromise = this.audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    this.enabled = true;
+                    this.updateCurrentTrackDisplay();
+                    this.updateFavoriteButton();
+                    if (this.showingFavorites) {
+                        this.showFavoritesList(); // 刷新收藏列表显示
+                    }
+                    // 触发自定义事件
+                    window.dispatchEvent(new CustomEvent('musicTrackChanged'));
+                })
+                .catch(error => {
+                    console.error('❌ 收藏音乐播放失败:', error);
+                    this.showError('播放失败: ' + error.message);
+                    this.hideLoadingState();
+                    this.resumeTickSound();
+                    this.showQuote();
+                });
+        }
+    }
+    
+    /**
+     * 移除收藏
+     * @param {number} index - 收藏列表中的索引
+     */
+    removeFavorite(index) {
+        if (index < 0 || index >= this.favorites.length) {
+            console.warn('❌ 无效的收藏索引:', index);
+            return;
+        }
+        
+        const track = this.favorites[index];
+        this.favorites.splice(index, 1);
+        this.saveFavorites();
+        
+        console.log('💔 移除收藏:', track.name);
+        
+        // 刷新收藏列表显示
+        if (this.showingFavorites) {
+            this.showFavoritesList();
+        }
+        
+        // 更新收藏按钮状态
+        this.updateFavoriteButton();
+    }
+    
+    /**
+     * 更新显示收藏列表按钮状态
+     */
+    updateShowFavoritesButton() {
+        const showFavoritesBtn = document.getElementById('showFavoritesBtn');
+        if (!showFavoritesBtn) return;
+        
+        if (this.showingFavorites) {
+            showFavoritesBtn.classList.add('active');
+            showFavoritesBtn.title = '返回音乐列表';
+        } else {
+            showFavoritesBtn.classList.remove('active');
+            showFavoritesBtn.title = `我的收藏 (${this.favorites.length})`;
+        }
+    }
+    
+    /**
+     * 获取收藏数量
+     * @returns {number}
+     */
+    getFavoritesCount() {
+        return this.favorites.length;
     }
 }
