@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jamendo API 测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        h1 {
+            color: #667eea;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .track {
+            padding: 10px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .track:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .track-name {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .track-artist {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+        }
+        select {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+            margin: 10px 5px;
+        }
+        #status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+        .error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        .loading {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Jamendo API 测试</h1>
+    
+    <div>
+        <select id="tagSelect">
+            <option value="">随机类型</option>
+            <option value="pop">流行 (Pop)</option>
+            <option value="rock">摇滚 (Rock)</option>
+            <option value="electronic">电子 (Electronic)</option>
+            <option value="classical">古典 (Classical)</option>
+            <option value="jazz">爵士 (Jazz)</option>
+            <option value="ambient">氛围 (Ambient)</option>
+            <option value="chillout">放松 (Chillout)</option>
+        </select>
+        
+        <button onclick="testGetRandomTracks()">获取随机音乐</button>
+        <button onclick="testSearchTracks()">搜索音乐</button>
+        <button onclick="clearResults()">清除结果</button>
+    </div>
+    
+    <div id="status"></div>
+    <div id="results"></div>
+    
+    <audio id="audioPlayer" controls style="width: 100%; margin-top: 20px; display: none;"></audio>
+
+    <script src="scripts/jamendoAPI.js"></script>
+    <script>
+        const jamendoAPI = new JamendoAPI();
+        const resultsDiv = document.getElementById('results');
+        const statusDiv = document.getElementById('status');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const tagSelect = document.getElementById('tagSelect');
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+        }
+        
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+            statusDiv.textContent = '';
+            statusDiv.className = '';
+            audioPlayer.style.display = 'none';
+        }
+        
+        async function testGetRandomTracks() {
+            clearResults();
+            showStatus('⏳ 正在加载音乐...', 'loading');
+            
+            try {
+                const selectedTag = tagSelect.value;
+                const options = { limit: 10 };
+                
+                if (selectedTag) {
+                    options.tags = selectedTag;
+                }
+                
+                const tracks = await jamendoAPI.getRandomTracks(options);
+                
+                if (tracks.length === 0) {
+                    showStatus('⚠️ 未获取到音乐', 'error');
+                    return;
+                }
+                
+                showStatus(`✅ 成功获取 ${tracks.length} 首音乐`, 'success');
+                
+                resultsDiv.innerHTML = '<h3>音乐列表：</h3>';
+                tracks.forEach((track, index) => {
+                    const trackDiv = document.createElement('div');
+                    trackDiv.className = 'track';
+                    trackDiv.innerHTML = `
+                        <div class="track-name">${index + 1}. ${track.name}</div>
+                        <div class="track-artist">🎤 ${track.artist}</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 5px;">
+                            ⏱️ ${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}
+                        </div>
+                    `;
+                    
+                    trackDiv.onclick = () => playTrack(track);
+                    resultsDiv.appendChild(trackDiv);
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ 加载失败: ' + error.message, 'error');
+            }
+        }
+        
+        async function testSearchTracks() {
+            clearResults();
+            const query = prompt('请输入搜索关键词:', 'piano');
+            
+            if (!query) return;
+            
+            showStatus('🔍 正在搜索...', 'loading');
+            
+            try {
+                const tracks = await jamendoAPI.searchTracks({
+                    query: query,
+                    limit: 10
+                });
+                
+                if (tracks.length === 0) {
+                    showStatus('⚠️ 未找到匹配的音乐', 'error');
+                    return;
+                }
+                
+                showStatus(`✅ 找到 ${tracks.length} 首音乐`, 'success');
+                
+                resultsDiv.innerHTML = `<h3>搜索结果："${query}"</h3>`;
+                tracks.forEach((track, index) => {
+                    const trackDiv = document.createElement('div');
+                    trackDiv.className = 'track';
+                    trackDiv.innerHTML = `
+                        <div class="track-name">${index + 1}. ${track.name}</div>
+                        <div class="track-artist">🎤 ${track.artist}</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 5px;">
+                            ⏱️ ${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}
+                        </div>
+                    `;
+                    
+                    trackDiv.onclick = () => playTrack(track);
+                    resultsDiv.appendChild(trackDiv);
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ 搜索失败: ' + error.message, 'error');
+            }
+        }
+        
+        function playTrack(track) {
+            audioPlayer.src = track.file;
+            audioPlayer.style.display = 'block';
+            audioPlayer.play();
+            
+            showStatus(`▶️ 正在播放: ${track.name} - ${track.artist}`, 'success');
+        }
+        
+        console.log('🎵 Jamendo API 测试页面已加载');
+        console.log('可用的标签:', jamendoAPI.getPopularTags());
+    </script>
+</body>
+</html>

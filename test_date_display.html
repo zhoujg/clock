@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日期显示测试</title>
+    <style>
+        body {
+            background-color: #e74c3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        .date-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px 40px;
+            border-radius: 10px;
+        }
+        
+        #dateText {
+            font-size: 36px;
+            color: rgba(255, 255, 255, 1);
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+        
+        #weekText {
+            font-size: 28px;
+            color: rgba(255, 255, 255, 1);
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            letter-spacing: 3px;
+            font-weight: 400;
+            padding-left: 20px;
+            border-left: 2px solid rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="date-display">
+        <div id="dateText">加载中...</div>
+        <div id="weekText">加载中...</div>
+    </div>
+    
+    <script>
+        function updateDate() {
+            const now = new Date();
+            const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const weekDay = weekDays[now.getDay()];
+            
+            const dateText = `${year}年${month}月${date}日`;
+            const weekText = weekDay;
+            
+            document.getElementById('dateText').textContent = dateText;
+            document.getElementById('weekText').textContent = weekText;
+            
+            console.log('日期已更新:', dateText, weekText);
+        }
+        
+        // 立即更新一次
+        updateDate();
+        
+        // 每分钟更新一次
+        setInterval(updateDate, 60000);
+    </script>
+</body>
+</html>

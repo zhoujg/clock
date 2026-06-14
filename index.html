@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="styles/pomodoro.css" />
     <link rel="stylesheet" href="styles/achievement.css" />
     <link rel="stylesheet" href="styles/forest.css" />
+    <link rel="stylesheet" href="styles/weather.css" />
 </head>
 <body>
     <!-- 控制面板 -->
@@ -31,10 +32,10 @@
             <span class="achievement-badge" id="achievementBadge">0</span>
         </button>
         
-        <button id="musicBtn" class="control-btn" title="音乐播放器">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
-            </svg>
+        <!-- 番茄钟按钮 -->
+        <button id="pomodoroToggle" class="control-btn" title="番茄钟">
+            🍅
+            <span class="pomodoro-status-indicator" id="statusIndicator"></span>
         </button>
         
         <button id="settingsToggle" class="control-btn" title="设置">
@@ -43,6 +44,71 @@
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
         </button>
+        
+        <!-- 极简浮动音乐播放器 -->
+        <div class="bgm-player-container" id="bgmPlayerContainer">
+            <!-- 极简状态的音乐图标 -->
+            <div class="music-mini-icon">🎵</div>
+            
+            <div class="player-header" id="playerHeader">
+                <span class="player-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+                    </svg>
+                    音乐播放器
+                </span>
+            </div>
+            
+            <div class="player-content">
+                <div class="current-track">
+                    <div class="current-track-name" id="currentTrackName">未播放</div>
+                    <div id="currentArtist" class="music-artist" style="display: none;"></div>
+                </div>
+                
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+                
+                <div class="player-controls">
+                    <button class="control-btn" id="prevBtn" title="上一曲">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                        </svg>
+                    </button>
+                    <button class="control-btn play-pause" id="playPauseBtn" title="播放/暂停">
+                        <svg class="play-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg class="pause-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                        </svg>
+                    </button>
+                    <button class="control-btn" id="nextBtn" title="下一曲">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                        </svg>
+                    </button>
+                    <button class="control-btn" id="loopBtn" title="循环">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="volume-control">
+                    <span class="volume-icon">🔊</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" />
+                </div>
+                
+                <div class="music-list-container" id="musicListContainer">
+                    <div class="no-music">加载中...</div>
+                </div>
+            </div>
+        </div>
         
         <div class="settings-panel" id="settingsPanel">
             <div class="panel-header">
@@ -96,60 +162,78 @@
             </div>
         </div>
         
-        <!-- 音乐列表面板 -->
-        <div class="music-panel" id="musicPanel">
+        <!-- 番茄钟面板 -->
+        <div class="pomodoro-panel" id="pomodoroPanel">
             <div class="panel-header">
-                <span>🎵 音乐播放器</span>
-                <button id="musicPanelCloseBtn" class="panel-close-btn" title="关闭">
+                <span>🍅 番茄钟</span>
+                <button class="panel-close-btn" id="pomodoroClose" title="关闭">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                     </svg>
                 </button>
             </div>
-            <div class="music-panel-content">
-                <div class="music-current-track">
-                    <div id="musicPanelTrackName">未播放</div>
-                </div>
-                <!-- 音乐控制按钮 -->
-                <div class="music-controls">
-                    <button id="musicPlayPauseBtn" class="music-control-btn" title="播放/暂停">
-                        <svg class="play-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                        <svg class="pause-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
-                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                        </svg>
+            <div class="panel-content">
+                <div class="pomodoro-modes">
+                    <button class="mode-btn active" data-mode="work">
+                        <span>工作</span>
+                        <small>25分钟</small>
                     </button>
-                    <button id="musicStopBtn" class="music-control-btn" title="停止">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <rect x="6" y="6" width="12" height="12"/>
-                        </svg>
+                    <button class="mode-btn" data-mode="shortBreak">
+                        <span>短休息</span>
+                        <small>5分钟</small>
                     </button>
-                    <button id="musicPrevBtn" class="music-control-btn" title="上一曲">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-                        </svg>
-                    </button>
-                    <button id="musicNextBtn" class="music-control-btn" title="下一曲">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                        </svg>
+                    <button class="mode-btn" data-mode="longBreak">
+                        <span>长休息</span>
+                        <small>15分钟</small>
                     </button>
                 </div>
-                <div class="music-panel-list" id="musicPanelList">
-                    <div class="no-music">加载中...</div>
+                <div class="pomodoro-custom">
+                    <label for="customMinutes">自定义时长（分钟）</label>
+                    <div class="custom-input-wrapper">
+                        <input type="number" id="customMinutes" min="1" max="180" placeholder="输入分钟数" />
+                        <button class="custom-start-btn" id="customStartBtn">开始</button>
+                    </div>
+                </div>
+                <div class="pomodoro-progress-bar">
+                    <div class="pomodoro-progress-fill" id="progressFill"></div>
+                </div>
+                <div class="pomodoro-controls">
+                    <button class="pomodoro-btn start" id="pomodoroStart">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    </button>
+                    <button class="pomodoro-btn pause" id="pomodoroPause" style="display: none;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                    </button>
+                    <button class="pomodoro-btn reset" id="pomodoroReset">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="pomodoro-sessions">
+                    <span>已完成 </span>
+                    <span id="sessionCount">0</span>
+                    <span> 个番茄</span>
                 </div>
             </div>
         </div>
+        
     </div>
 
     <!-- 动画线条容器 -->
     <canvas id="animationCanvas"></canvas>
 
     <!-- 日期显示 -->
-    <div class="date-display">
-        <div id="dateText"></div>
-        <div id="weekText"></div>
+    <div class="date-display" style="display: flex !important; visibility: visible !important; opacity: 1 !important;">
+        <div id="dateText" style="display: block !important; visibility: visible !important; opacity: 1 !important;"></div>
+        <!-- 天气显示将插入到这里 -->
+        <div id="weekText" style="display: block !important; visibility: visible !important; opacity: 1 !important;"></div>
     </div>
 
     <!-- 翻转时钟 -->
@@ -210,10 +294,12 @@
     <script src="scripts/quotes-data.js"></script>
     <script src="scripts/quotes.js"></script>
     <script src="scripts/tickSound.js"></script>
+    <script src="scripts/jamendoAPI.js"></script>
     <script src="scripts/bgmPlayer.js"></script>
     <script src="scripts/achievement.js"></script>
     <script src="scripts/forest.js"></script>
     <script src="scripts/pomodoro.js"></script>
+    <script src="scripts/weather.js"></script>
     <script src="scripts/app.js"></script>
 </body>
 </html>

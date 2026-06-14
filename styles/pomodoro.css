@@ -1,74 +1,58 @@
 /* 番茄钟样式 */
-.pomodoro-container {
-    position: fixed;
-    top: 20px;
-    right: 170px;
-    z-index: 1000;
-}
 
-.pomodoro-toggle {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px;
-    min-height: 40px;
-    max-width: 40px;
-    max-height: 40px;
+/* 番茄钟按钮的状态指示器 */
+.pomodoro-status-indicator {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: transparent;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    font-size: 20px;
-    position: relative;
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
 }
 
-.pomodoro-toggle:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.pomodoro-toggle.running-work {
-    background: rgba(255, 107, 107, 0.3);
+/* 运行中的工作状态 */
+#pomodoroToggle.running-work .pomodoro-status-indicator {
+    background: #ff6b6b;
+    box-shadow: 0 0 8px rgba(255, 107, 107, 0.6);
     animation: pulse-work 2s infinite;
 }
 
-.pomodoro-toggle.running-break {
-    background: rgba(78, 205, 196, 0.3);
+/* 运行中的休息状态 */
+#pomodoroToggle.running-break .pomodoro-status-indicator {
+    background: #4ecdc4;
+    box-shadow: 0 0 8px rgba(78, 205, 196, 0.6);
     animation: pulse-break 2s infinite;
 }
 
 @keyframes pulse-work {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
 }
 
 @keyframes pulse-break {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(78, 205, 196, 0); }
-}
-
-/* 状态指示器 - 隐藏 */
-.pomodoro-status-indicator {
-    display: none !important;
-    width: 0;
-    height: 0;
-    visibility: hidden;
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
 }
 
 .pomodoro-panel {
     position: absolute;
     top: 60px;
     right: 0;
-    width: 300px;
+    width: 320px;
     background: rgba(20, 20, 20, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 16px;
@@ -79,6 +63,7 @@
     transform: translateY(-10px) scale(0.95);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    z-index: 1000;
 }
 
 .pomodoro-panel.active {

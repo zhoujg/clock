@@ -101,35 +101,20 @@ class App {
         this.initializeDateDisplay();
         this.initializeBGMPlayer();
         
-        // 监听音乐列表更新事件
-        window.addEventListener('musicListUpdated', () => {
-            if (document.getElementById('musicPanel').classList.contains('active')) {
-                this.renderMusicPanelList();
-            }
-        });
-        
-        // 监听音乐曲目更改事件
-        window.addEventListener('musicTrackChanged', () => {
-            if (document.getElementById('musicPanel').classList.contains('active')) {
-                this.renderMusicPanelList();
-            }
-        });
-        
-        // 监听音乐播放状态改变事件
-        window.addEventListener('musicPlayStateChanged', () => {
-            if (document.getElementById('musicPanel').classList.contains('active')) {
-                this.updateMusicControlButtons();
-            }
-        });
-        
         // 最后加载保存的设置（这会更新状态显示）
         this.loadSavedSettings();
     }
 
     initializeDateDisplay() {
+        // 延迟执行以确保DOM完全加载
+        setTimeout(() => {
+            this.updateDate();
+            // 每分钟更新一次日期（因为日期可能在午夜改变）
+            setInterval(() => this.updateDate(), 60000);
+        }, 100);
+        
+        // 同时也立即执行一次
         this.updateDate();
-        // 每分钟更新一次日期（因为日期可能在午夜改变）
-        setInterval(() => this.updateDate(), 60000);
     }
 
     updateDate() {
@@ -144,15 +129,27 @@ class App {
         const dateText = `${year}年${month}月${date}日`;
         const weekText = weekDay;
         
-        document.getElementById('dateText').textContent = dateText;
-        document.getElementById('weekText').textContent = weekText;
+        const dateElement = document.getElementById('dateText');
+        const weekElement = document.getElementById('weekText');
+                
+        if (dateElement) {
+            dateElement.textContent = dateText;
+            dateElement.style.display = 'block';
+            dateElement.style.visibility = 'visible';
+            dateElement.style.opacity = '1';
+        }
+        
+        if (weekElement) {
+            weekElement.textContent = weekText;
+            weekElement.style.display = 'block';
+            weekElement.style.visibility = 'visible';
+            weekElement.style.opacity = '1';
+        }
     }
 
     initializeControls() {
         const settingsToggle = document.getElementById('settingsToggle');
         const settingsPanel = document.getElementById('settingsPanel');
-        const musicBtn = document.getElementById('musicBtn');
-        const musicPanel = document.getElementById('musicPanel');
         const bgColorBtn = document.getElementById('bgColorBtn');
         const animationBtn = document.getElementById('animationBtn');
         const tickSoundBtn = document.getElementById('tickSoundBtn');
@@ -163,9 +160,6 @@ class App {
             e.stopPropagation();
             settingsToggle.classList.toggle('active');
             settingsPanel.classList.toggle('active');
-            // 关闭其他面板
-            musicPanel.classList.remove('active');
-            musicBtn.classList.remove('active');
             // 关闭番茄钟面板
             const pomodoroPanel = document.getElementById('pomodoroPanel');
             if (pomodoroPanel) {
@@ -179,84 +173,6 @@ class App {
             e.stopPropagation();
             settingsPanel.classList.remove('active');
             settingsToggle.classList.remove('active');
-        });
-
-        // 音乐按钮切换
-        musicBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            musicBtn.classList.toggle('active');
-            musicPanel.classList.toggle('active');
-            // 关闭其他面板
-            settingsPanel.classList.remove('active');
-            settingsToggle.classList.remove('active');
-            // 关闭番茄钟面板
-            const pomodoroPanel = document.getElementById('pomodoroPanel');
-            if (pomodoroPanel) {
-                pomodoroPanel.classList.remove('active');
-            }
-            // 渲染音乐列表到面板
-            this.renderMusicPanelList();
-            // 更新控制按钮状态
-            this.updateMusicControlButtons();
-        });
-
-        // 音乐面板关闭按钮
-        const musicPanelCloseBtn = document.getElementById('musicPanelCloseBtn');
-        musicPanelCloseBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            musicPanel.classList.remove('active');
-            musicBtn.classList.remove('active');
-        });
-
-        // 音乐控制按钮
-        const musicPlayPauseBtn = document.getElementById('musicPlayPauseBtn');
-        const musicStopBtn = document.getElementById('musicStopBtn');
-        const musicPrevBtn = document.getElementById('musicPrevBtn');
-        const musicNextBtn = document.getElementById('musicNextBtn');
-
-        // 播放/暂停按钮
-        musicPlayPauseBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.bgmPlayerManager.togglePlay();
-            this.updateMusicControlButtons();
-            this.saveCurrentSettings();
-        });
-
-        // 停止按钮
-        musicStopBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.bgmPlayerManager.stop();
-            this.updateMusicControlButtons();
-            this.renderMusicPanelList(); // 更新曲目显示
-            this.saveCurrentSettings();
-        });
-
-        // 上一曲按钮
-        musicPrevBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.bgmPlayerManager.playPrevious();
-            this.renderMusicPanelList();
-            this.updateMusicControlButtons();
-            this.saveCurrentSettings();
-        });
-
-        // 下一曲按钮
-        musicNextBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.bgmPlayerManager.playNext();
-            this.renderMusicPanelList();
-            this.updateMusicControlButtons();
-            this.saveCurrentSettings();
-        });
-
-        // 阻止设置面板内点击冒泡
-        settingsPanel.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        // 阻止音乐面板内点击冒泡
-        musicPanel.addEventListener('click', (e) => {
-            e.stopPropagation();
         });
 
         // 背景色按钮
@@ -293,8 +209,6 @@ class App {
             if (!e.target.closest('.controls') && !e.target.closest('.color-panel') && !e.target.closest('.pomodoro-container')) {
                 settingsPanel.classList.remove('active');
                 settingsToggle.classList.remove('active');
-                musicPanel.classList.remove('active');
-                musicBtn.classList.remove('active');
                 document.getElementById('colorPanel').classList.remove('active');
             }
         });
@@ -322,17 +236,6 @@ class App {
             } else {
                 statusElement.textContent = '关闭';
                 statusElement.classList.remove('active');
-            }
-        }
-    }
-
-    updateMusicControlButtons() {
-        const playPauseBtn = document.getElementById('musicPlayPauseBtn');
-        if (playPauseBtn) {
-            if (this.bgmPlayerManager.isPlaying) {
-                playPauseBtn.classList.add('playing');
-            } else {
-                playPauseBtn.classList.remove('playing');
             }
         }
     }
@@ -367,58 +270,75 @@ class App {
     }
 
     initializeBGMPlayer() {
-        // BGM 播放器不再需要 UI 初始化
-        // 音乐播放完全通过顶部音乐按钮和面板控制
-    }
-
-    // 渲染音乐面板列表
-    renderMusicPanelList() {
-        const musicPanelList = document.getElementById('musicPanelList');
-        const musicPanelTrackName = document.getElementById('musicPanelTrackName');
+        // 绑定浮动播放器的控制按钮
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const loopBtn = document.getElementById('loopBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const progressContainer = document.getElementById('progressContainer');
         
-        if (!musicPanelList) return;
-        
-        // 获取 BGM 播放器的音乐列表
-        const musicList = this.bgmPlayerManager.musicList;
-        const currentTrackIndex = this.bgmPlayerManager.currentTrackIndex;
-        
-        if (musicList.length === 0) {
-            musicPanelList.innerHTML = '<div class="no-music">暂无音乐文件</div>';
-            return;
-        }
-        
-        // 更新当前播放的音乐名称
-        if (currentTrackIndex >= 0 && currentTrackIndex < musicList.length) {
-            musicPanelTrackName.textContent = '♪ ' + musicList[currentTrackIndex].name;
-        } else {
-            musicPanelTrackName.textContent = '未播放';
-        }
-        
-        // 渲染音乐列表
-        musicPanelList.innerHTML = '';
-        musicList.forEach((track, index) => {
-            const trackElement = document.createElement('div');
-            trackElement.className = 'music-panel-track';
-            if (index === currentTrackIndex) {
-                trackElement.classList.add('active');
-            }
-            
-            trackElement.innerHTML = `
-                <span class="track-icon">♪</span>
-                <span class="track-name">${track.name}</span>
-            `;
-            
-            trackElement.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.bgmPlayerManager.playTrack(index);
-                this.renderMusicPanelList(); // 重新渲染以更新活动状态
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', () => {
+                this.bgmPlayerManager.togglePlay();
                 this.saveCurrentSettings();
             });
-            
-            musicPanelList.appendChild(trackElement);
-        });
+        }
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                this.bgmPlayerManager.playPrevious();
+                this.saveCurrentSettings();
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                this.bgmPlayerManager.playNext();
+                this.saveCurrentSettings();
+            });
+        }
+        
+        if (loopBtn) {
+            loopBtn.addEventListener('click', () => {
+                this.bgmPlayerManager.toggleLoop();
+                this.saveCurrentSettings();
+            });
+        }
+        
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', (e) => {
+                this.bgmPlayerManager.setVolume(e.target.value);
+                this.saveCurrentSettings();
+            });
+        }
+        
+        if (progressContainer) {
+            progressContainer.addEventListener('click', (e) => {
+                const rect = progressContainer.getBoundingClientRect();
+                const percent = ((e.clientX - rect.left) / rect.width) * 100;
+                this.bgmPlayerManager.setProgress(percent);
+            });
+        }
+        
+        // 初始加载音乐列表
+        this.loadJamendoMusicForFloatingPlayer();
     }
-
+    
+    // 为浮动播放器加载音乐
+    async loadJamendoMusicForFloatingPlayer() {
+        try {
+            // 使用 BGM 标签组合加载音乐
+            await this.bgmPlayerManager.loadJamendoMusic({
+                tags: 'ambient+instrumental',  // 使用组合标签
+                limit: 20
+            });
+            
+        } catch (error) {
+            console.error('❌ 加载浮动播放器音乐失败:', error);
+        }
+    }
+    
     // 加载保存的设置
     loadSavedSettings() {
         const settings = this.settingsStorage.load();
@@ -482,5 +402,12 @@ class App {
 
 // 页面加载完成后初始化应用
 document.addEventListener('DOMContentLoaded', () => {
-    new App();
+    window.app = new App();
+    
+    // 确保日期显示被更新
+    setTimeout(() => {
+        if (window.app && window.app.updateDate) {
+            window.app.updateDate();
+        }
+    }, 500);
 });

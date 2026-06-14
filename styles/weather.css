@@ -1,0 +1,239 @@
+/**
+ * 天气显示样式
+ */
+
+/* 天气显示容器 - 集成到日期显示中 */
+.weather-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    opacity: 1;
+    margin: 0 15px;
+}
+
+.weather-display:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* 天气图标 */
+.weather-icon {
+    font-size: 2em;
+    line-height: 1;
+    animation: weatherIconFloat 3s ease-in-out infinite;
+}
+
+@keyframes weatherIconFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+/* 天气信息容器 */
+.weather-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+/* 温度显示 */
+.weather-temp {
+    font-size: 1.4em;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    font-family: 'Helvetica Neue', 'Arial', sans-serif;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    line-height: 1;
+}
+
+/* 天气描述 */
+.weather-desc {
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+/* 天气效果容器 */
+.weather-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+}
+
+/* 雨滴效果 */
+.rain-effect {
+    opacity: 0.6;
+}
+
+.raindrop {
+    position: absolute;
+    top: -10%;
+    width: 2px;
+    height: 60px;
+    background: linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0) 0%,
+        rgba(174, 194, 224, 0.8) 50%,
+        rgba(174, 194, 224, 0) 100%
+    );
+    animation: rainFall linear infinite;
+}
+
+@keyframes rainFall {
+    to {
+        transform: translateY(110vh);
+    }
+}
+
+/* 雪花效果 */
+.snow-effect {
+    opacity: 0.8;
+}
+
+.snowflake {
+    position: absolute;
+    top: -10%;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    animation: snowFall linear infinite;
+}
+
+@keyframes snowFall {
+    to {
+        transform: translateY(110vh) rotate(360deg);
+    }
+}
+
+/* 阴天背景效果 */
+body.weather-cloudy {
+    filter: brightness(0.85);
+}
+
+/* 响应式设计 - 平板 */
+@media (max-width: 768px) {
+    .weather-display {
+        padding: 6px 14px;
+        gap: 8px;
+        margin: 0 10px;
+    }
+    
+    .weather-icon {
+        font-size: 1.6em;
+    }
+    
+    .weather-temp {
+        font-size: 1.2em;
+    }
+    
+    .weather-desc {
+        font-size: 0.75em;
+    }
+}
+
+/* 响应式设计 - 手机竖屏 */
+@media (max-width: 480px) {
+    .weather-display {
+        padding: 5px 12px;
+        gap: 6px;
+        margin: 0 8px;
+        border-radius: 12px;
+    }
+    
+    .weather-icon {
+        font-size: 1.4em;
+    }
+    
+    .weather-info {
+        gap: 0;
+    }
+    
+    .weather-temp {
+        font-size: 1em;
+    }
+    
+    .weather-desc {
+        font-size: 0.7em;
+    }
+}
+
+/* 响应式设计 - 手机横屏 */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+    .weather-display {
+        padding: 4px 10px;
+        gap: 6px;
+        margin: 0 6px;
+        border-radius: 10px;
+    }
+    
+    .weather-icon {
+        font-size: 1.2em;
+    }
+    
+    .weather-temp {
+        font-size: 0.9em;
+    }
+    
+    .weather-desc {
+        font-size: 0.65em;
+    }
+    
+    /* 减少雨滴和雪花数量以提高性能 */
+    .raindrop:nth-child(n+30),
+    .snowflake:nth-child(n+20) {
+        display: none;
+    }
+}
+
+/* 更小的横屏设备 */
+@media (max-width: 700px) and (max-height: 400px) and (orientation: landscape) {
+    .weather-display {
+        padding: 3px 8px;
+        gap: 5px;
+        margin: 0 5px;
+    }
+    
+    .weather-icon {
+        font-size: 1em;
+    }
+    
+    .weather-temp {
+        font-size: 0.8em;
+    }
+    
+    .weather-desc {
+        font-size: 0.6em;
+    }
+}
+
+/* 天气刷新动画 */
+@keyframes weatherRefresh {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.weather-display.refreshing .weather-icon {
+    animation: weatherRefresh 1s ease-in-out;
+}

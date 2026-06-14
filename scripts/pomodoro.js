@@ -45,80 +45,7 @@ class PomodoroTimer {
     }
     
     createUI() {
-        // 创建番茄钟容器
-        this.container = document.createElement('div');
-        this.container.className = 'pomodoro-container';
-        this.container.innerHTML = `
-            <div class="pomodoro-toggle" id="pomodoroToggle" title="番茄钟">
-                🍅
-                <span class="pomodoro-status-indicator" id="statusIndicator"></span>
-            </div>
-            <div class="pomodoro-panel" id="pomodoroPanel">
-                <div class="panel-header">
-                    <span>🍅 番茄钟</span>
-                    <button class="panel-close-btn" id="pomodoroClose" title="关闭">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="panel-content">
-                <div class="pomodoro-modes">
-                    <button class="mode-btn active" data-mode="work">
-                        <span>工作</span>
-                        <small>25分钟</small>
-                    </button>
-                    <button class="mode-btn" data-mode="shortBreak">
-                        <span>短休息</span>
-                        <small>5分钟</small>
-                    </button>
-                    <button class="mode-btn" data-mode="longBreak">
-                        <span>长休息</span>
-                        <small>15分钟</small>
-                    </button>
-                </div>
-                <div class="pomodoro-custom">
-                    <label for="customMinutes">自定义时长（分钟）</label>
-                    <div class="custom-input-wrapper">
-                        <input type="number" id="customMinutes" min="1" max="180" placeholder="输入分钟数" />
-                        <button class="custom-start-btn" id="customStartBtn">开始</button>
-                    </div>
-                </div>
-                <div class="pomodoro-progress-bar">
-                    <div class="pomodoro-progress-fill" id="progressFill"></div>
-                </div>
-                <div class="pomodoro-controls">
-                    <button class="pomodoro-btn start" id="pomodoroStart">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                        </svg>
-                    </button>
-                    <button class="pomodoro-btn pause" id="pomodoroPause" style="display: none;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <rect x="6" y="4" width="4" height="16"></rect>
-                            <rect x="14" y="4" width="4" height="16"></rect>
-                        </svg>
-                    </button>
-                    <button class="pomodoro-btn reset" id="pomodoroReset">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="1 4 1 10 7 10"></polyline>
-                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="pomodoro-sessions">
-                    <span>已完成 </span>
-                    <span id="sessionCount">0</span>
-                    <span> 个番茄</span>
-                </div>
-                </div>
-            </div>
-        `;
-        
-        // 插入到页面中
-        document.body.appendChild(this.container);
-        
-        // 获取DOM元素引用
+        // 不再动态创建UI，直接获取HTML中已有的元素
         this.toggle = document.getElementById('pomodoroToggle');
         this.statusIndicator = document.getElementById('statusIndicator');
         this.progressFill = document.getElementById('progressFill');
@@ -144,20 +71,12 @@ class PomodoroTimer {
             // 关闭其他面板
             const settingsPanel = document.getElementById('settingsPanel');
             const settingsToggle = document.getElementById('settingsToggle');
-            const musicPanel = document.getElementById('musicPanel');
-            const musicBtn = document.getElementById('musicBtn');
             
             if (settingsPanel) {
                 settingsPanel.classList.remove('active');
             }
             if (settingsToggle) {
                 settingsToggle.classList.remove('active');
-            }
-            if (musicPanel) {
-                musicPanel.classList.remove('active');
-            }
-            if (musicBtn) {
-                musicBtn.classList.remove('active');
             }
         });
         
