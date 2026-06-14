@@ -218,18 +218,21 @@ body {
         left: 60px;
         transform: none;
         gap: 8px;
-        max-width: 35%;
+        white-space: nowrap;
+        flex-wrap: nowrap;
     }
     
     #dateText {
         font-size: 2vw;
         letter-spacing: 1px;
+        white-space: nowrap;
     }
     
     #weekText {
         font-size: 1.6vw;
         padding-left: 8px;
         letter-spacing: 1px;
+        white-space: nowrap;
     }
     
     /* 时钟 - 调整到适中尺寸（放大1.25倍：16vh -> 20vh） */
@@ -266,16 +269,19 @@ body {
         top: 5px;
         left: 50px;
         gap: 6px;
-        max-width: 30%;
+        white-space: nowrap;
+        flex-wrap: nowrap;
     }
     
     #dateText {
         font-size: 1.8vw;
+        white-space: nowrap;
     }
     
     #weekText {
         font-size: 1.4vw;
         padding-left: 6px;
+        white-space: nowrap;
     }
     
     /* 时钟放大1.25倍：14vh -> 17.5vh */

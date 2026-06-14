@@ -7,6 +7,28 @@ class PicsumManager {
         this.currentPicsumUrl = null;
         this.favorites = this.loadFavorites();
         this.initializeFavoritesPanel();
+        
+        // 监听屏幕方向变化
+        this.setupOrientationListener();
+    }
+
+    // 设置屏幕方向变化监听
+    setupOrientationListener() {
+        // 记录初始方向
+        this.currentOrientation = window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+        
+        // 监听窗口大小变化（包括方向变化）
+        window.addEventListener('resize', () => {
+            const newOrientation = window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+            
+            // 如果方向发生变化且当前显示的是Picsum图片
+            if (newOrientation !== this.currentOrientation && this.currentPicsumUrl) {
+                this.currentOrientation = newOrientation;
+                console.log('屏幕方向已变化为:', newOrientation);
+                // 可选：自动重新加载适合新方向的图片
+                // this.loadRandomImage();
+            }
+        });
     }
 
     // 加载收藏的图片
@@ -33,9 +55,28 @@ class PicsumManager {
     getRandomImageUrl() {
         const width = window.innerWidth;
         const height = window.innerHeight;
+        
+        // 检测屏幕方向
+        const isPortrait = height > width;
+        
+        // 根据方向设置合适的尺寸
+        // 对于竖屏，确保高度大于宽度
+        // 对于横屏，确保宽度大于高度
+        let finalWidth, finalHeight;
+        
+        if (isPortrait) {
+            // 竖屏：使用实际尺寸（高>宽）
+            finalWidth = width;
+            finalHeight = height;
+        } else {
+            // 横屏：使用实际尺寸（宽>高）
+            finalWidth = width;
+            finalHeight = height;
+        }
+        
         // 使用时间戳确保每次都是不同的图片
         const seed = Date.now();
-        return `https://picsum.photos/seed/${seed}/${width}/${height}`;
+        return `https://picsum.photos/seed/${seed}/${finalWidth}/${finalHeight}`;
     }
 
     // 加载随机图片

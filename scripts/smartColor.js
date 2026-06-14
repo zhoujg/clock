@@ -7,10 +7,11 @@ class SmartColorManager {
             weatherWidget: null // 将在天气组件加载后设置
         };
         
-        // 采样区域配置 - 精确对应日期显示的位置
+        // 采样区域配置 - 精确对应显示元素的位置
         this.sampleRegions = [
             { x: 0.25, y: 0.06, width: 0.15, height: 0.06 },  // 日期文字区域
-            { x: 0.45, y: 0.06, width: 0.1, height: 0.06 }    // 星期文字区域
+            { x: 0.45, y: 0.06, width: 0.1, height: 0.06 },   // 星期文字区域
+            { x: 0.35, y: 0.45, width: 0.3, height: 0.15 }    // 时钟卡片区域（中心位置）
         ];
         
         // 当前颜色状态
@@ -357,8 +358,66 @@ class SmartColorManager {
             this.elements.weekText.style.borderLeftColor = borderColor;
         }
         
+        // 时钟卡片（智能调整）
+        this.adjustClockPanelColors();
+        
         // 天气组件（如果存在）
         this.adjustWeatherColors(textColor, shadowColor);
+        
+        // 音乐播放器（如果存在）
+        this.adjustMusicPlayerColors(textColor, shadowColor, borderColor);
+    }
+    
+    // 调整时钟卡片颜色
+    adjustClockPanelColors() {
+        // 检查是否有背景图片
+        const bodyStyle = window.getComputedStyle(document.body);
+        const bgImage = bodyStyle.backgroundImage;
+        
+        if (!bgImage || bgImage === 'none') {
+            // 如果是纯色背景，不做处理（由 BackgroundManager 处理）
+            return;
+        }
+        
+        // 有背景图片时，根据当前模式智能调整卡片背景色
+        let panelBgColor, panelTextColor, panelShadowColor;
+        
+        if (this.currentMode === 'dark') {
+            // 深色背景 - 使用半透明浅色卡片，确保对比度
+            panelBgColor = 'rgba(255, 255, 255, 0.15)';
+            panelTextColor = 'rgba(255, 255, 255, 0.98)';
+            panelShadowColor = 'rgba(0, 0, 0, 0.6)';
+        } else {
+            // 浅色背景 - 使用半透明深色卡片
+            panelBgColor = 'rgba(0, 0, 0, 0.18)';
+            panelTextColor = 'rgba(255, 255, 255, 0.98)';
+            panelShadowColor = 'rgba(0, 0, 0, 0.8)';
+        }
+        
+        // 应用到翻转卡片面板
+        const style = document.createElement('style');
+        style.id = 'dynamic-flip-panel-style-smart';
+        
+        // 移除旧的智能样式
+        const oldStyle = document.getElementById('dynamic-flip-panel-style-smart');
+        if (oldStyle) {
+            oldStyle.remove();
+        }
+        
+        style.textContent = `
+            .tick-flip-panel {
+                background-color: ${panelBgColor} !important;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            .tick-flip-panel .tick-text {
+                color: ${panelTextColor} !important;
+                text-shadow: 0 2px 8px ${panelShadowColor} !important;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        console.log(`🎴 时钟卡片颜色调整: 模式=${this.currentMode}, 背景=${panelBgColor}`);
     }
     
     // 调整天气组件颜色
@@ -407,6 +466,155 @@ class SmartColorManager {
                 : 'drop-shadow(0 2px 8px rgba(255, 255, 255, 0.8))';
             console.log('  ✓ 图标滤镜已更新');
         }
+    }
+    
+    // 调整音乐播放器颜色
+    adjustMusicPlayerColors(textColor, shadowColor, borderColor) {
+        const playerContainer = document.querySelector('.bgm-player-container');
+        if (!playerContainer) {
+            console.log('⚠️ 音乐播放器未找到');
+            return;
+        }
+        
+        console.log('🎵 调整音乐播放器颜色');
+        
+        // 使用不透明的纯色背景
+        if (this.currentMode === 'dark') {
+            // 深色背景 - 使用浅色不透明容器
+            playerContainer.style.background = 'rgba(240, 240, 245, 0.98)';
+            playerContainer.style.borderColor = 'rgba(200, 200, 210, 0.8)';
+            playerContainer.style.color = 'rgba(0, 0, 0, 0.9)';
+        } else {
+            // 浅色背景 - 使用深色不透明容器
+            playerContainer.style.background = 'rgba(30, 30, 35, 0.98)';
+            playerContainer.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            playerContainer.style.color = 'rgba(255, 255, 255, 0.95)';
+        }
+        
+        // 播放器标题
+        const playerTitle = playerContainer.querySelector('.player-title');
+        if (playerTitle) {
+            playerTitle.style.color = this.currentMode === 'dark' 
+                ? 'rgba(0, 0, 0, 0.9)' 
+                : 'rgba(255, 255, 255, 0.95)';
+        }
+        
+        // 当前曲目名称
+        const trackName = playerContainer.querySelector('.current-track-name');
+        if (trackName) {
+            trackName.style.color = this.currentMode === 'dark' 
+                ? 'rgba(0, 0, 0, 0.9)' 
+                : 'rgba(255, 255, 255, 0.95)';
+        }
+        
+        // 艺术家名称
+        const artistName = playerContainer.querySelector('.music-artist');
+        if (artistName) {
+            artistName.style.color = this.currentMode === 'dark' 
+                ? 'rgba(0, 0, 0, 0.6)' 
+                : 'rgba(255, 255, 255, 0.6)';
+        }
+        
+        // 时间显示
+        const timeDisplays = playerContainer.querySelectorAll('.time-display span');
+        timeDisplays.forEach(span => {
+            span.style.color = this.currentMode === 'dark' 
+                ? 'rgba(0, 0, 0, 0.6)' 
+                : 'rgba(255, 255, 255, 0.6)';
+        });
+        
+        // 播放列表中的曲目
+        const tracks = playerContainer.querySelectorAll('.music-track');
+        tracks.forEach(track => {
+            const trackNameEl = track.querySelector('.track-name');
+            const trackIcon = track.querySelector('.track-icon');
+            
+            if (!track.classList.contains('active')) {
+                if (trackNameEl) {
+                    trackNameEl.style.color = this.currentMode === 'dark' 
+                        ? 'rgba(0, 0, 0, 0.85)' 
+                        : 'rgba(255, 255, 255, 0.85)';
+                }
+                if (trackIcon) {
+                    trackIcon.style.color = this.currentMode === 'dark' 
+                        ? 'rgba(0, 0, 0, 0.5)' 
+                        : 'rgba(255, 255, 255, 0.5)';
+                }
+            }
+            
+            // 调整音轨背景 - 使用不透明背景
+            if (this.currentMode === 'dark') {
+                track.style.background = 'rgba(220, 220, 230, 0.5)';
+            } else {
+                track.style.background = 'rgba(50, 50, 55, 0.5)';
+            }
+        });
+        
+        // 无音乐提示
+        const noMusic = playerContainer.querySelector('.no-music');
+        if (noMusic) {
+            noMusic.style.color = this.currentMode === 'dark' 
+                ? 'rgba(0, 0, 0, 0.5)' 
+                : 'rgba(255, 255, 255, 0.5)';
+        }
+        
+        // 音量图标
+        const volumeIcon = playerContainer.querySelector('.volume-icon');
+        if (volumeIcon) {
+            volumeIcon.style.color = this.currentMode === 'dark' 
+                ? 'rgba(0, 0, 0, 0.7)' 
+                : 'rgba(255, 255, 255, 0.7)';
+        }
+        
+        // 控制按钮
+        const controlBtns = playerContainer.querySelectorAll('.control-btn:not(.play-pause)');
+        controlBtns.forEach(btn => {
+            if (this.currentMode === 'dark') {
+                btn.style.background = 'rgba(220, 220, 230, 0.6)';
+                btn.style.borderColor = 'rgba(200, 200, 210, 0.8)';
+                btn.style.color = 'rgba(0, 0, 0, 0.8)';
+            } else {
+                btn.style.background = 'rgba(50, 50, 55, 0.6)';
+                btn.style.borderColor = 'rgba(70, 70, 75, 0.8)';
+                btn.style.color = 'rgba(255, 255, 255, 0.9)';
+            }
+        });
+        
+        // 其他半透明元素 - 改为不透明
+        const currentTrack = playerContainer.querySelector('.current-track');
+        if (currentTrack) {
+            if (this.currentMode === 'dark') {
+                currentTrack.style.background = 'rgba(230, 230, 240, 0.6)';
+                currentTrack.style.borderColor = 'rgba(200, 200, 210, 0.8)';
+            } else {
+                currentTrack.style.background = 'rgba(40, 40, 45, 0.6)';
+                currentTrack.style.borderColor = 'rgba(60, 60, 65, 0.8)';
+            }
+        }
+        
+        const volumeControl = playerContainer.querySelector('.volume-control');
+        if (volumeControl) {
+            if (this.currentMode === 'dark') {
+                volumeControl.style.background = 'rgba(230, 230, 240, 0.5)';
+                volumeControl.style.borderColor = 'rgba(200, 200, 210, 0.7)';
+            } else {
+                volumeControl.style.background = 'rgba(40, 40, 45, 0.5)';
+                volumeControl.style.borderColor = 'rgba(60, 60, 65, 0.7)';
+            }
+        }
+        
+        const playerHeader = playerContainer.querySelector('.player-header');
+        if (playerHeader) {
+            if (this.currentMode === 'dark') {
+                playerHeader.style.background = 'rgba(220, 220, 230, 0.5)';
+                playerHeader.style.borderBottomColor = 'rgba(200, 200, 210, 0.7)';
+            } else {
+                playerHeader.style.background = 'rgba(40, 40, 45, 0.5)';
+                playerHeader.style.borderBottomColor = 'rgba(60, 60, 65, 0.7)';
+            }
+        }
+        
+        console.log('  ✓ 音乐播放器颜色已更新');
     }
     
     // 手动触发重新分析（供外部调用）

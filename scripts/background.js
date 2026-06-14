@@ -74,6 +74,11 @@ class BackgroundManager {
         document.body.style.backgroundImage = `url(${imageUrl})`;
         document.body.style.backgroundSize = 'cover';
         document.body.style.backgroundPosition = 'center';
+        
+        // 触发智能颜色管理器分析图片并调整时钟卡片
+        if (window.smartColorManager) {
+            setTimeout(() => window.smartColorManager.refresh(), 100);
+        }
     }
 
     loadImage(file) {
