@@ -102,6 +102,9 @@ body {
     z-index: 20;
     text-align: center;
     max-width: 85%;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
 }
 
 #quoteDisplay {

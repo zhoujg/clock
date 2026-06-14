@@ -1,6 +1,6 @@
 // BGM 音乐播放器管理器
 class BGMPlayerManager {
-    constructor(tickSoundManager = null) {
+    constructor(tickSoundManager = null, quoteManager = null) {
         this.enabled = false;
         this.audio = null;
         this.currentTrack = null;
@@ -11,6 +11,7 @@ class BGMPlayerManager {
         this.isLooping = false; // 单曲循环
         this.tickSoundManager = tickSoundManager; // 滴答声管理器引用
         this.tickSoundWasEnabled = undefined; // 记录音乐播放前滴答声是否开启，undefined表示未记录
+        this.quoteManager = quoteManager; // 谚语管理器引用
         
         // Jamendo API 集成
         this.jamendoAPI = new JamendoAPI();
@@ -57,6 +58,8 @@ class BGMPlayerManager {
             
             // 播放音乐时暂停滴答声
             this.pauseTickSound();
+            // 播放音乐时隐藏谚语
+            this.hideQuote();
             // 触发自定义事件，通知UI更新
             window.dispatchEvent(new CustomEvent('musicPlayStateChanged'));
         });
@@ -66,6 +69,8 @@ class BGMPlayerManager {
             this.updatePlayPauseButton();
             // 暂停音乐时恢复滴答声
             this.resumeTickSound();
+            // 暂停音乐时显示谚语
+            this.showQuote();
             // 触发自定义事件，通知UI更新
             window.dispatchEvent(new CustomEvent('musicPlayStateChanged'));
         });
@@ -79,8 +84,9 @@ class BGMPlayerManager {
         this.audio.addEventListener('error', (e) => {
             console.error('音乐文件加载失败:', e);
             this.showError('音乐加载失败');
-            // 加载失败时也恢复滴答声
+            // 加载失败时也恢复滴答声和谚语
             this.resumeTickSound();
+            this.showQuote();
         });
     }
     
@@ -213,6 +219,20 @@ class BGMPlayerManager {
         this.tickSoundWasEnabled = undefined;
     }
     
+    // 隐藏谚语
+    hideQuote() {
+        if (this.quoteManager) {
+            this.quoteManager.hide();
+        }
+    }
+    
+    // 显示谚语
+    showQuote() {
+        if (this.quoteManager) {
+            this.quoteManager.show();
+        }
+    }
+    
     // 加载音乐列表
     async loadMusicList() {
         // 只支持在线音乐，直接加载 Jamendo 音乐
@@ -311,8 +331,9 @@ class BGMPlayerManager {
                         source: this.currentTrack.source
                     });
                     this.showError('播放失败: ' + error.message);
-                    // 播放失败时恢复滴答声
+                    // 播放失败时恢复滴答声和谚语
                     this.resumeTickSound();
+                    this.showQuote();
                 });
         }
     }
@@ -359,8 +380,9 @@ class BGMPlayerManager {
         this.enabled = false;
         this.isPlaying = false;
         this.updatePlayPauseButton();
-        // 停止音乐时恢复滴答声
+        // 停止音乐时恢复滴答声和谚语
         this.resumeTickSound();
+        this.showQuote();
     }
     
     // 上一曲
@@ -500,7 +522,8 @@ class BGMPlayerManager {
                 </div>
             `;
             
-            trackElement.addEventListener('click', () => {
+            trackElement.addEventListener('click', (e) => {
+                e.stopPropagation(); // 阻止事件冒泡
                 this.playTrack(index);
             });
             

@@ -89,4 +89,22 @@ class QuoteManager {
     getCurrentQuote() {
         return this.quotes[this.currentQuoteIndex];
     }
+    
+    // 隐藏谚语
+    hide() {
+        if (this.quoteContainer) {
+            this.quoteContainer.style.opacity = '0';
+            this.quoteContainer.style.visibility = 'hidden';
+            this.stopRotation(); // 停止轮播
+        }
+    }
+    
+    // 显示谚语
+    show() {
+        if (this.quoteContainer) {
+            this.quoteContainer.style.opacity = '1';
+            this.quoteContainer.style.visibility = 'visible';
+            this.startRotation(); // 恢复轮播
+        }
+    }
 }

@@ -84,10 +84,11 @@ class App {
         this.animationManager = new AnimationManager('animationCanvas');
         this.quoteManager = new QuoteManager();
         this.tickSoundManager = new TickSoundManager();
-        this.bgmPlayerManager = new BGMPlayerManager(this.tickSoundManager); // 传递滴答声管理器
+        this.bgmPlayerManager = new BGMPlayerManager(this.tickSoundManager, this.quoteManager); // 传递滴答声管理器和谚语管理器
         this.achievementSystem = new AchievementSystem();
         this.forestSystem = new ForestSystem(this.achievementSystem);
         this.pomodoroTimer = new PomodoroTimer(clockManager, this.achievementSystem, this.forestSystem);
+        this.picsumManager = new PicsumManager(this.backgroundManager, this.settingsStorage);
         
         // 设置时钟管理器的滴答声引用
         clockManager.setTickSoundManager(this.tickSoundManager);
@@ -98,6 +99,8 @@ class App {
         this.initializeControls();
         this.initializeColorPanel();
         this.initializeImageInput();
+        this.initializeBackgroundPanel();
+        this.initializePicsumControls();
         this.initializeDateDisplay();
         this.initializeBGMPlayer();
         
@@ -150,20 +153,23 @@ class App {
     initializeControls() {
         const settingsToggle = document.getElementById('settingsToggle');
         const settingsPanel = document.getElementById('settingsPanel');
-        const bgColorBtn = document.getElementById('bgColorBtn');
+        const backgroundBtn = document.getElementById('backgroundBtn');
         const animationBtn = document.getElementById('animationBtn');
         const tickSoundBtn = document.getElementById('tickSoundBtn');
-        const imageBtn = document.getElementById('imageBtn');
 
         // 设置按钮切换
         settingsToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             settingsToggle.classList.toggle('active');
             settingsPanel.classList.toggle('active');
-            // 关闭番茄钟面板
+            // 关闭番茄钟面板和背景面板
             const pomodoroPanel = document.getElementById('pomodoroPanel');
+            const backgroundPanel = document.getElementById('backgroundPanel');
             if (pomodoroPanel) {
                 pomodoroPanel.classList.remove('active');
+            }
+            if (backgroundPanel) {
+                backgroundPanel.classList.remove('active');
             }
         });
 
@@ -175,12 +181,19 @@ class App {
             settingsToggle.classList.remove('active');
         });
 
-        // 背景色按钮
-        bgColorBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const colorPanel = document.getElementById('colorPanel');
-            colorPanel.classList.toggle('active');
-        });
+        // 背景设置按钮
+        if (backgroundBtn) {
+            backgroundBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const backgroundPanel = document.getElementById('backgroundPanel');
+                if (backgroundPanel) {
+                    backgroundPanel.classList.toggle('active');
+                    // 关闭设置面板
+                    settingsPanel.classList.remove('active');
+                    settingsToggle.classList.remove('active');
+                }
+            });
+        }
 
         // 动画线条按钮
         animationBtn.addEventListener('click', (e) => {
@@ -198,18 +211,27 @@ class App {
             this.saveCurrentSettings();
         });
 
-        // 背景图片按钮
-        imageBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('imageInput').click();
-        });
-
         // 点击其他地方关闭所有面板
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.controls') && !e.target.closest('.color-panel') && !e.target.closest('.pomodoro-container')) {
+            // 排除音乐播放器容器内的点击
+            const bgmPlayerContainer = document.getElementById('bgmPlayerContainer');
+            const backgroundPanel = document.getElementById('backgroundPanel');
+            
+            if (!e.target.closest('.controls') && 
+                !e.target.closest('.background-panel') && 
+                !e.target.closest('.pomodoro-container')) {
                 settingsPanel.classList.remove('active');
                 settingsToggle.classList.remove('active');
-                document.getElementById('colorPanel').classList.remove('active');
+                if (backgroundPanel) {
+                    backgroundPanel.classList.remove('active');
+                }
+            }
+            
+            // 点击播放器外部区域时收起播放器
+            if (bgmPlayerContainer && 
+                !e.target.closest('.bgm-player-container') && 
+                bgmPlayerContainer.classList.contains('expanded')) {
+                bgmPlayerContainer.classList.remove('expanded');
             }
         });
     }
@@ -241,16 +263,7 @@ class App {
     }
 
     initializeColorPanel() {
-        const colorOptions = document.querySelectorAll('.color-option');
-        
-        colorOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const color = option.getAttribute('data-color');
-                this.backgroundManager.setColor(color);
-                document.getElementById('colorPanel').classList.remove('active');
-                this.saveCurrentSettings();
-            });
-        });
+        // 废弃的旧方法，已整合到背景面板
     }
 
     initializeImageInput() {
@@ -262,6 +275,10 @@ class App {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     this.backgroundManager.setImage(event.target.result);
+                    // 清除当前的 Picsum 状态
+                    this.picsumManager.currentPicsumId = null;
+                    this.picsumManager.currentPicsumUrl = null;
+                    this.picsumManager.updateFavoriteButton();
                     this.saveCurrentSettings();
                 };
                 reader.readAsDataURL(file);
@@ -269,7 +286,278 @@ class App {
         });
     }
 
+    initializeBackgroundPanel() {
+        const backgroundPanel = document.getElementById('backgroundPanel');
+        const backgroundPanelCloseBtn = document.getElementById('backgroundPanelCloseBtn');
+        
+        // 关闭按钮
+        if (backgroundPanelCloseBtn) {
+            backgroundPanelCloseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                backgroundPanel.classList.remove('active');
+            });
+        }
+        
+        // 标签页切换
+        const tabs = document.querySelectorAll('.background-tab');
+        const contents = document.querySelectorAll('.background-tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tabName = tab.dataset.tab;
+                
+                // 移除所有活动状态
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                // 添加当前活动状态
+                tab.classList.add('active');
+                const content = document.querySelector(`[data-content="${tabName}"]`);
+                if (content) {
+                    content.classList.add('active');
+                }
+            });
+        });
+        
+        // 初始化各个标签页
+        this.initializeColorTab();
+        this.initializeUploadTab();
+        this.initializeRandomTab();
+    }
+    
+    initializeColorTab() {
+        const colorItems = document.querySelectorAll('.color-item');
+        
+        colorItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const color = item.dataset.color;
+                
+                // 更新选中状态
+                colorItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                // 应用背景色
+                this.backgroundManager.setColor(color);
+                
+                // 清除 Picsum 状态
+                this.picsumManager.currentPicsumId = null;
+                this.picsumManager.currentPicsumUrl = null;
+                this.picsumManager.updateFavoriteButton();
+                
+                this.saveCurrentSettings();
+                this.showNotification('已应用纯色背景 ✓');
+            });
+        });
+    }
+    
+    initializeUploadTab() {
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+        
+        // 点击上传区域
+        uploadArea.addEventListener('click', (e) => {
+            e.stopPropagation();
+            imageInput.click();
+        });
+        
+        // 拖拽上传
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        this.backgroundManager.setImage(event.target.result);
+                        this.picsumManager.currentPicsumId = null;
+                        this.picsumManager.currentPicsumUrl = null;
+                        this.picsumManager.updateFavoriteButton();
+                        this.saveCurrentSettings();
+                        this.showNotification('已应用本地图片 ✓');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    }
+    
+    initializeRandomTab() {
+        const randomLoadBtn = document.getElementById('randomLoadBtn');
+        const randomFavoriteBtn = document.getElementById('randomFavoriteBtn');
+        const favoritesGrid = document.getElementById('favoritesGrid');
+        
+        // 加载随机图片
+        if (randomLoadBtn) {
+            randomLoadBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                try {
+                    randomLoadBtn.classList.add('loading');
+                    await this.picsumManager.loadRandomImage();
+                    randomFavoriteBtn.disabled = false;
+                    this.saveCurrentSettings();
+                    this.showNotification('已加载随机图片 ✓');
+                } catch (error) {
+                    console.error('加载随机图片失败:', error);
+                    this.showNotification('加载失败 ✗');
+                } finally {
+                    randomLoadBtn.classList.remove('loading');
+                }
+            });
+        }
+        
+        // 收藏按钮
+        if (randomFavoriteBtn) {
+            randomFavoriteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.picsumManager.favoriteCurrentImage();
+                this.updateFavoritesGrid();
+            });
+        }
+        
+        // 初始化收藏网格
+        this.updateFavoritesGrid();
+    }
+    
+    updateFavoritesGrid() {
+        const favoritesGrid = document.getElementById('favoritesGrid');
+        const favoritesCount = document.getElementById('favoritesCount');
+        const randomFavoriteBtn = document.getElementById('randomFavoriteBtn');
+        
+        if (!favoritesGrid) return;
+        
+        const favorites = this.picsumManager.favorites;
+        
+        // 更新计数
+        if (favoritesCount) {
+            favoritesCount.textContent = favorites.length;
+        }
+        
+        // 更新收藏按钮状态
+        if (randomFavoriteBtn && this.picsumManager.currentPicsumId) {
+            const isFavorited = this.picsumManager.isCurrentImageFavorited();
+            if (isFavorited) {
+                randomFavoriteBtn.classList.add('favorited');
+            } else {
+                randomFavoriteBtn.classList.remove('favorited');
+            }
+        }
+        
+        if (favorites.length === 0) {
+            favoritesGrid.innerHTML = `
+                <div class="no-favorites-placeholder">
+                    <div class="placeholder-icon">📷</div>
+                    <div class="placeholder-text">暂无收藏</div>
+                </div>
+            `;
+            return;
+        }
+        
+        // 渲染收藏项（最新的在前面）
+        const sortedFavorites = [...favorites].reverse();
+        favoritesGrid.innerHTML = sortedFavorites.map((fav, index) => {
+            const originalIndex = favorites.length - 1 - index;
+            return `
+                <div class="favorite-item" style="background-image: url('${fav.url}');" data-index="${originalIndex}">
+                    <div class="favorite-item-actions">
+                        <button class="favorite-item-btn use">✓</button>
+                        <button class="favorite-item-btn delete">✕</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // 绑定事件
+        favoritesGrid.querySelectorAll('.favorite-item').forEach(item => {
+            const index = parseInt(item.dataset.index);
+            
+            // 应用按钮
+            const useBtn = item.querySelector('.use');
+            if (useBtn) {
+                useBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.picsumManager.useFavoriteImage(index);
+                    this.saveCurrentSettings();
+                    this.showNotification('已应用收藏图片 ✓');
+                    if (randomFavoriteBtn) {
+                        randomFavoriteBtn.disabled = false;
+                        randomFavoriteBtn.classList.add('favorited');
+                    }
+                });
+            }
+            
+            // 删除按钮
+            const deleteBtn = item.querySelector('.delete');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.picsumManager.deleteFavorite(index);
+                    this.updateFavoritesGrid();
+                    this.showNotification('已删除收藏 ✓');
+                });
+            }
+        });
+    }
+    
+    showNotification(message) {
+        // 移除旧的通知
+        const oldNotification = document.querySelector('.background-notification');
+        if (oldNotification) {
+            oldNotification.remove();
+        }
+        
+        const notification = document.createElement('div');
+        notification.className = 'background-notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => notification.classList.add('show'), 10);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 2000);
+    }
+
+    initializePicsumControls() {
+        // 废弃的旧方法，已整合到背景面板
+        // 检查当前背景是否是 Picsum 图片
+        this.picsumManager.checkCurrentBackground();
+    }
+
     initializeBGMPlayer() {
+        // 音乐播放器容器的展开/收起逻辑
+        const bgmPlayerContainer = document.getElementById('bgmPlayerContainer');
+        
+        if (bgmPlayerContainer) {
+            // 点击播放器容器切换展开/收起状态
+            bgmPlayerContainer.addEventListener('click', (e) => {
+                // 如果当前是收起状态，点击展开
+                if (!bgmPlayerContainer.classList.contains('expanded')) {
+                    e.stopPropagation();
+                    bgmPlayerContainer.classList.add('expanded');
+                }
+                // 如果已经展开，不做处理（让内部元素的点击正常工作）
+            });
+        }
+        
         // 绑定浮动播放器的控制按钮
         const playPauseBtn = document.getElementById('playPauseBtn');
         const prevBtn = document.getElementById('prevBtn');
@@ -279,28 +567,32 @@ class App {
         const progressContainer = document.getElementById('progressContainer');
         
         if (playPauseBtn) {
-            playPauseBtn.addEventListener('click', () => {
+            playPauseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.bgmPlayerManager.togglePlay();
                 this.saveCurrentSettings();
             });
         }
         
         if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
+            prevBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.bgmPlayerManager.playPrevious();
                 this.saveCurrentSettings();
             });
         }
         
         if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
+            nextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.bgmPlayerManager.playNext();
                 this.saveCurrentSettings();
             });
         }
         
         if (loopBtn) {
-            loopBtn.addEventListener('click', () => {
+            loopBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.bgmPlayerManager.toggleLoop();
                 this.saveCurrentSettings();
             });
@@ -315,6 +607,7 @@ class App {
         
         if (progressContainer) {
             progressContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const rect = progressContainer.getBoundingClientRect();
                 const percent = ((e.clientX - rect.left) / rect.width) * 100;
                 this.bgmPlayerManager.setProgress(percent);
@@ -330,7 +623,7 @@ class App {
         try {
             // 使用 BGM 标签组合加载音乐
             await this.bgmPlayerManager.loadJamendoMusic({
-                tags: 'ambient+instrumental',  // 使用组合标签
+                tags: 'ambient',  // 使用组合标签
                 limit: 20
             });
             
@@ -354,6 +647,15 @@ class App {
         // 恢复背景图片
         if (settings.backgroundImage) {
             this.backgroundManager.setImage(settings.backgroundImage);
+            // 恢复 Picsum 状态
+            if (settings.picsumId && settings.picsumUrl) {
+                this.picsumManager.currentPicsumId = settings.picsumId;
+                this.picsumManager.currentPicsumUrl = settings.picsumUrl;
+                this.picsumManager.updateFavoriteButton();
+            } else {
+                // 检查是否是 Picsum 图片
+                this.picsumManager.checkCurrentBackground();
+            }
         }
         
         // 恢复动画状态
@@ -393,7 +695,9 @@ class App {
             backgroundImage: backgroundImage,
             animationEnabled: this.animationManager.enabled,
             tickSoundEnabled: this.tickSoundManager.enabled,
-            bgmPlayer: this.bgmPlayerManager.getSettings()
+            bgmPlayer: this.bgmPlayerManager.getSettings(),
+            picsumId: this.picsumManager.currentPicsumId,
+            picsumUrl: this.picsumManager.currentPicsumUrl
         };
         
         this.settingsStorage.save(settings);

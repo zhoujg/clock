@@ -1,0 +1,302 @@
+/* Picsum 图片功能样式 */
+
+/* 收藏按钮高亮状态 */
+.setting-item.favorited {
+    background: rgba(255, 215, 0, 0.15);
+}
+
+.setting-item.favorited .setting-icon {
+    color: #ffd700;
+    transform: scale(1.2);
+}
+
+/* 加载状态 */
+.setting-item.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* 通知样式 */
+.picsum-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    font-size: 14px;
+    z-index: 10000;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.picsum-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 收藏夹面板 */
+.picsum-favorites-panel {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 340px;
+    max-height: 500px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    z-index: 2001;
+    display: flex;
+    flex-direction: column;
+}
+
+.picsum-favorites-panel.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.picsum-favorites-panel .panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.picsum-favorites-panel .panel-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.picsum-favorites-panel .panel-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.picsum-favorites-panel .panel-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.picsum-favorites-panel .panel-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 收藏容器 */
+.picsum-favorites-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+/* 无收藏状态 */
+.no-favorites {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.no-favorites-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.no-favorites-text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+}
+
+.no-favorites-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.5;
+}
+
+/* 收藏项 */
+.favorite-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.favorite-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.favorite-item:hover .favorite-actions {
+    opacity: 1;
+}
+
+/* 收藏预览图 */
+.favorite-preview {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.2s ease;
+}
+
+.favorite-item:hover .favorite-preview {
+    filter: brightness(0.7);
+}
+
+/* 收藏操作按钮 */
+.favorite-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.favorite-use-btn,
+.favorite-delete-btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.favorite-use-btn:hover {
+    background: rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+    transform: scale(1.1);
+}
+
+.favorite-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+.favorite-use-btn:active,
+.favorite-delete-btn:active {
+    transform: scale(0.95);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .picsum-favorites-panel {
+        width: 300px;
+        max-height: 400px;
+    }
+    
+    .picsum-notification {
+        top: 70px;
+        right: 15px;
+        font-size: 13px;
+        padding: 10px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .picsum-favorites-panel {
+        width: calc(100vw - 30px);
+        max-height: 350px;
+        right: 15px;
+    }
+    
+    .picsum-favorites-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .picsum-notification {
+        top: 65px;
+        right: 15px;
+        font-size: 12px;
+        padding: 8px 14px;
+    }
+}
+
+/* 手机横屏模式 */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+    .picsum-favorites-panel {
+        width: 280px;
+        max-height: 300px;
+        top: 50px;
+    }
+    
+    .picsum-notification {
+        top: 50px;
+    }
+    
+    .no-favorites {
+        padding: 20px 15px;
+    }
+    
+    .no-favorites-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+    }
+    
+    .no-favorites-text {
+        font-size: 13px;
+    }
+    
+    .no-favorites-hint {
+        font-size: 11px;
+    }
+}
+
+/* 更小的横屏设备 */
+@media (max-width: 700px) and (max-height: 400px) and (orientation: landscape) {
+    .picsum-favorites-panel {
+        width: 260px;
+        max-height: 250px;
+        top: 40px;
+    }
+    
+    .picsum-notification {
+        top: 40px;
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+    
+    .picsum-favorites-container {
+        gap: 8px;
+    }
+    
+    .favorite-actions {
+        padding: 6px;
+    }
+    
+    .favorite-use-btn,
+    .favorite-delete-btn {
+        padding: 4px 8px;
+    }
+    
+    .favorite-use-btn svg,
+    .favorite-delete-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+}

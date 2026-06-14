@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="styles/achievement.css" />
     <link rel="stylesheet" href="styles/forest.css" />
     <link rel="stylesheet" href="styles/weather.css" />
+    <link rel="stylesheet" href="styles/background-panel.css" />
 </head>
 <body>
     <!-- 控制面板 -->
@@ -120,14 +121,15 @@
                 </button>
             </div>
             <div class="panel-content">
-                <div class="setting-item" id="bgColorBtn">
+                <div class="setting-item" id="backgroundBtn">
                     <span class="setting-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <circle cx="12" cy="12" r="4"></circle>
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
                         </svg>
                     </span>
-                    <span class="setting-text">背景颜色</span>
+                    <span class="setting-text">背景设置</span>
                 </div>
                 <div class="setting-item" id="animationBtn">
                     <span class="setting-icon">
@@ -148,16 +150,6 @@
                     </span>
                     <span class="setting-text">滴答声音</span>
                     <span class="setting-status" id="tickSoundStatus">关闭</span>
-                </div>
-                <div class="setting-item" id="imageBtn">
-                    <span class="setting-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                    </span>
-                    <span class="setting-text">背景图片</span>
                 </div>
             </div>
         </div>
@@ -269,8 +261,112 @@
     <!-- 背景图片文件输入 -->
     <input type="file" id="imageInput" accept="image/*" />
     
-    <!-- 颜色选择面板 -->
-    <div class="color-panel" id="colorPanel">
+    <!-- 背景设置面板 -->
+    <div class="background-panel" id="backgroundPanel">
+        <div class="panel-header">
+            <span>🎨 背景设置</span>
+            <button id="backgroundPanelCloseBtn" class="panel-close-btn" title="关闭">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- 标签页导航 -->
+        <div class="background-tabs">
+            <button class="background-tab active" data-tab="color">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="10"/>
+                </svg>
+                <span>纯色</span>
+            </button>
+            <button class="background-tab" data-tab="upload">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/>
+                </svg>
+                <span>本地</span>
+            </button>
+            <button class="background-tab" data-tab="random">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                </svg>
+                <span>随机</span>
+            </button>
+        </div>
+        
+        <!-- 标签页内容 -->
+        <div class="background-content">
+            <!-- 纯色标签页 -->
+            <div class="background-tab-content active" data-content="color">
+                <div class="color-grid">
+                    <div class="color-item" style="background-color: #1a1a1a;" data-color="#1a1a1a" title="暗夜黑"></div>
+                    <div class="color-item" style="background-color: #2c3e50;" data-color="#2c3e50" title="午夜蓝"></div>
+                    <div class="color-item" style="background-color: #34495e;" data-color="#34495e" title="湿沥青"></div>
+                    <div class="color-item" style="background-color: #8e44ad;" data-color="#8e44ad" title="紫水晶"></div>
+                    <div class="color-item" style="background-color: #2980b9;" data-color="#2980b9" title="贝尔蓝"></div>
+                    <div class="color-item" style="background-color: #27ae60;" data-color="#27ae60" title="翡翠绿"></div>
+                    <div class="color-item" style="background-color: #e74c3c;" data-color="#e74c3c" title="茜草红"></div>
+                    <div class="color-item" style="background-color: #f39c12;" data-color="#f39c12" title="橘色"></div>
+                    <div class="color-item" style="background-color: #16a085;" data-color="#16a085" title="绿松石"></div>
+                    <div class="color-item" style="background-color: #c0392b;" data-color="#c0392b" title="石榴红"></div>
+                    <div class="color-item" style="background-color: #9b59b6;" data-color="#9b59b6" title="紫罗兰"></div>
+                    <div class="color-item" style="background-color: #3498db;" data-color="#3498db" title="天空蓝"></div>
+                </div>
+            </div>
+            
+            <!-- 本地图片标签页 -->
+            <div class="background-tab-content" data-content="upload">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div class="upload-text">点击或拖拽上传图片</div>
+                    <div class="upload-hint">支持 JPG、PNG、GIF 格式</div>
+                </div>
+            </div>
+            
+            <!-- 随机图片标签页 -->
+            <div class="background-tab-content" data-content="random">
+                <div class="random-actions">
+                    <button class="random-load-btn" id="randomLoadBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                        </svg>
+                        <span>加载随机图片</span>
+                    </button>
+                    <button class="random-favorite-btn" id="randomFavoriteBtn" disabled>
+                        <svg class="favorite-icon-empty" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <svg class="favorite-icon-filled" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span>收藏当前图片</span>
+                    </button>
+                </div>
+                
+                <div class="random-favorites-section">
+                    <div class="section-title">
+                        <span>我的收藏</span>
+                        <span class="favorites-count" id="favoritesCount">0</span>
+                    </div>
+                    <div class="favorites-grid" id="favoritesGrid">
+                        <div class="no-favorites-placeholder">
+                            <div class="placeholder-icon">📷</div>
+                            <div class="placeholder-text">暂无收藏</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 颜色选择面板（已废弃，改用背景面板） -->
+    <div class="color-panel" id="colorPanel" style="display: none;">
         <div class="color-option" style="background-color: #1a1a1a;" data-color="#1a1a1a"></div>
         <div class="color-option" style="background-color: #2c3e50;" data-color="#2c3e50"></div>
         <div class="color-option" style="background-color: #34495e;" data-color="#34495e"></div>
@@ -279,6 +375,27 @@
         <div class="color-option" style="background-color: #27ae60;" data-color="#27ae60"></div>
         <div class="color-option" style="background-color: #e74c3c;" data-color="#e74c3c"></div>
         <div class="color-option" style="background-color: #f39c12;" data-color="#f39c12"></div>
+    </div>
+
+    <!-- Picsum 收藏夹面板（已废弃，整合到背景面板） -->
+    <div class="picsum-favorites-panel" id="picsumFavoritesPanel" style="display: none;">
+        <div class="panel-header">
+            <span>📁 图片收藏夹</span>
+            <button id="picsumFavoritesPanelCloseBtn" class="panel-close-btn" title="关闭">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="panel-content">
+            <div id="picsumFavoritesContainer" class="picsum-favorites-container">
+                <div class="no-favorites">
+                    <div class="no-favorites-icon">📷</div>
+                    <div class="no-favorites-text">暂无收藏的图片</div>
+                    <div class="no-favorites-hint">点击随机图片后，使用收藏按钮保存喜欢的图片</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- BGM 音乐播放器 - 已移除，使用顶部音乐按钮代替 -->
@@ -300,6 +417,7 @@
     <script src="scripts/forest.js"></script>
     <script src="scripts/pomodoro.js"></script>
     <script src="scripts/weather.js"></script>
+    <script src="scripts/picsum.js"></script>
     <script src="scripts/app.js"></script>
 </body>
 </html>
