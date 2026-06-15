@@ -85,7 +85,7 @@
     left: 0;
     width: 100%;
     height: 100vh;
-    background: #f8fafc;
+    background: linear-gradient(180deg, #e8f4fd 0%, #f5f9ff 100%);
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
@@ -99,32 +99,74 @@
     visibility: visible;
 }
 
-/* 面板头部 */
+/* 面板头部 - 截图风格标题栏 */
 .stories-panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #ffffff;
+    padding: 16px 24px;
+    background: transparent;
     position: sticky;
     top: 0;
     z-index: 1;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.stories-header-left {
+.stories-header-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #166534;
 }
 
-.stories-panel-header h2 {
-    margin: 0;
-    font-size: 20px;
+.stories-title-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.stories-title-text {
+    color: #166534;
     font-weight: 600;
-    color: #1f2937;
-    letter-spacing: 0.3px;
+}
+
+.stories-title-separator {
+    color: #166534;
+    opacity: 0.5;
+    font-weight: 400;
+    margin: 0 2px;
+}
+
+.stories-title-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #166534;
+    font-weight: 500;
+}
+
+.stories-count-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    background: #166534;
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.stories-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* 标题旁添加按钮 */
@@ -173,156 +215,225 @@
     color: #374151;
 }
 
-/* 进度条 */
-.stories-progress {
-    padding: 16px 24px;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.stories-progress-bar {
-    width: 100%;
-    height: 6px;
-    background: #e5e7eb;
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 8px;
-}
-
-.stories-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    border-radius: 3px;
-    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.stories-progress-text {
-    text-align: center;
-    font-size: 13px;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-/* 故事列表 */
+/* ============================
+   故事列表 - 双列卡片网格
+   ============================ */
 .stories-list {
-    padding: 16px 24px 24px;
-    max-width: 680px;
+    padding: 20px 24px 40px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
-/* 空状态 */
-.stories-empty {
-    text-align: center;
-    padding: 80px 20px;
-    color: #9ca3af;
-}
-
-.stories-empty-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    opacity: 0.8;
-}
-
-.stories-empty-text {
-    font-size: 16px;
-    margin-bottom: 8px;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.stories-empty-hint {
-    font-size: 13px;
-    color: #9ca3af;
+@media (max-width: 768px) {
+    .stories-list {
+        grid-template-columns: 1fr;
+        padding: 16px 16px 32px;
+    }
 }
 
 /* ============================
-   故事卡片
+   维度卡片（截图风格）
    ============================ */
-.story-card {
+.story-dimension-card {
     background: #ffffff;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 14px;
-    border: 1px solid #e5e7eb;
-    transition: all 0.25s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.story-card:hover {
-    border-color: #d1d5db;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    transform: translateY(-1px);
-}
-
-.story-card.completion-flash {
-    animation: completionFlash 0.6s ease;
-}
-
-@keyframes completionFlash {
-    0%, 100% { transform: scale(1); border-color: #e5e7eb; }
-    50% { transform: scale(1.01); border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
-}
-
-/* 卡片头部 */
-.story-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-}
-
-.story-value-badge {
-    padding: 4px 12px;
     border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    background: rgba(255, 255, 255, 0.9);
+    padding: 20px 20px 16px;
     border: 1px solid #e5e7eb;
-    color: var(--value-color, #6b7280);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+    transition: all 0.25s ease;
     display: flex;
-    align-items: center;
-    gap: 4px;
+    flex-direction: column;
 }
 
-.story-delete-btn {
-    background: none;
-    border: none;
-    color: #d1d5db;
+.story-dimension-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.story-dimension-card.all-completed {
+    border-color: #a7f3d0;
+    background: #f0fdf4;
+}
+
+/* 添加新故事卡片（放在所有卡片后） */
+.story-add-dimension-card {
+    border: 2px dashed #d1d5db;
+    background: #fafafa;
     cursor: pointer;
-    padding: 4px;
-    border-radius: 6px;
-    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 120px;
+    transition: all 0.25s ease;
 }
 
-.story-delete-btn:hover {
-    background: #fef2f2;
-    color: #ef4444;
+.story-add-dimension-card:hover {
+    border-color: #6366f1;
+    background: #f5f3ff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
 }
 
-/* 故事内容 */
-.story-content {
+.story-add-dimension-content {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
+    color: #9ca3af;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
-.story-title {
+.story-add-dimension-card:hover .story-add-dimension-content {
+    color: #6366f1;
+}
+
+.story-add-dimension-content svg {
+    width: 32px;
+    height: 32px;
+    color: #d1d5db;
+    transition: all 0.2s ease;
+}
+
+.story-add-dimension-card:hover .story-add-dimension-content svg {
+    color: #6366f1;
+    transform: scale(1.1);
+}
+
+/* 卡片头部 */
+.story-dimension-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.story-dimension-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--value-color, #374151);
+}
+
+.story-dimension-emoji {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.story-dimension-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-size: 16px;
+    font-weight: 600;
+}
+
+.story-dimension-name {
+    color: #1f2937;
+}
+
+.story-dimension-subtitle {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.story-dimension-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.story-dimension-edit:hover {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: #6366f1;
+}
+
+/* 任务列表 */
+.story-dimension-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+/* 任务项（截图风格） */
+.story-task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border: 1px solid #f3f4f6;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.story-task-item:hover {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+}
+
+.story-task-item.completed {
+    background: #f0fdf4;
+    border-color: #a7f3d0;
+    opacity: 0.85;
+}
+
+.story-task-item.completed .story-task-title {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.story-task-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.story-task-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.story-task-title {
+    font-size: 14px;
     font-weight: 600;
     color: #1f2937;
     line-height: 1.4;
 }
 
-.story-description {
-    font-size: 14px;
+.story-task-tag {
+    font-size: 10px;
+    font-weight: 500;
     color: #6b7280;
-    line-height: 1.6;
+    background: #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
 
-.story-time-info {
+.story-task-meta {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -330,43 +441,177 @@
     color: #9ca3af;
 }
 
-.story-time-info svg {
+.story-task-meta svg {
     color: #9ca3af;
 }
 
-/* 卡片操作按钮 */
-.story-card-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.story-complete-btn,
-.story-edit-btn {
-    padding: 8px 16px;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-    color: #6b7280;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
+.story-task-status-wrap {
     display: flex;
     align-items: center;
-    gap: 6px;
 }
 
-.story-complete-btn:hover {
+.story-task-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.story-task-status.in-progress {
     background: #ecfdf5;
-    border-color: #a7f3d0;
     color: #059669;
+    border: 1px solid #a7f3d0;
 }
 
-.story-edit-btn:hover {
+.story-task-status.completed {
+    background: #d1fae5;
+    color: #047857;
+    border: 1px solid #6ee7b7;
+}
+
+/* 右侧勾选框 */
+.story-task-right {
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.story-task-checkbox {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    background: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.story-task-checkbox:hover {
+    border-color: #6366f1;
     background: #eef2ff;
-    border-color: #c7d2fe;
-    color: #6366f1;
+    transform: scale(1.1);
+}
+
+.story-task-checkbox.checked {
+    background: #10b981;
+    border-color: #10b981;
+}
+
+.story-task-checkbox.checked:hover {
+    background: #059669;
+    border-color: #059669;
+}
+
+/* 进度条区域 */
+.story-dimension-progress {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.story-dimension-progress-bar {
+    flex: 1;
+    height: 5px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.story-dimension-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.story-dimension-progress-text {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: right;
+}
+
+/* 空状态卡片 */
+.stories-empty-card {
+    grid-column: 1 / -1;
+    background: #ffffff;
+    border: 2px dashed #d1d5db;
+    border-radius: 20px;
+    padding: 48px 32px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    max-width: 400px;
+    margin: 40px auto;
+}
+
+.stories-empty-card:hover {
+    border-color: #6366f1;
+    background: #f5f3ff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+}
+
+.stories-empty-card .stories-empty-icon {
+    font-size: 48px;
+    line-height: 1;
+    opacity: 0.9;
+}
+
+.stories-empty-card .stories-empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.stories-empty-card .stories-empty-desc {
+    font-size: 14px;
+    color: #6b7280;
+    max-width: 280px;
+    line-height: 1.5;
+}
+
+.stories-empty-card .stories-empty-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #6366f1;
+    border: none;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+    pointer-events: none;
+}
+
+.stories-empty-card:hover .stories-empty-btn {
+    background: #4f46e5;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.stories-empty-card .stories-empty-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 /* ============================
@@ -541,7 +786,8 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-.value-tag.active {
+.value-tag.active,
+.value-tag.active:hover {
     border-color: var(--value-color, #6366f1);
     background: var(--value-color, #6366f1);
     color: white;
@@ -590,10 +836,49 @@
 /* 模态框底部 */
 .story-modal-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     gap: 10px;
     padding: 16px 24px;
     border-top: 1px solid #e5e7eb;
+}
+
+.story-modal-footer-left {
+    display: flex;
+    align-items: center;
+}
+
+.story-modal-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.story-modal-delete {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.story-modal-delete:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #b91c1c;
+}
+
+.story-modal-delete svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 .story-modal-cancel {
@@ -1082,7 +1367,6 @@
     }
     
     .stories-panel-header,
-    .stories-progress,
     .stories-list {
         padding-left: 16px;
         padding-right: 16px;
