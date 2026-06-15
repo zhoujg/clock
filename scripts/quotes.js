@@ -8,35 +8,81 @@ class QuoteManager {
         this.init();
     }
     
-    // 从quotes-data.js加载励志语
+    // 从assets/quotes.txt加载励志语
     loadQuotesFromData() {
-        // quotes-data.js 会定义全局变量 QUOTES_DATA
-        if (window.QUOTES_DATA && Array.isArray(window.QUOTES_DATA)) {
-            this.quotes = window.QUOTES_DATA;
-        } else {
-            console.warn('未找到励志语数据，使用默认励志语');
-            this.quotes = [{
-                english: "Every day is a new beginning.",
-                chinese: "每一天都是新的开始。"
-            }];
+        fetch('assets/quotes.txt')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                this.quotes = this.parseQuotesText(text);
+                // 如果有DOM已经初始化，显示第一条励志语并开始轮播
+                if (this.quoteContainer) {
+                    this.showRandomQuote();
+                    this.startRotation();
+                }
+            })
+            .catch(error => {
+                console.warn('加载励志语数据失败，使用默认励志语:', error);
+                this.quotes = [{
+                    english: "Every day is a new beginning.",
+                    chinese: "每一天都是新的开始。"
+                }];
+                // 如果有DOM已经初始化，显示默认励志语并开始轮播
+                if (this.quoteContainer) {
+                    this.showRandomQuote();
+                    this.startRotation();
+                }
+            });
+    }
+    
+    // 解析文本格式：英文|中文
+    parseQuotesText(text) {
+        const quotes = [];
+        const lines = text.trim().split('\n');
+        
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (!trimmedLine) continue;
+            
+            // 使用 | 分隔符分割英文和中文
+            const parts = trimmedLine.split('|');
+            if (parts.length >= 2) {
+                const english = parts[0].trim();
+                const chinese = parts[1].trim();
+                if (english && chinese) {
+                    quotes.push({ english, chinese });
+                }
+            }
         }
+        
+        return quotes.length > 0 ? quotes : [{
+            english: "Every day is a new beginning.",
+            chinese: "每一天都是新的开始。"
+        }];
     }
     
     init() {
         this.quoteContainer = document.querySelector('.quote-container');
         if (this.quoteContainer) {
-            // 加载励志语
+            // 异步加载励志语，加载完成后会自动显示第一条并开始轮播
             this.loadQuotesFromData();
-            // 显示第一条
-            this.showRandomQuote();
-            // 开始轮播
-            this.startRotation();
         }
     }
 
     
     // 获取随机励志语
     getRandomQuote() {
+        // 如果还没有加载励志语，返回默认励志语
+        if (!this.quotes || this.quotes.length === 0) {
+            return {
+                english: "Every day is a new beginning.",
+                chinese: "每一天都是新的开始。"
+            };
+        }
         const randomIndex = Math.floor(Math.random() * this.quotes.length);
         this.currentQuoteIndex = randomIndex;
         return this.quotes[randomIndex];

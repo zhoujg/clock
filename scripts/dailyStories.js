@@ -1029,8 +1029,6 @@ class DailyStories {
 let dailyStoriesManager;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎯 初始化每日三个故事系统...');
     dailyStoriesManager = new DailyStories();
     window.dailyStoriesManager = dailyStoriesManager;
-    console.log('✅ 每日三个故事系统初始化完成');
 });

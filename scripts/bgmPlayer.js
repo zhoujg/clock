@@ -841,7 +841,6 @@ class BGMPlayerManager {
         try {
             const data = localStorage.getItem('musicFavorites');
             this.favorites = data ? JSON.parse(data) : [];
-            console.log('✅ 加载收藏音乐:', this.favorites.length, '首');
         } catch (error) {
             console.error('❌ 加载收藏音乐失败:', error);
             this.favorites = [];
@@ -1049,7 +1048,6 @@ class BGMPlayerManager {
         
         // 🎯 优化：记录开始加载时间
         const loadStartTime = Date.now();
-        console.log('🎵 开始加载收藏音乐:', track.name, '| URL:', track.file);
         
         this.audio.src = track.file;
         

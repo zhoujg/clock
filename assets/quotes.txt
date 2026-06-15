@@ -1,30 +1,100 @@
-Every day is a new beginning.|每一天都是新的开始。
-Believe in yourself, and you will be unstoppable.|相信自己，你将势不可挡。
-Small steps every day lead to big changes.|每天的一小步，终将带来巨大的改变。
-Your journey is just beginning, embrace every challenge.|你的旅程才刚刚开始，拥抱每一个挑战。
-Mistakes are proof that you are trying.|错误证明你在努力。
-Be brave enough to be bad at something new.|勇敢地尝试新事物，哪怕一开始做得不够好。
-Change is hard at first, messy in the middle, and gorgeous at the end.|改变开始很难，中间很乱，但结果很美。
-The expert in anything was once a beginner.|任何领域的专家都曾是初学者。
-Don't compare your beginning to someone else's middle.|不要拿你的开始与别人的中间比较。
-Every master was once a disaster.|每个大师曾经都很糟糕。
-Progress, not perfection.|追求进步，而非完美。
-You don't have to be great to start, but you have to start to be great.|你不必很厉害才能开始，但必须开始才能变得厉害。
-One language sets you in a corridor for life. Two languages open every door along the way.|一种语言带你走一条路，两种语言为你打开所有门。
-The beautiful thing about learning is that no one can take it away from you.|学习的美妙之处在于没人能把它从你身边带走。
-A new city, a new chapter, a new you.|新城市，新篇章，新的你。
-Every challenge you face today makes you stronger tomorrow.|今天面对的每一个挑战都会让你明天更强大。
-You are braver than you believe.|你比你想象的更勇敢。
-Success is the sum of small efforts repeated day in and day out.|成功是日复一日小努力的总和。
-The harder you work for something, the greater you'll feel when you get it.|为某事越努力，得到时的感觉就越棒。
-Your potential is endless.|你的潜力是无限的。
-It's okay to not know, but it's not okay to not try.|不知道没关系，但不去尝试不行。
-Dream big, work hard, stay focused.|梦想要大，工作要努力，保持专注。
-The only way to do great work is to love what you do.|做伟大工作的唯一方式是热爱你所做的事。
-Be patient with yourself.|对自己有耐心。
-You are capable of amazing things.|你有能力做惊人的事情。
-Every moment is a fresh beginning.|每一刻都是全新的开始。
-The best way to predict the future is to create it.|预测未来的最好方式就是创造未来。
-Your only limit is your mind.|你唯一的限制是你的思想。
-Stars can't shine without darkness.|星星需要黑暗才能闪耀。
-Don't watch the clock; do what it does. Keep going.|不要盯着时钟；要像它一样，一直向前走。
+Every day is a new beginning. | 每一天都是新的开始。
+When in Rome, do as the Romans do. | 入乡随俗。
+A smooth sea never made a skilled sailor. | 平静的大海造就不出熟练的水手。
+The first step is the hardest. | 万事开头难。
+Bloom where you are planted. | 在扎根的地方绽放。
+It is never too late to be what you might have been. | 成为你想成为的人，永远都不晚。
+Adapt or perish, nature's inexorable imperative. | 适应或消亡，这是自然不变的法则。
+Don't be afraid to start over. It's a chance to build something better. | 别怕重来，那是建造更好的东西的机会。
+New place, same brilliant you. | 新地方，同样出色的你。
+The secret of change is to focus all your energy not on fighting the old, but on building the new. | 改变的秘诀不是与旧事物斗争，而是致力于建设新事物。
+Rome wasn't built in a day. | 罗马不是一天建成的。
+Practice makes perfect. | 熟能生巧。
+Learning is a treasure that will follow its owner everywhere. | 学问是随身携带的宝藏。
+It does not matter how slowly you go as long as you do not stop. | 只要不停下，走得慢也没关系。
+There is no royal road to learning. | 学问之路无捷径。
+Failure is the mother of success. | 失败是成功之母。
+The expert in anything was once a beginner. | 任何领域的专家都曾是初学者。
+Don't let what you cannot do interfere with what you can do. | 别让你做不到的事，干扰了你能做到的事。
+Knowledge is power. | 知识就是力量。
+A little progress each day adds up to big results. | 每天进步一点点，终将带来巨大的成果。
+Mistakes are proof that you are trying. | 犯错证明你在尝试。
+The only way to do great work is to love what you do. | 做出伟大工作的唯一方法是热爱你所做的事。
+Today a reader, tomorrow a leader. | 今日的读者，明日的领导者。
+Strive for progress, not perfection. | 追求进步，而非完美。
+Asking questions is the first step to wisdom. | 提问是智慧的第一步。
+God helps those who help themselves. | 天助自助者。
+Where there's a will, there's a way. | 有志者事竟成。
+Fall seven times, stand up eight. | 跌倒七次，爬起来八次。
+A journey of a thousand miles begins with a single step. | 千里之行，始于足下。
+Cleanliness is next to godliness. | 清洁近乎神圣。
+You are what you eat. | 人如其食。
+Early to bed and early to rise makes a person healthy, wealthy, and wise. | 早睡早起使人健康、富有又聪明。
+Better safe than sorry. | 小心驶得万年船。
+Worrying does not take away tomorrow's troubles, it takes away today's peace. | 忧虑带不走明天的烦恼，只会带走今天的平静。
+When you have health, you have everything. | 拥有健康，就拥有一切。
+Take care of your body. It's the only place you have to live. | 照顾好身体，那是你唯一的住所。
+Don't put off until tomorrow what you can do today. | 今日事今日毕。
+A problem shared is a problem halved. | 问题分担了，就减半了。
+It's okay to not know, but it's not okay to not try. | 不知道没关系，但不尝试就不行了。
+Keep calm and carry on. | 保持冷静，继续前行。
+Believe in yourself, and you will be unstoppable. | 相信自己，你将势不可挡。
+Be yourself; everyone else is already taken. | 做你自己，因为别人都有人做了。
+You are braver than you believe, stronger than you seem, and smarter than you think. | 你比你想象中更勇敢、更坚强、更聪明。
+What others think of you is none of your business. | 别人怎么看你，不关你的事。
+Don't compare your chapter 1 to someone else's chapter 20. | 别拿自己的第一章去比别人的第二十章。
+Stars can't shine without darkness. | 没有黑暗，星星无法发光。
+You have within you right now, everything you need to deal with whatever the world can throw at you. | 此刻的你，内心已具备应对世间一切的能力。
+The strongest people are not those who show strength in front of us, but those who win battles we know nothing about. | 最强的人不是在我们面前展示力量的人，而是在我们看不见的战场上获胜的人。
+Be a voice, not an echo. | 发出自己的声音，不做回音。
+Self-respect is the root of all respect. | 自尊是一切尊重之根源。
+Don't be afraid of being different. Be afraid of being the same as everyone else. | 别怕与众不同，该怕的是和别人一模一样。
+Stay true to yourself. An original is worth more than a copy. | 忠于自己。原创比复制品更有价值。
+No one can make you feel inferior without your consent. | 未经你的同意，没人能让你觉得自卑。
+You are enough. Just as you are. | 你就是最好的，此时此刻的你就很好。
+Courage is not the absence of fear, but the triumph over it. | 勇气不是没有恐惧，而是战胜恐惧。
+Home is where the heart is. | 心之所安，即是吾家。
+Distance doesn't ruin a relationship, doubt does. | 距离毁不掉感情，怀疑才会。
+Family is not an important thing. It's everything. | 家庭不是重要的东西，它是全部。
+Wherever you go, no matter what the weather, always bring your own sunshine. | 无论你去哪里，无论天气如何，请带上你自己的阳光。
+Love knows no distance. | 爱无距离。
+The most important thing in the world is family and love. | 世界上最重要的事是家庭和爱。
+We may not have it all together, but together we have it all. | 我们也许并非拥有一切，但只要在一起，我们就拥有一切。
+A loving heart is the truest wisdom. | 仁爱之心是最真实的智慧。
+Don't forget to call home. We are always here. | 别忘了打电话回家，我们永远在这儿。
+To the world you may be one person, but to us you are the world. | 对于世界来说，你可能只是一个人；但对我们来说，你是全世界。
+Happiness is having a family who loves you, no matter the distance. | 幸福是拥有爱你的家人，无论距离多远。
+Be kind, for everyone you meet is fighting a hard battle. | 要善良，因为你遇到的每个人都在经历一场艰难的战役。
+Kindness is a language which the deaf can hear and the blind can see. | 善良是聋子能听见、盲人能看见的语言。
+A true friend is someone who knows your past, believes in your future, and accepts you just the way you are. | 真正的朋友了解你的过去，相信你的未来，并接受现在的你。
+Love yourself first, and everything else falls into line. | 先爱自己，其他一切都会顺理成章。
+Respect the culture, keep your roots. | 尊重当地文化，保留你的根基。
+When someone speaks Cantonese, just smile. You'll learn. | 当有人说粤语时，微笑就好，你会学会的。
+Be like water – flow around obstacles. | 像水一样——绕过障碍物。
+MTR can take you anywhere, but only your heart knows where home is. | 地铁能带你去任何地方，但只有心知道家在哪。
+It's okay to miss Beijing. Missing it means you loved it. | 想念北京是正常的，想念意味着你爱过那里。
+Small space, big dreams. | 空间虽小，梦想很大。
+Pace up in the city, slow down in your mind. | 城市节奏要快，内心节奏要慢。
+Use English to learn, use Mandarin to make friends, use Cantonese to live. | 用英语学习，用普通话交友，用粤语生活。
+From the Forbidden City to Victoria Harbour, you carry history with you. | 从紫禁城到维多利亚港，你带着历史在身上。
+Don't let language be a wall; let it be a window. | 别让语言成为一堵墙，让它成为一扇窗。
+This too shall pass. | 一切都会过去的。
+Just do it. | 尽管去做。
+Keep going. | 继续走。
+You've got this. | 你能行的。
+Progress, not perfection. | 要进步，不要完美。
+Stay humble. Stay hungry. | 保持谦逊，保持渴望。
+Let it go. | 随它去吧。
+Breathe. | 深呼吸。
+So far, you've survived 100% of your bad days. | 目前为止，你百分百熬过了所有糟糕的日子。
+Make today so awesome that yesterday gets jealous. | 让今天精彩到让昨天嫉妒。
+A sharp sword is honed from grinding, a plum blossom's fragrance comes from bitter cold. | 宝剑锋从磨砺出，梅花香自苦寒来。
+Read ten thousand books, travel ten thousand miles. | 读万卷书，行万里路。
+If you have a bosom friend within the seas, the ends of the earth seem like next door. | 海内存知己，天涯若比邻。
+A thousand-mile journey begins with a single step. | 不积跬步，无以至千里。
+A fall into a pit, a gain in your wit. | 吃一堑，长一智。
+A loss may turn out to be a gain. | 塞翁失马，焉知非福。
+Do not do unto others what you would not have them do unto you. | 己所不欲，勿施于人。
+Dripping water wears through stone. | 水滴石穿。
+Cultivate the mind through stillness, nurture virtue through frugality. | 静以修身，俭以养德。
+If the family lives in harmony, all affairs will prosper. | 家和万事兴。
