@@ -11,16 +11,16 @@ class DailyStories {
         this.forestSystem = null;
         this.pomodoroTimer = null;
         
-        // 预设价值观标签
+        // 预设生活方向盘维度
         this.values = [
-            { name: '责任', color: '#e74c3c', emoji: '💼' },
-            { name: '学习', color: '#3498db', emoji: '📚' },
+            { name: '工作', color: '#3498db', emoji: '💼' },
+            { name: '家庭', color: '#e74c3c', emoji: '👨‍👩‍👧' },
             { name: '健康', color: '#27ae60', emoji: '💪' },
-            { name: '家庭', color: '#f39c12', emoji: '👨‍👩‍👧' },
-            { name: '成长', color: '#9b59b6', emoji: '🌱' },
-            { name: '效率', color: '#16a085', emoji: '⚡' },
-            { name: '创新', color: '#e67e22', emoji: '💡' },
-            { name: '专注', color: '#34495e', emoji: '🎯' }
+            { name: '精神', color: '#9b59b6', emoji: '🧘' },
+            { name: '财富', color: '#f39c12', emoji: '💰' },
+            { name: '休闲', color: '#16a085', emoji: '🎮' },
+            { name: '人际', color: '#e67e22', emoji: '🤝' },
+            { name: '贡献', color: '#34495e', emoji: '❤️' }
         ];
         
         this.init();
@@ -61,11 +61,7 @@ class DailyStories {
     
     // 获取默认的空故事结构
     getDefaultStories() {
-        return [
-            { id: 1, title: '', story: '', value: '', completed: false, completedAt: null, pomodoroCount: 0, timeSpent: 0 },
-            { id: 2, title: '', story: '', value: '', completed: false, completedAt: null, pomodoroCount: 0, timeSpent: 0 },
-            { id: 3, title: '', story: '', value: '', completed: false, completedAt: null, pomodoroCount: 0, timeSpent: 0 }
-        ];
+        return [];
     }
     
     // 加载今天的故事
@@ -103,67 +99,60 @@ class DailyStories {
     
     // 创建UI
     createUI() {
-        // 创建触发按钮（添加到控制面板）
-        const controls = document.querySelector('.controls');
+        // 创建独立的故事按钮（放置在右下角）
         const toggleBtn = document.createElement('button');
         toggleBtn.id = 'storiesToggle';
-        toggleBtn.className = 'control-btn stories-toggle';
+        toggleBtn.className = 'stories-main-btn';
         toggleBtn.title = '每日三个故事';
         toggleBtn.innerHTML = `
-            🎯
+            <svg class="stories-main-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stories-svg-body" d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4z" fill="currentColor" opacity="0.85"/>
+                <path class="stories-svg-body2" d="M13 13h7v7h-7v-7z" fill="currentColor" opacity="0.5"/>
+            </svg>
+            <div class="stories-main-text">故事</div>
             <span class="stories-badge" id="storiesBadge">0/3</span>
         `;
         
-        // 插入到第一个位置
-        controls.insertBefore(toggleBtn, controls.firstChild);
+        // 直接添加到 body
+        document.body.appendChild(toggleBtn);
         
-        // 创建侧边栏面板
+        // 创建全屏面板
         const panel = document.createElement('div');
         panel.id = 'storiesPanel';
         panel.className = 'stories-panel';
         panel.innerHTML = `
             <div class="stories-panel-header">
-                <h2>🎯 今日三个故事</h2>
+                <div class="stories-header-left">
+                    <h2>每日故事</h2>
+                    <button class="stories-add-btn" id="addStoryBtn" title="添加故事">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                    </button>
+                </div>
                 <button class="stories-close-btn" id="storiesClose">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                     </svg>
                 </button>
-            </div>
-            
-            <div class="stories-date">
-                ${this.formatDate(this.currentDate)}
             </div>
             
             <div class="stories-progress">
                 <div class="stories-progress-bar">
                     <div class="stories-progress-fill" id="storiesProgressFill"></div>
                 </div>
-                <div class="stories-progress-text" id="storiesProgressText">已完成 0/3</div>
+                <div class="stories-progress-text" id="storiesProgressText">已完成 0 个故事</div>
             </div>
             
             <div class="stories-list" id="storiesList">
                 <!-- 故事卡片将在这里动态生成 -->
             </div>
-            
-            <div class="stories-tips">
-                <div class="tips-icon">💡</div>
-                <div class="tips-text">
-                    找到三个今天重要的结果，用简短的故事描述，与你的价值观联系起来。
-                </div>
-            </div>
-            
-            <div class="stories-stats">
-                <button class="stats-btn" id="statsBtn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-                    </svg>
-                    查看统计
-                </button>
-            </div>
         `;
         
         document.body.appendChild(panel);
+        
+        // 创建添加故事的模态框
+        this.createAddStoryModal();
         
         // 创建统计面板
         this.createStatsPanel();
@@ -210,10 +199,24 @@ class DailyStories {
         
         listContainer.innerHTML = '';
         
-        this.stories.forEach((story, index) => {
-            const card = this.createStoryCard(story, index);
-            listContainer.appendChild(card);
-        });
+        // 只显示未完成的故事
+        const uncompletedStories = this.stories.filter(s => !s.completed);
+        
+        if (uncompletedStories.length === 0) {
+            listContainer.innerHTML = `
+                <div class="stories-empty">
+                    <div class="stories-empty-icon">📝</div>
+                    <div class="stories-empty-text">暂无未完成的故事</div>
+                    <div class="stories-empty-hint">点击下方按钮添加新故事</div>
+                </div>
+            `;
+        } else {
+            uncompletedStories.forEach((story) => {
+                const originalIndex = this.stories.indexOf(story);
+                const card = this.createStoryCard(story, originalIndex);
+                listContainer.appendChild(card);
+            });
+        }
         
         this.updateProgress();
     }
@@ -226,68 +229,55 @@ class DailyStories {
         
         const valueInfo = this.values.find(v => v.name === story.value) || { color: '#95a5a6', emoji: '⭐' };
         
+        // 构建时间显示
+        let timeDisplay = '';
+        if (story.startDate || story.startTime) {
+            const parts = [];
+            if (story.startDate) parts.push(story.startDate);
+            if (story.startTime) parts.push(story.startTime);
+            timeDisplay = parts.join(' ');
+        }
+        
         card.innerHTML = `
             <div class="story-card-header">
-                <div class="story-number">${index + 1}</div>
-                <label class="story-checkbox">
-                    <input type="checkbox" ${story.completed ? 'checked' : ''} data-index="${index}">
-                    <span class="checkbox-custom"></span>
-                </label>
+                <div class="story-value-badge" style="--value-color: ${valueInfo.color}">
+                    ${valueInfo.emoji} ${story.value || '未分类'}
+                </div>
+                <button class="story-delete-btn" data-index="${index}" title="删除故事">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                </button>
             </div>
             
             <div class="story-content">
-                <input 
-                    type="text" 
-                    class="story-title-input" 
-                    placeholder="例如：完成项目计划"
-                    value="${story.title}"
-                    data-index="${index}"
-                    data-field="title"
-                    ${story.completed ? 'readonly' : ''}
-                />
+                <div class="story-title">${story.title || '未命名故事'}</div>
                 
-                <textarea 
-                    class="story-description-input" 
-                    placeholder="用简短的故事描述：这件事为什么重要？与你的哪个价值观相关？"
-                    data-index="${index}"
-                    data-field="story"
-                    ${story.completed ? 'readonly' : ''}
-                >${story.story}</textarea>
+                ${story.story ? `<div class="story-description">${story.story}</div>` : ''}
                 
-                <div class="story-values">
-                    ${this.values.map(v => `
-                        <button 
-                            class="value-tag ${story.value === v.name ? 'active' : ''}" 
-                            data-index="${index}" 
-                            data-value="${v.name}"
-                            style="--value-color: ${v.color}"
-                            ${story.completed ? 'disabled' : ''}
-                        >
-                            ${v.emoji} ${v.name}
-                        </button>
-                    `).join('')}
+                ${timeDisplay ? `
+                    <div class="story-time-info">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                        ${timeDisplay}
+                    </div>
+                ` : ''}
+                
+                <div class="story-card-actions">
+                    <button class="story-complete-btn" data-index="${index}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                        完成
+                    </button>
+                    <button class="story-edit-btn" data-index="${index}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                        编辑
+                    </button>
                 </div>
-                
-                ${!story.completed && story.title ? `
-                    <div class="story-pomodoro-link">
-                        <button class="link-pomodoro-btn" data-index="${index}">
-                            🍅 开始25分钟倒计时
-                        </button>
-                    </div>
-                ` : ''}
-                
-                ${story.pomodoroCount > 0 || story.timeSpent > 0 ? `
-                    <div class="story-stats">
-                        ${story.pomodoroCount > 0 ? `<span class="story-stat">🍅 ${story.pomodoroCount}个</span>` : ''}
-                        ${story.timeSpent > 0 ? `<span class="story-stat">⏱️ ${story.timeSpent}分钟</span>` : ''}
-                    </div>
-                ` : ''}
-                
-                ${story.completed ? `
-                    <div class="story-completed-time">
-                        ✅ 完成于 ${this.formatTime(story.completedAt)}
-                    </div>
-                ` : ''}
             </div>
         `;
         
@@ -303,9 +293,9 @@ class DailyStories {
     
     // 更新进度
     updateProgress() {
-        const completedCount = this.stories.filter(s => s.completed).length;
         const total = this.stories.length;
-        const percentage = (completedCount / total) * 100;
+        const completedCount = this.stories.filter(s => s.completed).length;
+        const percentage = total > 0 ? (completedCount / total) * 100 : 0;
         
         const progressFill = document.getElementById('storiesProgressFill');
         const progressText = document.getElementById('storiesProgressText');
@@ -315,25 +305,29 @@ class DailyStories {
         }
         
         if (progressText) {
-            progressText.textContent = `已完成 ${completedCount}/${total}`;
+            progressText.textContent = `已完成 ${completedCount}/${total} 个故事`;
         }
     }
     
     // 更新徽章
     updateBadge() {
-        const completedCount = this.stories.filter(s => s.completed).length;
+        const uncompletedCount = this.stories.filter(s => !s.completed).length;
+        const totalCount = this.stories.length;
         const badge = document.getElementById('storiesBadge');
         
         if (badge) {
-            badge.textContent = `${completedCount}/3`;
+            badge.className = 'stories-badge';
             
-            // 根据完成情况改变颜色
-            if (completedCount === 3) {
-                badge.style.backgroundColor = '#27ae60';
-            } else if (completedCount > 0) {
-                badge.style.backgroundColor = '#f39c12';
+            if (totalCount === 0) {
+                // 今天没有设置过故事
+                badge.textContent = '0';
+            } else if (uncompletedCount === 0) {
+                // 全部完成，显示大拇指
+                badge.textContent = '👍';
+                badge.classList.add('completed');
             } else {
-                badge.style.backgroundColor = '#e74c3c';
+                // 有未完成的故事
+                badge.textContent = uncompletedCount;
             }
         }
     }
@@ -349,41 +343,51 @@ class DailyStories {
             this.closePanel();
         });
         
-        // 事件委托：处理所有故事相关的交互
-        document.getElementById('storiesList')?.addEventListener('change', (e) => {
-            if (e.target.type === 'checkbox') {
-                const index = parseInt(e.target.dataset.index);
-                this.toggleStoryCompletion(index, e.target.checked);
-            }
+        // 添加故事按钮
+        document.getElementById('addStoryBtn')?.addEventListener('click', () => {
+            this.showAddStoryModal();
         });
         
-        document.getElementById('storiesList')?.addEventListener('input', (e) => {
-            if (e.target.classList.contains('story-title-input') || 
-                e.target.classList.contains('story-description-input')) {
-                const index = parseInt(e.target.dataset.index);
-                const field = e.target.dataset.field;
-                this.updateStoryField(index, field, e.target.value);
-            }
-        });
-        
+        // 事件委托：故事列表交互
         document.getElementById('storiesList')?.addEventListener('click', (e) => {
-            if (e.target.classList.contains('value-tag')) {
-                const index = parseInt(e.target.dataset.index);
-                const value = e.target.dataset.value;
-                this.updateStoryValue(index, value);
-            } else if (e.target.classList.contains('link-pomodoro-btn')) {
-                const index = parseInt(e.target.dataset.index);
-                this.linkToPomodoro(index);
+            const completeBtn = e.target.closest('.story-complete-btn');
+            const editBtn = e.target.closest('.story-edit-btn');
+            const deleteBtn = e.target.closest('.story-delete-btn');
+            
+            if (completeBtn) {
+                const index = parseInt(completeBtn.dataset.index);
+                this.toggleStoryCompletion(index, true);
+            } else if (editBtn) {
+                const index = parseInt(editBtn.dataset.index);
+                this.showAddStoryModal(index);
+            } else if (deleteBtn) {
+                const index = parseInt(deleteBtn.dataset.index);
+                this.deleteStory(index);
             }
         });
         
-        // 统计按钮
-        document.getElementById('statsBtn')?.addEventListener('click', () => {
-            this.showStats();
+        // 模态框事件
+        document.getElementById('storyModalClose')?.addEventListener('click', () => {
+            this.closeAddStoryModal();
         });
         
-        document.getElementById('statsClose')?.addEventListener('click', () => {
-            this.closeStats();
+        document.getElementById('storyModalOverlay')?.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                this.closeAddStoryModal();
+            }
+        });
+        
+        document.getElementById('storyModalSave')?.addEventListener('click', () => {
+            this.saveStoryFromModal();
+        });
+        
+        // 模态框中的维度选择
+        document.getElementById('storyModalValues')?.addEventListener('click', (e) => {
+            const tag = e.target.closest('.value-tag');
+            if (tag) {
+                document.querySelectorAll('#storyModalValues .value-tag').forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+            }
         });
     }
     
@@ -394,6 +398,7 @@ class DailyStories {
         
         if (this.isOpen) {
             panel.classList.add('active');
+            this.updateUI();
         } else {
             panel.classList.remove('active');
         }
@@ -405,6 +410,167 @@ class DailyStories {
         document.getElementById('storiesPanel')?.classList.remove('active');
     }
     
+    // 创建添加故事模态框
+    createAddStoryModal() {
+        const modal = document.createElement('div');
+        modal.id = 'storyModalOverlay';
+        modal.className = 'story-modal-overlay';
+        modal.innerHTML = `
+            <div class="story-modal">
+                <div class="story-modal-header">
+                    <h3 id="storyModalTitle">添加故事</h3>
+                    <button class="story-modal-close" id="storyModalClose">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="story-modal-body">
+                    <div class="story-modal-field">
+                        <label>故事标题 <span class="required">*</span></label>
+                        <input type="text" id="storyModalName" placeholder="例如：完成项目计划" maxlength="50" />
+                    </div>
+                    <div class="story-modal-field">
+                        <label>故事描述</label>
+                        <textarea id="storyModalDesc" placeholder="用简短的故事描述这件事为什么重要" rows="3" maxlength="200"></textarea>
+                    </div>
+                    <div class="story-modal-field">
+                        <label>生活方向盘</label>
+                        <div class="story-modal-values" id="storyModalValues">
+                            ${this.values.map(v => `
+                                <button class="value-tag" data-value="${v.name}" style="--value-color: ${v.color}">
+                                    ${v.emoji} ${v.name}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="story-modal-row">
+                        <div class="story-modal-field story-modal-field-half">
+                            <label>开始日期</label>
+                            <input type="date" id="storyModalStartDate" />
+                        </div>
+                        <div class="story-modal-field story-modal-field-half">
+                            <label>开始时间</label>
+                            <input type="time" id="storyModalStartTime" />
+                        </div>
+                    </div>
+                </div>
+                <div class="story-modal-footer">
+                    <button class="story-modal-cancel" id="storyModalCancel">取消</button>
+                    <button class="story-modal-save" id="storyModalSave">保存</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // 取消按钮也关闭
+        document.getElementById('storyModalCancel')?.addEventListener('click', () => {
+            this.closeAddStoryModal();
+        });
+        
+        this._editingIndex = null;
+    }
+    
+    // 显示添加/编辑故事模态框
+    showAddStoryModal(editIndex = null) {
+        const overlay = document.getElementById('storyModalOverlay');
+        const title = document.getElementById('storyModalTitle');
+        const nameInput = document.getElementById('storyModalName');
+        const descInput = document.getElementById('storyModalDesc');
+        const startDateInput = document.getElementById('storyModalStartDate');
+        const startTimeInput = document.getElementById('storyModalStartTime');
+        
+        // 重置表单
+        nameInput.value = '';
+        descInput.value = '';
+        startDateInput.value = '';
+        startTimeInput.value = '';
+        document.querySelectorAll('#storyModalValues .value-tag').forEach(t => t.classList.remove('active'));
+        
+        if (editIndex !== null && editIndex >= 0 && editIndex < this.stories.length) {
+            // 编辑模式
+            this._editingIndex = editIndex;
+            const story = this.stories[editIndex];
+            title.textContent = '编辑故事';
+            nameInput.value = story.title || '';
+            descInput.value = story.story || '';
+            startDateInput.value = story.startDate || '';
+            startTimeInput.value = story.startTime || '';
+            
+            if (story.value) {
+                const tag = document.querySelector(`#storyModalValues .value-tag[data-value="${story.value}"]`);
+                if (tag) tag.classList.add('active');
+            }
+        } else {
+            // 新增模式
+            this._editingIndex = null;
+            title.textContent = '添加故事';
+        }
+        
+        overlay.classList.add('active');
+        setTimeout(() => nameInput.focus(), 100);
+    }
+    
+    // 关闭模态框
+    closeAddStoryModal() {
+        const overlay = document.getElementById('storyModalOverlay');
+        overlay.classList.remove('active');
+        this._editingIndex = null;
+    }
+    
+    // 从模态框保存故事
+    saveStoryFromModal() {
+        const name = document.getElementById('storyModalName').value.trim();
+        const desc = document.getElementById('storyModalDesc').value.trim();
+        const activeTag = document.querySelector('#storyModalValues .value-tag.active');
+        const value = activeTag ? activeTag.dataset.value : '';
+        const startDate = document.getElementById('storyModalStartDate').value;
+        const startTime = document.getElementById('storyModalStartTime').value;
+        
+        if (!name) {
+            document.getElementById('storyModalName').classList.add('error');
+            setTimeout(() => document.getElementById('storyModalName').classList.remove('error'), 1500);
+            return;
+        }
+        
+        if (this._editingIndex !== null) {
+            // 更新已有故事
+            this.stories[this._editingIndex].title = name;
+            this.stories[this._editingIndex].story = desc;
+            this.stories[this._editingIndex].value = value;
+            this.stories[this._editingIndex].startDate = startDate || '';
+            this.stories[this._editingIndex].startTime = startTime || '';
+        } else {
+            // 新增故事
+            const newStory = {
+                id: Date.now(),
+                title: name,
+                story: desc,
+                value: value,
+                startDate: startDate || '',
+                startTime: startTime || '',
+                completed: false,
+                completedAt: null,
+                pomodoroCount: 0,
+                timeSpent: 0
+            };
+            this.stories.push(newStory);
+        }
+        
+        this.saveTodayStories();
+        this.updateUI();
+        this.updateBadge();
+        this.closeAddStoryModal();
+    }
+    
+    // 删除故事
+    deleteStory(index) {
+        this.stories.splice(index, 1);
+        this.saveTodayStories();
+        this.updateUI();
+        this.updateBadge();
+    }
+    
     // 切换故事完成状态
     toggleStoryCompletion(index, completed) {
         this.stories[index].completed = completed;
@@ -412,6 +578,7 @@ class DailyStories {
         
         this.saveTodayStories();
         this.updateUI();
+        this.updateBadge();
         
         // 播放完成动画
         if (completed) {
@@ -606,16 +773,17 @@ class DailyStories {
             const data = JSON.parse(allData);
             const dates = Object.keys(data);
             
-            // 统计完成所有三个故事的天数
+            // 统计完成所有故事的天数
             let perfectDays = 0;
             let totalStories = 0;
             
             dates.forEach(date => {
                 const dayStories = data[date];
                 const completed = dayStories.filter(s => s.completed).length;
+                const total = dayStories.length;
                 totalStories += completed;
                 
-                if (completed === 3) {
+                if (total > 0 && completed === total) {
                     perfectDays++;
                 }
             });
@@ -657,14 +825,13 @@ class DailyStories {
     
     // 庆祝全部完成
     celebrateAllCompleted() {
-        // 创建庆祝提示
         const celebration = document.createElement('div');
         celebration.className = 'celebration-modal';
         celebration.innerHTML = `
             <div class="celebration-content">
                 <div class="celebration-icon">🎉</div>
                 <h2>太棒了！</h2>
-                <p>你完成了今天的三个故事！</p>
+                <p>你完成了今天的所有故事！</p>
                 <p>每一天的积累，都在成就更好的自己。</p>
                 <button class="celebration-close-btn">继续努力</button>
             </div>
@@ -693,39 +860,7 @@ class DailyStories {
     
     // 显示欢迎提示
     showWelcomePrompt() {
-        // 检查是否所有故事都为空
-        const isEmpty = this.stories.every(s => !s.title && !s.story);
-        
-        if (isEmpty) {
-            setTimeout(() => {
-                const welcome = document.createElement('div');
-                welcome.className = 'welcome-prompt';
-                welcome.innerHTML = `
-                    <div class="welcome-content">
-                        <div class="welcome-icon">🌅</div>
-                        <h3>新的一天，新的开始</h3>
-                        <p>今天你想完成哪三件重要的事情？</p>
-                        <button class="welcome-btn" id="welcomeStartBtn">开始规划</button>
-                    </div>
-                `;
-                
-                document.body.appendChild(welcome);
-                
-                setTimeout(() => {
-                    welcome.classList.add('active');
-                }, 100);
-                
-                document.getElementById('welcomeStartBtn').addEventListener('click', () => {
-                    welcome.classList.remove('active');
-                    setTimeout(() => {
-                        welcome.remove();
-                    }, 300);
-                    
-                    // 打开面板
-                    this.togglePanel();
-                });
-            }, 2000);
-        }
+        // 新的一天不再自动弹3个空故事，跳过欢迎提示
     }
     
     // 显示统计
@@ -774,12 +909,12 @@ class DailyStories {
                 <h3>📅 最近7天</h3>
                 <div class="recent-days">
                     ${stats.recentDays.map(day => `
-                        <div class="day-item ${day.completed === 3 ? 'full-completed' : ''}">
+                        <div class="day-item ${day.completed === day.total && day.total > 0 ? 'full-completed' : ''}">
                             <div class="day-date">${day.dateStr}</div>
                             <div class="day-progress">
-                                <div class="day-progress-bar" style="width: ${(day.completed / 3) * 100}%"></div>
+                                <div class="day-progress-bar" style="width: ${day.total > 0 ? (day.completed / day.total) * 100 : 0}%"></div>
                             </div>
-                            <div class="day-count">${day.completed}/3</div>
+                            <div class="day-count">${day.completed}/${day.total}</div>
                         </div>
                     `).join('')}
                 </div>
@@ -812,7 +947,7 @@ class DailyStories {
                 const completed = dayStories.filter(s => s.completed).length;
                 totalStories += completed;
                 
-                if (completed === 3) {
+                if (completed === total && total > 0) {
                     completedDays++;
                 }
                 
@@ -863,12 +998,14 @@ class DailyStories {
                 return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             }});
             
-            const dayData = data[dateStr] || this.getDefaultStories();
+            const dayData = data[dateStr] || [];
             const completed = dayData.filter(s => s.completed).length;
+            const total = dayData.length;
             
             days.push({
                 dateStr: `${date.getMonth() + 1}/${date.getDate()}`,
-                completed
+                completed,
+                total
             });
         }
         

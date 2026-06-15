@@ -9,6 +9,7 @@ class BGMPlayerManager {
         this.currentTrackIndex = -1;
         this.isPlaying = false;
         this.isLooping = false; // 单曲循环
+        this.isPlaylistLooping = false; // 播放列表循环
         this.tickSoundManager = tickSoundManager; // 滴答声管理器引用
         this.tickSoundWasEnabled = undefined; // 记录音乐播放前滴答声是否开启，undefined表示未记录
         this.quoteManager = quoteManager; // 谚语管理器引用
@@ -43,8 +44,11 @@ class BGMPlayerManager {
                 // 单曲循环
                 this.audio.currentTime = 0;
                 this.audio.play();
+            } else if (this.isPlaylistLooping) {
+                // 播放列表循环
+                this.playNextInCurrentList();
             } else {
-                // 自动播放下一曲
+                // 自动播放下一曲（不循环）
                 this.playNext();
             }
         });
@@ -428,14 +432,55 @@ class BGMPlayerManager {
     
     // 下一曲
     playNext() {
-        if (this.musicList.length === 0) return;
+        if (this.musicList.length === 0 && this.favorites.length === 0) return;
         
-        let newIndex = this.currentTrackIndex + 1;
-        if (newIndex >= this.musicList.length) {
-            newIndex = 0;
+        // 如果当前显示收藏列表，在收藏列表中切换
+        if (this.showingFavorites && this.favorites.length > 0) {
+            this.playNextFavorite();
+        } else if (this.musicList.length > 0) {
+            // 否则在普通播放列表中切换
+            let newIndex = this.currentTrackIndex + 1;
+            if (newIndex >= this.musicList.length) {
+                newIndex = 0;
+            }
+            
+            this.playTrack(newIndex);
+        }
+    }
+    
+    // 在当前列表中播放下一曲（用于播放列表循环）
+    playNextInCurrentList() {
+        if (this.showingFavorites && this.favorites.length > 0) {
+            this.playNextFavorite();
+        } else if (this.musicList.length > 0) {
+            let newIndex = this.currentTrackIndex + 1;
+            if (newIndex >= this.musicList.length) {
+                newIndex = 0; // 循环到第一首
+            }
+            this.playTrack(newIndex);
+        }
+    }
+    
+    // 在收藏列表中播放下一首
+    playNextFavorite() {
+        if (this.favorites.length === 0) return;
+        
+        // 找到当前播放歌曲在收藏列表中的索引
+        let currentFavoriteIndex = -1;
+        if (this.currentTrack) {
+            const trackId = this.currentTrack.id || this.currentTrack.file;
+            currentFavoriteIndex = this.favorites.findIndex(
+                fav => (fav.id && fav.id === trackId) || fav.file === this.currentTrack.file
+            );
         }
         
-        this.playTrack(newIndex);
+        // 计算下一首的索引
+        let nextIndex = currentFavoriteIndex + 1;
+        if (nextIndex >= this.favorites.length) {
+            nextIndex = 0; // 循环到第一首收藏
+        }
+        
+        this.playFavoriteTrack(nextIndex);
     }
     
     // 切换循环模式

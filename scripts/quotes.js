@@ -51,17 +51,36 @@ class QuoteManager {
         const englishElement = document.getElementById('quoteEnglish');
         const chineseElement = document.getElementById('quoteChinese');
         
-        // 淡出
-        quoteElement.style.opacity = '0';
+        // 在动画开始前暂时禁用 backdrop-filter 以避免闪烁
+        const originalBackdropFilter = quoteElement.style.backdropFilter || '';
+        const originalWebkitBackdropFilter = quoteElement.style.webkitBackdropFilter || '';
         
-        setTimeout(() => {
-            // 更新内容
-            englishElement.textContent = quote.english;
-            chineseElement.textContent = quote.chinese;
+        // 使用requestAnimationFrame确保流畅渲染
+        requestAnimationFrame(() => {
+            // 临时禁用 backdrop-filter
+            quoteElement.style.backdropFilter = 'none';
+            quoteElement.style.webkitBackdropFilter = 'none';
             
-            // 淡入
-            quoteElement.style.opacity = '1';
-        }, this.fadeDuration);
+            // 淡出
+            quoteElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                // 更新内容
+                englishElement.textContent = quote.english;
+                chineseElement.textContent = quote.chinese;
+                
+                // 使用requestAnimationFrame确保DOM更新后再淡入
+                requestAnimationFrame(() => {
+                    quoteElement.style.opacity = '1';
+                    
+                    // 淡入完成后恢复 backdrop-filter
+                    setTimeout(() => {
+                        quoteElement.style.backdropFilter = originalBackdropFilter || 'blur(15px)';
+                        quoteElement.style.webkitBackdropFilter = originalWebkitBackdropFilter || 'blur(15px)';
+                    }, this.fadeDuration);
+                });
+            }, this.fadeDuration);
+        });
     }
     
     // 开始轮播

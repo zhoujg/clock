@@ -74,9 +74,9 @@ class PicsumManager {
             finalHeight = height;
         }
         
-        // 将尺寸放大1.5倍以获得更高清的图片（适配高分辨率屏幕）
-        finalWidth = Math.round(finalWidth * 1.5);
-        finalHeight = Math.round(finalHeight * 1.5);
+        // 将尺寸放大1.2倍以获得更高清的图片（适配高分辨率屏幕）
+        finalWidth = Math.round(finalWidth * 1.2);
+        finalHeight = Math.round(finalHeight * 1.2);
         
         // 使用时间戳确保每次都是不同的图片
         const seed = Date.now();
