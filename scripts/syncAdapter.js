@@ -147,6 +147,10 @@ class SyncAdapter {
                     this.localTimestamps[key] = ts;
                 }
             }
+            // 记录此次全量拉取时间，后续增量拉取从这里开始
+            if (result.server_time) {
+                this.localTimestamps['__lastIncrementalPull'] = result.server_time;
+            }
             this._saveTimestamps();
 
             // 5. 把合并后的结果推回云端（包含本地独有的数据）
@@ -353,16 +357,25 @@ class SyncAdapter {
                 if (typeof window.picsumManager.updateFavoritesPanel === 'function') {
                     window.picsumManager.updateFavoritesPanel();
                 }
+                // 同时刷新 app 中的收藏网格（背景面板标签页）
+                if (window.app && typeof window.app.updateFavoritesGrid === 'function') {
+                    window.app.updateFavoritesGrid();
+                }
                 console.log('[Sync] picsum 收藏已刷新');
             } catch (e) { console.warn('[Sync] picsum 刷新失败:', e); }
         }
 
         // 刷新音乐收藏（如果模块已加载）
-        if (window.bgmPlayer) {
+        const bgmPlayer = window.bgmPlayer || (window.app && window.app.bgmPlayerManager);
+        if (bgmPlayer) {
             try {
-                window.bgmPlayer.loadFavorites();
-                if (typeof window.bgmPlayer.updateFavoriteButton === 'function') {
-                    window.bgmPlayer.updateFavoriteButton();
+                bgmPlayer.loadFavorites();
+                if (typeof bgmPlayer.updateFavoriteButton === 'function') {
+                    bgmPlayer.updateFavoriteButton();
+                }
+                // 如果当前正在显示收藏列表，也刷新收藏列表
+                if (bgmPlayer.showingFavorites && typeof bgmPlayer.showFavoritesList === 'function') {
+                    bgmPlayer.showFavoritesList();
                 }
                 console.log('[Sync] 音乐收藏已刷新');
             } catch (e) { console.warn('[Sync] 音乐收藏刷新失败:', e); }
@@ -370,15 +383,33 @@ class SyncAdapter {
     }
 
     /**
-     * 处理冲突：云端数据回写本地
+     * 处理冲突：云端版本与本地版本合并（不直接覆盖）
+     * 数组类型按 ID 并集合并，避免丢失本地独有的数据
      */
     _handleConflicts(conflicts) {
+        const arrayKeys = ['picsumFavorites', 'musicFavorites'];
+
         for (const [cloudKey, value] of Object.entries(conflicts)) {
             const localKey = this.keyMap[cloudKey];
-            if (localKey && value) {
+            if (!localKey || !value) continue;
+
+            if (arrayKeys.includes(cloudKey) && Array.isArray(value)) {
+                // 数组类型：云端 + 本地并集合并
+                const localRaw = localStorage.getItem(localKey);
+                const localArr = localRaw ? (() => {
+                    try { return JSON.parse(localRaw); } catch (e) { return []; }
+                })() : [];
+                const merged = this._mergeArraysById(localArr, value);
+                localStorage.setItem(localKey, JSON.stringify(merged));
+                console.log(`[Sync] 冲突合并 ${cloudKey}: 本地${localArr.length} + 云端${value.length} → ${merged.length}`);
+            } else {
+                // 对象/简单类型：云端覆盖本地
                 localStorage.setItem(localKey, JSON.stringify(value));
             }
         }
+
+        // 冲突合并后，把合并结果推回云端
+        this._pushMergedToCloud();
 
         // 通知 UI 刷新
         this._reloadModuleState();

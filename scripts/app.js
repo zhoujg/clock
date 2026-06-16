@@ -808,15 +808,27 @@ class App {
         // 监听登录状态变化
         window.cloudSync.onChange((isLoggedIn) => {
             if (isLoggedIn) {
-                // 登录后触发同步
+                // 登录后触发全量同步
                 console.log('[App] 检测到登录，开始同步...');
                 this._syncFromCloud();
+                // 启动定期轮询（每 30s 拉取其他设备的更新）
+                if (window.syncAdapter) {
+                    window.syncAdapter.startPeriodicSync(30000);
+                }
+            } else {
+                // 登出后停止轮询
+                if (window.syncAdapter) {
+                    window.syncAdapter.stopPeriodicSync();
+                }
             }
         });
 
-        // 如果已登录，立即同步
+        // 如果已登录，立即同步并启动轮询
         if (window.cloudSync.isLoggedIn) {
             this._syncFromCloud();
+            if (window.syncAdapter) {
+                window.syncAdapter.startPeriodicSync(30000);
+            }
         }
     }
 
