@@ -33,31 +33,68 @@ class SyncAdapter {
     }
 
     /**
-     * 登录后全量同步：先推送本地未同步数据 → 再拉取云端 → 融合到本地
+     * 登录后全量同步：先拉取云端 → 与本地智能合并 → 推送合并结果
+     * 确保两台设备的收藏数据不会互相覆盖丢失
      */
     async syncAfterLogin() {
         if (!this.cloudSync.isLoggedIn) return null;
 
         console.log('[Sync] 开始全量同步...');
 
-        // 1. 先把本地故事推送到云端（防止匿名期间的数据丢失）
+        // 1. 先把本地故事推送到云端（故事走独立 API，不走 user_data）
         await this._pushLocalStoriesToCloud();
 
+        // 2. 拉取云端 user_data（设置、收藏等）
         const result = await this.cloudSync.pullAll();
 
         if (result.success && result.data) {
+            // 3. 智能合并：云端 + 本地 = 并集（保留两边的收藏）
             this._mergeCloudToLocal(result.data);
-            // 更新本地时间戳
+
+            // 4. 更新本地时间戳
             if (result.timestamps) {
                 for (const [key, ts] of Object.entries(result.timestamps)) {
                     this.localTimestamps[key] = ts;
                 }
             }
             this._saveTimestamps();
+
+            // 5. 把合并后的结果推回云端（包含本地独有的数据）
+            await this._pushMergedToCloud();
+
+            // 6. 刷新各模块的内存状态
+            this._reloadModuleState();
             console.log('[Sync] 全量同步完成');
         }
 
         return result;
+    }
+
+    /**
+     * 把合并后的 user_data 推回云端
+     * 此时 localStorage 已是云端+本地的并集，推回去让其他设备也能同步到
+     */
+    async _pushMergedToCloud() {
+        try {
+            const data = {};
+            for (const [cloudKey, localKey] of Object.entries(this.keyMap)) {
+                const raw = localStorage.getItem(localKey);
+                if (raw) {
+                    try {
+                        data[cloudKey] = JSON.parse(raw);
+                    } catch (e) {
+                        data[cloudKey] = raw;
+                    }
+                }
+            }
+
+            if (Object.keys(data).length > 0) {
+                console.log('[Sync] 推送合并数据:', Object.keys(data).join(', '));
+                await this.cloudSync.push(data, {});
+            }
+        } catch (e) {
+            console.warn('[Sync] 合并数据推送失败:', e);
+        }
     }
 
     /**
@@ -66,17 +103,14 @@ class SyncAdapter {
      */
     async _pushLocalStoriesToCloud() {
         try {
-            const raw = localStorage.getItem('dailyStories');
-            if (!raw) return;
+            const storyRaw = localStorage.getItem('dailyStories');
+            if (!storyRaw) return;
 
-            const allStories = JSON.parse(raw);
+            const allStories = JSON.parse(storyRaw);
             const dates = Object.keys(allStories);
-
             for (const date of dates) {
                 const stories = allStories[date];
                 if (!stories || stories.length === 0) continue;
-
-                // 转换为云端格式
                 const cloudStories = stories.map((story, idx) => ({
                     story_index: idx + 1,
                     title: story.title || '',
@@ -85,7 +119,6 @@ class SyncAdapter {
                     completed: story.completed ? 1 : 0,
                     _localUpdatedAt: new Date().toISOString()
                 }));
-
                 console.log(`[Sync] 推送本地故事: ${date}, ${cloudStories.length}条`);
                 await this.cloudSync.pushStories(date, cloudStories);
             }
@@ -164,17 +197,85 @@ class SyncAdapter {
     }
 
     /**
-     * 将云端数据合并到本地（云端优先策略）
+     * 将云端数据智能合并到本地
+     * - 对象类型（settings）：云端优先覆盖
+     * - 数组类型（picsumFavorites, musicFavorites）：按 ID 并集合并
      */
     _mergeCloudToLocal(cloudData) {
+        // 数组类型的 key（需要按 ID 合并，不能直接覆盖）
+        const arrayKeys = ['picsumFavorites', 'musicFavorites'];
+
         for (const [cloudKey, value] of Object.entries(cloudData)) {
             const localKey = this.keyMap[cloudKey];
             if (!localKey) continue;
+            if (value === null || value === undefined) continue;
 
-            if (value !== null && value !== undefined) {
+            if (arrayKeys.includes(cloudKey) && Array.isArray(value)) {
+                // 数组类型：按 ID 并集合并
+                const localRaw = localStorage.getItem(localKey);
+                const localArr = localRaw ? (() => {
+                    try { return JSON.parse(localRaw); } catch (e) { return []; }
+                })() : [];
+
+                const merged = this._mergeArraysById(localArr, value);
+                localStorage.setItem(localKey, JSON.stringify(merged));
+                console.log(`[Sync] 合并 ${cloudKey}: 本地${localArr.length} + 云端${value.length} → ${merged.length}`);
+            } else {
+                // 对象/简单类型：直接覆盖
                 const jsonStr = JSON.stringify(value);
                 localStorage.setItem(localKey, jsonStr);
             }
+        }
+    }
+
+    /**
+     * 按 ID 合并两个数组，并集去重（本地 + 云端）
+     * 同一 ID 以时间戳较新的为准
+     */
+    _mergeArraysById(localArr, cloudArr) {
+        const map = new Map();
+
+        // 先加入本地数据
+        for (const item of localArr) {
+            const id = item.id || item.file || item.url || JSON.stringify(item);
+            map.set(id, item);
+        }
+
+        // 再加入云端数据（同 ID 以云端为准，因为是更新的）
+        for (const item of cloudArr) {
+            const id = item.id || item.file || item.url || JSON.stringify(item);
+            // 云端数据覆盖本地（last-write-wins）
+            map.set(id, item);
+        }
+
+        return Array.from(map.values());
+    }
+
+    /**
+     * 合并后刷新各模块的内存状态
+     * 确保 UI 展示的是最新合并后的数据
+     */
+    _reloadModuleState() {
+        // 刷新 picsum 收藏（如果模块已加载）
+        if (window.picsumManager) {
+            try {
+                window.picsumManager.favorites = window.picsumManager.loadFavorites();
+                if (typeof window.picsumManager.updateFavoritesPanel === 'function') {
+                    window.picsumManager.updateFavoritesPanel();
+                }
+                console.log('[Sync] picsum 收藏已刷新');
+            } catch (e) { console.warn('[Sync] picsum 刷新失败:', e); }
+        }
+
+        // 刷新音乐收藏（如果模块已加载）
+        if (window.bgmPlayer) {
+            try {
+                window.bgmPlayer.loadFavorites();
+                if (typeof window.bgmPlayer.updateFavoriteButton === 'function') {
+                    window.bgmPlayer.updateFavoriteButton();
+                }
+                console.log('[Sync] 音乐收藏已刷新');
+            } catch (e) { console.warn('[Sync] 音乐收藏刷新失败:', e); }
         }
     }
 
@@ -190,6 +291,7 @@ class SyncAdapter {
         }
 
         // 通知 UI 刷新
+        this._reloadModuleState();
         if (window.app) {
             try { window.app.loadSavedSettings(); } catch (e) {}
         }
