@@ -95,17 +95,28 @@
 }
 
 .stories-panel.dark-bg {
-    color: #f3f4f6;
+    color: #f1f5f9;
 }
 
-/* 深色背景模式下的元素适配 */
+/* ============================
+   深色模式统一样式
+   ============================ */
+
+/* 面板基色 */
+.stories-panel.dark-bg {
+    color: #f1f5f9;
+}
+
+/* 维度卡片：背景融入维度色着色 */
 .stories-panel.dark-bg .story-dimension-card {
-    background: rgba(30, 41, 59, 0.85);
-    border-color: rgba(71, 85, 105, 0.5);
+    background: color-mix(in srgb, var(--value-color, #64748b) 8%, rgba(30, 41, 59, 0.95));
+    border-color: color-mix(in srgb, var(--value-color, #64748b) 30%, rgba(71, 85, 105, 0.6));
+    border-top: 3px solid var(--value-color, #64748b);
 }
 
 .stories-panel.dark-bg .story-dimension-card:hover {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: color-mix(in srgb, var(--value-color, #6366f1) 60%, rgba(99, 102, 241, 0.5));
 }
 
 .stories-panel.dark-bg .story-dimension-card.all-completed {
@@ -113,18 +124,37 @@
     border-color: rgba(52, 211, 153, 0.4);
 }
 
+/* 卡片头部：背景着色+维度色分割线 */
 .stories-panel.dark-bg .story-dimension-header {
-    border-bottom-color: rgba(71, 85, 105, 0.4);
+    border-bottom-color: color-mix(in srgb, var(--value-color, #64748b) 25%, rgba(71, 85, 105, 0.5));
+    background: color-mix(in srgb, var(--value-color, #64748b) 6%, transparent);
+    margin: -20px -20px 16px;
+    padding: 16px 20px 12px;
+    border-radius: 17px 17px 0 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--value-color, #64748b) 25%, rgba(71, 85, 105, 0.5));
 }
 
+/* 维度名字：用维度色（提亮后），更醒目 */
 .stories-panel.dark-bg .story-dimension-name {
-    color: #f1f5f9;
+    color: color-mix(in srgb, var(--value-color, #f8fafc) 65%, #ffffff);
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 .stories-panel.dark-bg .story-dimension-subtitle {
     color: #94a3b8;
 }
 
+/* 维度标签：提亮原始颜色 */
+.stories-panel.dark-bg .story-task-tag {
+    --dim-color: var(--value-color, #94a3b8);
+    color: color-mix(in srgb, var(--dim-color) 70%, #ffffff);
+    background: color-mix(in srgb, var(--dim-color) 25%, rgba(71, 85, 105, 0.5));
+    font-weight: 600;
+    border: 1px solid color-mix(in srgb, var(--dim-color) 30%, transparent);
+}
+
+/* 编辑按钮 */
 .stories-panel.dark-bg .story-dimension-edit {
     background: rgba(51, 65, 85, 0.6);
     border-color: rgba(71, 85, 105, 0.6);
@@ -137,19 +167,20 @@
     color: #a5b4fc;
 }
 
+/* 任务项：融入维度颜色 */
 .stories-panel.dark-bg .story-task-item {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(51, 65, 85, 0.5);
+    background: color-mix(in srgb, var(--value-color, #64748b) 8%, rgba(51, 65, 85, 0.5));
+    border-color: color-mix(in srgb, var(--value-color, #64748b) 20%, rgba(71, 85, 105, 0.5));
 }
 
 .stories-panel.dark-bg .story-task-item:hover {
-    background: rgba(51, 65, 85, 0.6);
-    border-color: rgba(71, 85, 105, 0.6);
+    background: color-mix(in srgb, var(--value-color, #64748b) 14%, rgba(71, 85, 105, 0.6));
+    border-color: color-mix(in srgb, var(--value-color, #64748b) 35%, rgba(99, 102, 241, 0.4));
 }
 
 .stories-panel.dark-bg .story-task-item.completed {
-    background: rgba(6, 78, 59, 0.2);
-    border-color: rgba(52, 211, 153, 0.3);
+    background: rgba(6, 78, 59, 0.25);
+    border-color: rgba(52, 211, 153, 0.35);
 }
 
 .stories-panel.dark-bg .story-task-item.completed .story-task-title {
@@ -157,51 +188,78 @@
 }
 
 .stories-panel.dark-bg .story-task-title {
-    color: #e2e8f0;
+    color: #f1f5f9;
+    font-weight: 600;
 }
 
-.stories-panel.dark-bg .story-task-meta {
-    color: #64748b;
-}
-
+.stories-panel.dark-bg .story-task-meta,
 .stories-panel.dark-bg .story-task-time {
-    color: #64748b;
+    color: #94a3b8;
 }
 
+/* 状态标签 */
+.stories-panel.dark-bg .story-task-status.in-progress {
+    background: rgba(5, 150, 105, 0.25);
+    color: #6ee7b7;
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+.stories-panel.dark-bg .story-task-status.pending {
+    background: rgba(71, 85, 105, 0.5);
+    color: #cbd5e1;
+    border-color: rgba(100, 116, 139, 0.5);
+}
+
+.stories-panel.dark-bg .story-task-status.completed {
+    background: rgba(5, 150, 105, 0.3);
+    color: #6ee7b7;
+    border-color: rgba(52, 211, 153, 0.5);
+}
+
+/* 勾选框 */
 .stories-panel.dark-bg .story-task-checkbox {
     background: rgba(30, 41, 59, 0.8);
-    border-color: #475569;
+    border-color: #94a3b8;
 }
 
 .stories-panel.dark-bg .story-task-checkbox:hover {
     background: rgba(51, 65, 85, 0.8);
+    border-color: var(--value-color, #a5b4fc);
 }
 
+.stories-panel.dark-bg .story-task-checkbox.checked {
+    background: var(--value-color, #10b981);
+    border-color: var(--value-color, #10b981);
+}
+
+/* 进度条 */
 .stories-panel.dark-bg .story-dimension-progress {
-    border-top-color: rgba(71, 85, 105, 0.4);
+    border-top-color: rgba(71, 85, 105, 0.5);
 }
 
 .stories-panel.dark-bg .story-dimension-progress-bar {
-    background: rgba(51, 65, 85, 0.6);
+    background: rgba(71, 85, 105, 0.6);
 }
 
 .stories-panel.dark-bg .story-dimension-progress-text {
-    color: #94a3b8;
+    color: #cbd5e1;
+    font-weight: 600;
 }
 
+/* 添加新故事卡片 */
 .stories-panel.dark-bg .story-add-dimension-card {
-    border-color: rgba(71, 85, 105, 0.5);
-    background: rgba(30, 41, 59, 0.4);
+    border-color: rgba(71, 85, 105, 0.6);
+    background: rgba(30, 41, 59, 0.5);
 }
 
 .stories-panel.dark-bg .story-add-dimension-card:hover {
-    border-color: rgba(99, 102, 241, 0.6);
-    background: rgba(49, 46, 129, 0.3);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.7);
+    background: rgba(49, 46, 129, 0.25);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
 }
 
 .stories-panel.dark-bg .story-add-dimension-content {
-    color: #64748b;
+    color: #94a3b8;
 }
 
 .stories-panel.dark-bg .story-add-dimension-card:hover .story-add-dimension-content {
@@ -209,20 +267,22 @@
 }
 
 .stories-panel.dark-bg .story-add-dimension-content svg {
-    color: #475569;
+    color: #64748b;
 }
 
 .stories-panel.dark-bg .story-add-dimension-card:hover .story-add-dimension-content svg {
     color: #818cf8;
 }
 
+/* 标题药丸 */
 .stories-panel.dark-bg .stories-header-title {
-    background: rgba(6, 78, 59, 0.3);
-    border-color: rgba(52, 211, 153, 0.3);
+    background: rgba(6, 78, 59, 0.35);
+    border-color: rgba(52, 211, 153, 0.4);
     color: #6ee7b7;
 }
 
 .stories-panel.dark-bg .stories-title-icon,
+.stories-panel.dark-bg .stories-title-top,
 .stories-panel.dark-bg .stories-title-text,
 .stories-panel.dark-bg .stories-title-separator,
 .stories-panel.dark-bg .stories-title-status {
@@ -234,33 +294,350 @@
     color: #064e3b;
 }
 
+/* 关闭按钮 */
 .stories-panel.dark-bg .stories-close-btn {
     background: rgba(51, 65, 85, 0.6);
-    color: #94a3b8;
+    color: #cbd5e1;
 }
 
 .stories-panel.dark-bg .stories-close-btn:hover {
-    background: rgba(71, 85, 105, 0.7);
-    color: #e2e8f0;
+    background: rgba(71, 85, 105, 0.8);
+    color: #f1f5f9;
 }
 
+/* 空状态卡片 */
 .stories-panel.dark-bg .stories-empty-card {
     background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(71, 85, 105, 0.5);
+    border-color: rgba(71, 85, 105, 0.6);
 }
 
 .stories-panel.dark-bg .stories-empty-card:hover {
-    border-color: rgba(99, 102, 241, 0.6);
-    background: rgba(49, 46, 129, 0.3);
+    border-color: rgba(99, 102, 241, 0.7);
+    background: rgba(49, 46, 129, 0.25);
 }
 
 .stories-panel.dark-bg .stories-empty-card .stories-empty-title {
-    color: #e2e8f0;
+    color: #f1f5f9;
 }
 
 .stories-panel.dark-bg .stories-empty-card .stories-empty-desc {
     color: #94a3b8;
 }
+
+/* 模态框深色模式（body级，因为模态框不是面板子元素） */
+body.stories-dark .story-modal-overlay .story-modal {
+    background: rgba(30, 41, 59, 0.98);
+    border-color: rgba(71, 85, 105, 0.6);
+}
+
+body.stories-dark .story-modal-header {
+    border-color: rgba(71, 85, 105, 0.6);
+}
+
+body.stories-dark .story-modal-header h3 {
+    color: #f1f5f9;
+}
+
+body.stories-dark .story-modal-field input,
+body.stories-dark .story-modal-field textarea,
+body.stories-dark .story-modal-field input[type="date"],
+body.stories-dark .story-modal-field input[type="time"] {
+    background: rgba(51, 65, 85, 0.6) !important;
+    border-color: rgba(71, 85, 105, 0.6);
+    color: #f1f5f9 !important;
+    color-scheme: dark;
+}
+
+body.stories-dark .story-modal-field input:focus,
+body.stories-dark .story-modal-field textarea:focus,
+body.stories-dark .story-modal-field input[type="date"]:focus,
+body.stories-dark .story-modal-field input[type="time"]:focus {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border-color: #6366f1 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+body.stories-dark .story-modal-field input::placeholder,
+body.stories-dark .story-modal-field textarea::placeholder {
+    color: #64748b;
+}
+
+body.stories-dark .story-modal-field label {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+body.stories-dark .value-tag {
+    background: rgba(51, 65, 85, 0.6);
+    border-color: rgba(71, 85, 105, 0.6);
+    color: #cbd5e1;
+}
+
+body.stories-dark .value-tag:hover:not(:disabled) {
+    border-color: var(--value-color, #d1d5db);
+    background: rgba(51, 65, 85, 0.8);
+    color: #f1f5f9;
+}
+
+body.stories-dark .value-tag.active,
+body.stories-dark .value-tag.active:hover {
+    color: #ffffff;
+}
+
+body.stories-dark .story-modal-footer {
+    border-color: rgba(71, 85, 105, 0.6);
+}
+
+body.stories-dark .story-modal-cancel {
+    background: rgba(71, 85, 105, 0.6);
+    border-color: rgba(100, 116, 139, 0.6);
+    color: #cbd5e1;
+}
+
+body.stories-dark .story-modal-cancel:hover {
+    background: rgba(100, 116, 139, 0.7);
+    color: #f1f5f9;
+}
+
+body.stories-dark .story-modal-close {
+    background: rgba(71, 85, 105, 0.6);
+    color: #cbd5e1;
+}
+
+body.stories-dark .story-modal-close:hover {
+    background: rgba(100, 116, 139, 0.8);
+    color: #f1f5f9;
+}
+
+body.stories-dark .story-modal-delete {
+    background: rgba(127, 29, 29, 0.3);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+}
+
+body.stories-dark .story-modal-delete:hover {
+    background: rgba(127, 29, 29, 0.4);
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #fecaca;
+}
+
+
+.stories-panel.dark-bg .story-dimension-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border-color: rgba(99, 102, 241, 0.6);
+}
+
+.stories-panel.dark-bg .story-dimension-card.all-completed {
+    background: rgba(6, 78, 59, 0.35);
+    border-color: rgba(52, 211, 153, 0.5);
+    border-top-color: rgba(52, 211, 153, 0.8);
+}
+
+/* 卡片头部：分割线用维度颜色淡色 */
+.stories-panel.dark-bg .story-dimension-header {
+    border-bottom-color: rgba(71, 85, 105, 0.6);
+}
+
+/* 维度名字：纯白色，粗体 */
+.stories-panel.dark-bg .story-dimension-name {
+    color: #ffffff;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.stories-panel.dark-bg .story-dimension-subtitle {
+    color: #94a3b8;
+}
+
+/* 维度标签：半透明底色 + 维度色文字（提亮版） */
+.stories-panel.dark-bg .story-task-tag {
+    color: color-mix(in srgb, var(--value-color, #cbd5e1) 80%, #ffffff);
+    background: color-mix(in srgb, var(--value-color, #64748b) 18%, rgba(71, 85, 105, 0.45));
+    border: 1px solid color-mix(in srgb, var(--value-color, #64748b) 35%, rgba(71, 85, 105, 0.4));
+    font-weight: 600;
+}
+
+/* 编辑按钮 */
+.stories-panel.dark-bg .story-dimension-edit {
+    background: rgba(71, 85, 105, 0.6);
+    border-color: rgba(100, 116, 139, 0.6);
+    color: #cbd5e1;
+}
+
+.stories-panel.dark-bg .story-dimension-edit:hover {
+    background: rgba(100, 116, 139, 0.7);
+    border-color: rgba(99, 102, 241, 0.6);
+    color: #a5b4fc;
+}
+
+/* 任务项：背景比卡片稍浅，保证层级 */
+.stories-panel.dark-bg .story-task-item {
+    background: rgba(71, 85, 105, 0.45);
+    border-color: rgba(100, 116, 139, 0.5);
+}
+
+.stories-panel.dark-bg .story-task-item:hover {
+    background: rgba(100, 116, 139, 0.55);
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.stories-panel.dark-bg .story-task-item.completed {
+    background: rgba(6, 78, 59, 0.3);
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+.stories-panel.dark-bg .story-task-item.completed .story-task-title {
+    color: #94a3b8;
+}
+
+/* 故事标题：纯白色 */
+.stories-panel.dark-bg .story-task-title {
+    color: #f8fafc;
+    font-weight: 600;
+}
+
+/* 元信息：更亮的灰色 */
+.stories-panel.dark-bg .story-task-meta,
+.stories-panel.dark-bg .story-task-time {
+    color: #94a3b8;
+}
+
+/* 状态标签：暗底+亮色文字，不刺眼 */
+.stories-panel.dark-bg .story-task-status.in-progress {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+.stories-panel.dark-bg .story-task-status.pending {
+    background: rgba(100, 116, 139, 0.4);
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.4);
+}
+
+.stories-panel.dark-bg .story-task-status.completed {
+    background: rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+    border-color: rgba(52, 211, 153, 0.5);
+}
+
+/* 勾选框：更亮的边框，选中用维度色 */
+.stories-panel.dark-bg .story-task-checkbox {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: #94a3b8;
+}
+
+.stories-panel.dark-bg .story-task-checkbox:hover {
+    background: rgba(71, 85, 105, 0.8);
+    border-color: var(--value-color, #a5b4fc);
+}
+
+.stories-panel.dark-bg .story-task-checkbox.checked {
+    background: var(--value-color, #10b981);
+    border-color: var(--value-color, #10b981);
+}
+
+/* 进度条：轨道更醒目，文字更亮 */
+.stories-panel.dark-bg .story-dimension-progress {
+    border-top-color: rgba(71, 85, 105, 0.6);
+}
+
+.stories-panel.dark-bg .story-dimension-progress-bar {
+    background: rgba(71, 85, 105, 0.7);
+}
+
+.stories-panel.dark-bg .story-dimension-progress-text {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+/* 添加新故事卡片 */
+.stories-panel.dark-bg .story-add-dimension-card {
+    border-color: rgba(71, 85, 105, 0.7);
+    background: rgba(51, 65, 85, 0.6);
+}
+
+.stories-panel.dark-bg .story-add-dimension-card:hover {
+    border-color: rgba(99, 102, 241, 0.8);
+    background: rgba(49, 46, 129, 0.3);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+}
+
+.stories-panel.dark-bg .story-add-dimension-content {
+    color: #94a3b8;
+}
+
+.stories-panel.dark-bg .story-add-dimension-card:hover .story-add-dimension-content {
+    color: #a5b4fc;
+}
+
+.stories-panel.dark-bg .story-add-dimension-content svg {
+    color: #64748b;
+}
+
+.stories-panel.dark-bg .story-add-dimension-card:hover .story-add-dimension-content svg {
+    color: #818cf8;
+}
+
+/* 标题药丸：用绿色系，更醒目 */
+.stories-panel.dark-bg .stories-header-title {
+    background: rgba(6, 78, 59, 0.4);
+    border-color: rgba(52, 211, 153, 0.5);
+    color: #6ee7b7;
+}
+
+.stories-panel.dark-bg .stories-title-icon,
+.stories-panel.dark-bg .stories-title-top,
+.stories-panel.dark-bg .stories-title-text,
+.stories-panel.dark-bg .stories-title-separator,
+.stories-panel.dark-bg .stories-title-status {
+    color: #6ee7b7;
+}
+
+.stories-panel.dark-bg .stories-count-circle {
+    background: #6ee7b7;
+    color: #064e3b;
+}
+
+/* 关闭按钮 */
+.stories-panel.dark-bg .stories-close-btn {
+    background: rgba(71, 85, 105, 0.6);
+    color: #e2e8f0;
+}
+
+.stories-panel.dark-bg .stories-close-btn:hover {
+    background: rgba(100, 116, 139, 0.8);
+    color: #f8fafc;
+}
+
+/* 空状态卡片 */
+.stories-panel.dark-bg .stories-empty-card {
+    background: rgba(51, 65, 85, 0.7);
+    border-color: rgba(71, 85, 105, 0.7);
+}
+
+.stories-panel.dark-bg .stories-empty-card:hover {
+    border-color: rgba(99, 102, 241, 0.8);
+    background: rgba(49, 46, 129, 0.3);
+}
+
+.stories-panel.dark-bg .stories-empty-card .stories-empty-title {
+    color: #f8fafc;
+}
+
+.stories-panel.dark-bg .stories-empty-card .stories-empty-desc {
+    color: #94a3b8;
+}
+
+/* 模态框深色模式 */
+body.stories-dark .story-modal-overlay .story-modal {
+    background: rgba(30, 41, 59, 0.98);
+    border-color: rgba(71, 85, 105, 0.7);
+}
+
+
+
 
 .stories-panel.active {
     opacity: 1;
@@ -295,6 +672,12 @@
 .stories-title-icon {
     font-size: 18px;
     line-height: 1;
+}
+
+.stories-title-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .stories-title-text {
@@ -1548,6 +1931,35 @@
         padding-right: 16px;
     }
     
+    /* 平板/窄屏：标题双行排列 */
+    .stories-header-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        padding: 10px 18px;
+        font-size: 15px;
+        border-radius: 24px;
+    }
+    
+    .stories-title-top {
+        gap: 6px;
+    }
+    
+    .stories-title-separator {
+        display: none;
+    }
+    
+    .stories-title-status {
+        font-size: 13px;
+    }
+    
+    .stories-count-circle {
+        min-width: 22px;
+        height: 22px;
+        font-size: 12px;
+        padding: 0 6px;
+    }
+    
     .add-story-btn {
         width: calc(100% - 32px);
         margin-left: 16px;
@@ -1582,6 +1994,47 @@
         font-size: 8px;
         padding: 1px 4px;
         min-width: 16px;
+    }
+    
+    /* 手机竖屏：标题更紧凑 */
+    .stories-panel-header {
+        padding: 10px 12px;
+    }
+    
+    .stories-header-title {
+        gap: 3px;
+        padding: 8px 14px;
+        font-size: 14px;
+        border-radius: 20px;
+    }
+    
+    .stories-title-icon {
+        font-size: 16px;
+    }
+    
+    .stories-title-text {
+        font-size: 15px;
+    }
+    
+    .stories-title-status {
+        font-size: 12px;
+        gap: 4px;
+    }
+    
+    .stories-count-circle {
+        min-width: 20px;
+        height: 20px;
+        font-size: 11px;
+        padding: 0 5px;
+    }
+    
+    .stories-header-right {
+        gap: 4px;
+    }
+    
+    .stories-close-btn {
+        width: 32px;
+        height: 32px;
     }
 }
 

@@ -188,10 +188,18 @@ class AnimationManager {
     }
 
     toggle() {
-        this.enabled = !this.enabled;
-        this.canvas.classList.toggle('active');
-        
-        if (this.enabled) {
+        this.setEnabled(!this.enabled);
+    }
+
+    // 直接设置为指定状态（恢复设置时用）
+    setEnabled(enabled) {
+        enabled = !!enabled;
+        if (this.enabled === enabled) return;
+
+        this.enabled = enabled;
+        this.canvas.classList.toggle('active', enabled);
+
+        if (enabled) {
             this.createRabbitParticles();
             this.time = 0;
             // 初始状态为兔子形态（静止），而不是散开

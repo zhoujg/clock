@@ -71,14 +71,19 @@ class TickSoundManager {
     }
 
     toggle() {
-        this.enabled = !this.enabled;
+        this.setEnabled(!this.enabled);
+        return this.enabled;
+    }
+
+    // 直接设置为指定状态（恢复设置时用）
+    setEnabled(enabled) {
+        if (this.enabled === !!enabled) return;
+        this.enabled = !!enabled;
 
         // 确保 AudioContext 处于运行状态（iOS 需要在用户手势后恢复）
         if (this.enabled && this.audioContext && this.audioContext.state === 'suspended') {
             this.audioContext.resume().catch(e => console.warn('AudioContext resume 失败:', e));
         }
-
-        return this.enabled;
     }
 
     playTick() {

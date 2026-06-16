@@ -48,8 +48,8 @@ function isValidPhone($phone) {
         return true;
     }
     
-    // 中国香港手机号：8位，以5-9开头（移动电话）
-    if (preg_match('/^[5-9]\d{7}$/', $clean)) {
+    // 中国香港手机号：8位，以4-9开头（移动电话）
+    if (preg_match('/^[4-9]\d{7}$/', $clean)) {
         return true;
     }
     

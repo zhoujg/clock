@@ -27,7 +27,7 @@ $cleanPhone = preg_replace('/^\+86/', '', $phone);
 
 // 查找用户
 $db = Database::getInstance()->getConnection();
-$stmt = $db->prepare('SELECT id, phone, password FROM users WHERE phone = ?');
+$stmt = $db->prepare('SELECT id, phone, password, nickname FROM users WHERE phone = ?');
 $stmt->execute([$cleanPhone]);
 $user = $stmt->fetch();
 
@@ -41,7 +41,8 @@ $token = Auth::generateToken($user['id'], $user['phone']);
 Auth::jsonSuccess([
     'token' => $token,
     'user'  => [
-        'id'    => (int) $user['id'],
-        'phone' => $user['phone']
+        'id'       => (int) $user['id'],
+        'phone'    => $user['phone'],
+        'nickname' => $user['nickname']
     ]
 ]);

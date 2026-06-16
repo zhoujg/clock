@@ -11,13 +11,13 @@
 // 数据库配置
 define('DB_HOST', 'localhost');
 define('DB_PORT', 3306);
-define('DB_NAME', 'clock_app');
+define('DB_NAME', 'clock');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 // JWT 密钥（部署时务必改为随机字符串，可用 php -r "echo bin2hex(random_bytes(32));" 生成）
-define('JWT_SECRET', 'change_me_to_random_64_char_string');
+define('JWT_SECRET', '02b652b3dff49b3279d803856f127eb6607f986a7cad22e67244ead82449014e%');
 define('JWT_EXPIRE', 86400 * 30);        // Token 有效期：30 天
 define('JWT_ALGORITHM', 'HS256');
 

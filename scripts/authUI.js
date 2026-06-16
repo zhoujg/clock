@@ -30,7 +30,6 @@ class AuthUI {
                 <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.6"/>
                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
             </svg>
-            <span class="auth-entrance-label">未登录</span>
         `;
         btn.addEventListener('click', () => this.toggle());
 
@@ -46,23 +45,9 @@ class AuthUI {
 
     updateEntranceState(isLoggedIn) {
         if (isLoggedIn) {
-            this.entranceBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="auth-entrance-icon">
-                    <circle cx="12" cy="8" r="4" fill="#4ade80"/>
-                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#4ade80" stroke-width="2" stroke-linecap="round" fill="none"/>
-                </svg>
-                <span class="auth-entrance-label">${this.cloudSync.userPhone}</span>
-            `;
             this.entranceBtn.classList.add('logged-in');
-            this.entranceBtn.title = '已登录 - 点击管理账号';
+            this.entranceBtn.title = '已登录 - 点击查看个人信息';
         } else {
-            this.entranceBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="auth-entrance-icon">
-                    <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.5"/>
-                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
-                </svg>
-                <span class="auth-entrance-label">未登录</span>
-            `;
             this.entranceBtn.classList.remove('logged-in');
             this.entranceBtn.title = '点击登录以同步数据';
         }
@@ -81,7 +66,13 @@ class AuthUI {
 
     open(mode = null) {
         if (mode) this.mode = mode;
-        this.renderForm();
+
+        if (this.cloudSync.isLoggedIn) {
+            this.renderProfile();
+        } else {
+            this.renderForm();
+        }
+
         this.panel.style.display = 'flex';
         this.isOpen = true;
     }
@@ -163,6 +154,25 @@ class AuthUI {
             </p>
 
             <form id="authForm" style="display:flex; flex-direction:column; gap:16px;">
+                ${!isLogin ? `
+                <div>
+                    <label style="display:block; margin-bottom:6px; font-size:13px; color: rgba(255,255,255,0.6);">
+                        昵称
+                    </label>
+                    <input type="text" id="authNickname"
+                        placeholder="给自己取个名字吧"
+                        maxlength="20"
+                        style="
+                            width:100%; padding:10px 12px;
+                            background: rgba(255,255,255,0.08);
+                            border: 1px solid rgba(255,255,255,0.15);
+                            border-radius: 8px;
+                            color: #fff; font-size:14px;
+                            outline: none; transition: border-color 0.2s;
+                            box-sizing: border-box;
+                        " />
+                </div>
+                ` : ''}
                 <div>
                     <label style="display:block; margin-bottom:6px; font-size:13px; color: rgba(255,255,255,0.6);">
                         手机号
@@ -242,6 +252,84 @@ class AuthUI {
         this.bindFormEvents();
     }
 
+    renderProfile() {
+        const phone = this.cloudSync.userPhone || '';
+        const nickname = this.cloudSync.userNickname;
+
+        this.formWrapper.innerHTML = `
+            <div style="text-align:center;">
+                <div style="
+                    width:72px; height:72px; margin:0 auto 16px;
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                ">
+                    <svg viewBox="0 0 24 24" fill="none" style="width:36px; height:36px;">
+                        <circle cx="12" cy="8" r="4" fill="#fff" opacity="0.9"/>
+                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.9"/>
+                    </svg>
+                </div>
+
+                <div style="margin-bottom:24px;">
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:2px;">
+                        <span style="color:rgba(255,255,255,0.35); font-size:11px; min-width:28px;">昵称</span>
+                        <span style="color:#fff; font-size:16px; font-weight:500;">${nickname || '未设置'}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <span style="color:rgba(255,255,255,0.35); font-size:11px; min-width:28px;">号码</span>
+                        <span style="color:rgba(255,255,255,0.55); font-size:14px;">${phone}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 20px;
+            ">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                    <span style="color: rgba(255,255,255,0.5); font-size:13px;">状态</span>
+                    <span style="display:flex; align-items:center; gap:6px; color:#4ade80; font-size:13px;">
+                        <span style="width:8px; height:8px; background:#4ade80; border-radius:50%; display:inline-block;"></span>
+                        已登录
+                    </span>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span style="color: rgba(255,255,255,0.5); font-size:13px;">同步</span>
+                    <span style="color: rgba(255,255,255,0.35); font-size:13px;">
+                        跨设备自动同步
+                    </span>
+                </div>
+            </div>
+
+            <button id="authLogoutBtn" style="
+                width:100%; padding:10px;
+                background: rgba(239,68,68,0.15);
+                border: 1px solid rgba(239,68,68,0.3);
+                border-radius: 8px;
+                color: #ef4444; font-size:13px;
+                cursor: pointer; transition: all 0.2s;
+            ">
+                退出登录
+            </button>
+        `;
+
+        // 退出登录事件
+        const logoutBtn = document.getElementById('authLogoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if (confirm('确定要退出登录吗？本地数据不会丢失。')) {
+                    this.cloudSync.logout();
+                    this.mode = 'login';
+                    this.renderForm();
+                    this.close();
+                }
+            });
+        }
+    }
+
     bindFormEvents() {
         const form = document.getElementById('authForm');
         const errorEl = document.getElementById('authError');
@@ -254,6 +342,8 @@ class AuthUI {
 
             const phone = document.getElementById('authPhone').value.trim();
             const password = document.getElementById('authPassword').value;
+            const nicknameEl = document.getElementById('authNickname');
+            const nickname = nicknameEl ? nicknameEl.value.trim() : '';
 
             errorEl.style.display = 'none';
 
@@ -265,7 +355,7 @@ class AuthUI {
             // 手机号格式校验（支持中国大陆和香港）
             const cleanPhone = phone.replace(/^\+86/, '').replace(/^\+852/, '');
             const isChinaPhone = /^1[3-9]\d{9}$/.test(cleanPhone);
-            const isHKPhone = /^[5-9]\d{7}$/.test(cleanPhone);
+            const isHKPhone = /^[4-9]\d{7}$/.test(cleanPhone);
             if (!isChinaPhone && !isHKPhone) {
                 this.showError('请输入有效的手机号（支持中国大陆和香港）');
                 return;
@@ -284,7 +374,7 @@ class AuthUI {
                 if (this.mode === 'login') {
                     result = await this.cloudSync.login(phone, password);
                 } else {
-                    result = await this.cloudSync.register(phone, password);
+                    result = await this.cloudSync.register(phone, password, nickname);
                 }
 
                 if (result.success) {
@@ -322,7 +412,7 @@ class AuthUI {
         }
 
         // 输入框 focus 效果
-        ['authPhone', 'authPassword'].forEach(id => {
+        ['authNickname', 'authPhone', 'authPassword'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 el.addEventListener('focus', () => {

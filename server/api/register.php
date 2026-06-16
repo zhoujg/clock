@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $data = getJsonBody();
 $phone = trim($data['phone'] ?? '');
 $password = $data['password'] ?? '';
+$nickname = trim($data['nickname'] ?? '');
 
 // 验证输入
 if (!isValidPhone($phone)) {
@@ -43,8 +44,8 @@ if ($stmt->fetch()) {
 
 // 创建用户
 $hash = Auth::hashPassword($password);
-$stmt = $db->prepare('INSERT INTO users (phone, password) VALUES (?, ?)');
-$stmt->execute([$cleanPhone, $hash]);
+$stmt = $db->prepare('INSERT INTO users (phone, password, nickname) VALUES (?, ?, ?)');
+$stmt->execute([$cleanPhone, $hash, $nickname]);
 $userId = (int) $db->lastInsertId();
 
 // 生成 Token
@@ -60,7 +61,8 @@ foreach ($keys as $key) {
 Auth::jsonSuccess([
     'token'    => $token,
     'user'     => [
-        'id'    => $userId,
-        'phone' => $cleanPhone
+        'id'       => $userId,
+        'phone'    => $cleanPhone,
+        'nickname' => $nickname
     ]
 ], 201);

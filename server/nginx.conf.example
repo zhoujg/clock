@@ -1,40 +1,29 @@
-# 时钟应用 - Nginx 配置
-# 将此文件放到 /etc/nginx/sites-available/clock 并创建软链接到 sites-enabled/
+# 时钟应用 - Nginx 配置示例
+#
+# 将此段添加到 neihou.cn 的 server 块中
+#
+# 目录结构：
+#   /www/wwwroot/neihou/public/clock/    ← 前端（neihou.cn/clock/）
+#   /www/wwwroot/neihou/clockserver/     ← 后端 PHP（不暴露在 public 下）
 
-server {
-    listen 80;
-    server_name your-domain.com;  # 修改为你的域名
-
-    root /var/www/clock;           # 修改为实际路径
-    index index.html;
-
-    # 静态文件
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    # PHP API（如果使用 PHP-FPM）
-    location /api/ {
-        # 只允许 api/ 目录下的 .php 文件
-        if (!-f $request_filename) {
-            return 404;
-        }
-
-        include fastcgi_params;
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;  # 修改为你的 PHP-FPM 版本
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_read_timeout 60s;
-    }
-
-    # 安全：禁止直接访问 server 目录中的非 API 文件
-    location ~ ^/server/(?!api/) {
-        deny all;
-    }
-
-    location ~ ^/\. {
-        deny all;
-    }
-
-    # 上传大小限制
-    client_max_body_size 10m;
+# ============================================
+# API 请求代理到 clockserver
+# 浏览器请求 /clockserver/api/xxx.php
+#   → Nginx 映射到 /www/wwwroot/neihou/clockserver/api/xxx.php
+# ============================================
+# ============================================
+# ⬇️ 时钟 API：放在 enable-php-83.conf 之前
+# ============================================
+location ~ ^/clockserver/api/(.+)\.php$ {
+    include fastcgi_params;
+    fastcgi_pass unix:/tmp/php-cgi-83.sock;
+    fastcgi_param SCRIPT_FILENAME /www/wwwroot/neihou/clockserver/api/$1.php;
+    fastcgi_read_timeout 60s;
 }
+
+# 上传大小限制
+client_max_body_size 10m;
+
+
+
+

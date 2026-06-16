@@ -33,12 +33,16 @@ class SyncAdapter {
     }
 
     /**
-     * 登录后全量同步：拉取云端 → 融合到本地
+     * 登录后全量同步：先推送本地未同步数据 → 再拉取云端 → 融合到本地
      */
     async syncAfterLogin() {
         if (!this.cloudSync.isLoggedIn) return null;
 
         console.log('[Sync] 开始全量同步...');
+
+        // 1. 先把本地故事推送到云端（防止匿名期间的数据丢失）
+        await this._pushLocalStoriesToCloud();
+
         const result = await this.cloudSync.pullAll();
 
         if (result.success && result.data) {
@@ -54,6 +58,40 @@ class SyncAdapter {
         }
 
         return result;
+    }
+
+    /**
+     * 登录后将本地所有故事推送到云端
+     * 防止用户在匿名期间创建的故事丢失
+     */
+    async _pushLocalStoriesToCloud() {
+        try {
+            const raw = localStorage.getItem('dailyStories');
+            if (!raw) return;
+
+            const allStories = JSON.parse(raw);
+            const dates = Object.keys(allStories);
+
+            for (const date of dates) {
+                const stories = allStories[date];
+                if (!stories || stories.length === 0) continue;
+
+                // 转换为云端格式
+                const cloudStories = stories.map((story, idx) => ({
+                    story_index: idx + 1,
+                    title: story.title || '',
+                    content: JSON.stringify(story),
+                    value_dim: story.value || '',
+                    completed: story.completed ? 1 : 0,
+                    _localUpdatedAt: new Date().toISOString()
+                }));
+
+                console.log(`[Sync] 推送本地故事: ${date}, ${cloudStories.length}条`);
+                await this.cloudSync.pushStories(date, cloudStories);
+            }
+        } catch (e) {
+            console.warn('[Sync] 本地故事推送失败:', e);
+        }
     }
 
     /**

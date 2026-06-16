@@ -23,8 +23,9 @@ class CloudSync {
         this.lastSyncKey = 'clock_last_sync';
         this.lastSync = localStorage.getItem(this.lastSyncKey) || null;
 
-        // API 基础路径（部署时修改为此处）
-        this.baseURL = '/api';
+        // API 基础路径（自动区分本地开发和线上环境）
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        this.baseURL = isLocal ? '/server/api' : '/clockserver/api';
 
         // 同步状态
         this.isSyncing = false;
@@ -44,13 +45,17 @@ class CloudSync {
         return this.user ? this.user.phone : '';
     }
 
+    get userNickname() {
+        return this.user ? (this.user.nickname || '') : '';
+    }
+
     /**
      * 注册
      */
-    async register(phone, password) {
+    async register(phone, password, nickname = '') {
         const res = await this._fetch('/register.php', {
             method: 'POST',
-            body: JSON.stringify({ phone, password })
+            body: JSON.stringify({ phone, password, nickname })
         });
         if (res.success) {
             this._setAuth(res.token, res.user);

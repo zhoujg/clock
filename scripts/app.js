@@ -869,15 +869,11 @@ class App {
             }
         }
         
-        // 恢复动画状态
-        if (settings.animationEnabled) {
-            this.animationManager.toggle();
-        }
+        // 恢复动画状态（直接设置，不 toggle）
+        this.animationManager.setEnabled(!!settings.animationEnabled);
 
-        // 恢复滴答声状态
-        if (settings.tickSoundEnabled) {
-            this.tickSoundManager.toggle();
-        }
+        // 恢复滴答声状态（直接设置，不 toggle）
+        this.tickSoundManager.setEnabled(!!settings.tickSoundEnabled);
 
         // 恢复BGM播放器设置
         if (settings.bgmPlayer) {

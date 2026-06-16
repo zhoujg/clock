@@ -137,17 +137,23 @@ class WeatherModule {
     }
     
     /**
-     * 加载天气数据（优先从缓存读取）
+     * 加载天气数据（缓存优先展示，后台刷新最新数据）
      */
     async loadWeatherData() {
-        // 尝试从本地存储读取
+        // 1. 先展示缓存（即使过期也先用，避免白屏）
         const cached = this.getCachedWeather();
-        if (cached && this.isCacheValid(cached)) {
+        if (cached) {
             this.displayWeather(cached);
+        }
+
+        // 2. 如果缓存有效，后台静默刷新（防止 App 冷启动显示旧数据）
+        if (cached && this.isCacheValid(cached)) {
+            // 异步拉取最新数据，静默更新
+            this.fetchWeatherData().catch(() => {});
             return;
         }
-        
-        // 获取新的天气数据
+
+        // 3. 缓存过期或无缓存，同步拉取
         await this.fetchWeatherData();
     }
     
@@ -198,9 +204,15 @@ class WeatherModule {
                 }
             } catch (error) {
                 console.error('获取天气数据失败:', error);
-                // 失败时使用模拟数据
-                this.weatherData = this.getMockWeatherData();
-                this.displayWeather(this.weatherData);
+                // 失败时优先用缓存，没有再降到模拟数据
+                const cached = this.getCachedWeather();
+                if (cached) {
+                    this.weatherData = cached;
+                    this.displayWeather(this.weatherData);
+                } else {
+                    this.weatherData = this.getMockWeatherData();
+                    this.displayWeather(this.weatherData);
+                }
             }
         }
     }

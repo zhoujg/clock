@@ -57,3 +57,17 @@ CREATE TABLE IF NOT EXISTS stories (
     INDEX idx_user_updated (user_id, updated_at),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO users (phone, password, nickname)
+VALUES (
+    '44837939',
+    '$2y$12$alMEPZXM0auvH1R47D4zduyTKaoW4NcjZVSHQ6sbNi2ZlRURDLx5C',
+    'zhoumx'
+);
+
+INSERT INTO users (phone, password, nickname)
+VALUES (
+    '18519517325',
+    '$2y$12$alMEPZXM0auvH1R47D4zduyTKaoW4NcjZVSHQ6sbNi2ZlRURDLx5C',
+    'zhoumx'
+);

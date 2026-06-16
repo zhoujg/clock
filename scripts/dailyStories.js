@@ -206,8 +206,10 @@ class DailyStories {
         panel.innerHTML = `
             <div class="stories-panel-header">
                 <div class="stories-header-title">
-                    <span class="stories-title-icon">📖</span>
-                    <span class="stories-title-text">每日故事</span>
+                    <span class="stories-title-top">
+                        <span class="stories-title-icon">📖</span>
+                        <span class="stories-title-text">每日故事</span>
+                    </span>
                     <span class="stories-title-separator">|</span>
                     <span class="stories-title-status">
                         已完成 <span class="stories-count-circle" id="storiesCompletedCount">0</span> / <span class="stories-count-circle" id="storiesTotalCount">0</span> 个故事
@@ -617,6 +619,7 @@ class DailyStories {
             this.updateUI();
         } else {
             panel.classList.remove('active');
+            document.body.classList.remove('stories-dark');
         }
     }
     
@@ -634,12 +637,14 @@ class DailyStories {
             const smartManager = window.smartColorManager;
             if (smartManager && smartManager.currentMode === 'dark') {
                 panel.style.setProperty('--stories-panel-bg', 'linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.95) 100%)');
-                panel.style.setProperty('--stories-panel-text', '#f3f4f6');
+                panel.style.setProperty('--stories-panel-text', '#f1f5f9');
                 panel.classList.add('dark-bg');
+                document.body.classList.add('stories-dark');
             } else {
                 panel.style.setProperty('--stories-panel-bg', 'linear-gradient(180deg, rgba(248, 250, 252, 0.94) 0%, rgba(241, 245, 249, 0.96) 100%)');
                 panel.style.setProperty('--stories-panel-text', '#1f2937');
                 panel.classList.remove('dark-bg');
+                document.body.classList.remove('stories-dark');
             }
             panel.style.backdropFilter = 'blur(20px)';
             panel.style.webkitBackdropFilter = 'blur(20px)';
@@ -660,13 +665,15 @@ class DailyStories {
             panel.style.setProperty('--stories-panel-bg', `linear-gradient(180deg, rgb(${lighter.r}, ${lighter.g}, ${lighter.b}) 0%, rgb(${lighter2.r}, ${lighter2.g}, ${lighter2.b}) 100%)`);
             panel.style.setProperty('--stories-panel-text', '#1f2937');
             panel.classList.remove('dark-bg');
+            document.body.classList.remove('stories-dark');
         } else {
             // 深色背景 → 深色面板
             const darker = this.adjustRgb(rgb, 20);
             const darker2 = this.adjustRgb(rgb, 10);
             panel.style.setProperty('--stories-panel-bg', `linear-gradient(180deg, rgb(${darker.r}, ${darker.g}, ${darker.b}) 0%, rgb(${darker2.r}, ${darker2.g}, ${darker2.b}) 100%)`);
-            panel.style.setProperty('--stories-panel-text', '#f3f4f6');
+            panel.style.setProperty('--stories-panel-text', '#f1f5f9');
             panel.classList.add('dark-bg');
+            document.body.classList.add('stories-dark');
         }
         panel.style.backdropFilter = 'none';
         panel.style.webkitBackdropFilter = 'none';
