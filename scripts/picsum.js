@@ -46,6 +46,8 @@ class PicsumManager {
     saveFavorites() {
         try {
             localStorage.setItem('picsumFavorites', JSON.stringify(this.favorites));
+            // 同步到云端
+            if (window.syncAdapter) window.syncAdapter.pushChanges('picsumFavorites');
         } catch (error) {
             console.error('保存收藏图片失败:', error);
         }

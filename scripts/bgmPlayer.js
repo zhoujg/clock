@@ -853,6 +853,8 @@ class BGMPlayerManager {
     saveFavorites() {
         try {
             localStorage.setItem('musicFavorites', JSON.stringify(this.favorites));
+            // 同步到云端
+            if (window.syncAdapter) window.syncAdapter.pushChanges('musicFavorites');
             console.log('✅ 保存收藏音乐:', this.favorites.length, '首');
         } catch (error) {
             console.error('❌ 保存收藏音乐失败:', error);

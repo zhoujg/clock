@@ -35,7 +35,7 @@ body {
 /* 日期显示样式 */
 .date-display {
     position: fixed;
-    top: 8%;
+    top: 14%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;

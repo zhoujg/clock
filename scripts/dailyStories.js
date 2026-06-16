@@ -54,8 +54,20 @@ class DailyStories {
         if (this.currentDate !== today) {
             this.currentDate = today;
             this.stories = this.getDefaultStories();
-            this.saveTodayStories();
-            this.showWelcomePrompt();
+            
+            // 新的一天，先尝试从云端加载（可能有其他设备创建的故事）
+            if (window.syncAdapter && window.cloudSync.isLoggedIn) {
+                this._loadFromCloud().then(() => {
+                    // 如果云端也没数据，用默认空列表
+                    if (this.stories.length === 0) {
+                        this.saveTodayStories();
+                        this.showWelcomePrompt();
+                    }
+                });
+            } else {
+                this.saveTodayStories();
+                this.showWelcomePrompt();
+            }
         }
     }
     
@@ -66,17 +78,64 @@ class DailyStories {
     
     // 加载今天的故事
     loadTodayStories() {
+        let localStories = this.getDefaultStories();
+
         try {
             const allData = localStorage.getItem(this.storageKey);
-            if (!allData) return this.getDefaultStories();
-            
-            const data = JSON.parse(allData);
-            const todayData = data[this.currentDate];
-            
-            return todayData || this.getDefaultStories();
+            if (allData) {
+                const data = JSON.parse(allData);
+                const todayData = data[this.currentDate];
+                if (todayData && todayData.length > 0) {
+                    localStories = todayData;
+                }
+            }
         } catch (error) {
             console.error('加载今日故事失败:', error);
-            return this.getDefaultStories();
+        }
+
+        // 异步从云端加载（不阻塞 UI）
+        if (window.syncAdapter && window.cloudSync.isLoggedIn) {
+            this._loadFromCloud();
+        }
+
+        return localStories;
+    }
+
+    // 从云端加载今日故事
+    async _loadFromCloud() {
+        try {
+            const cloudStories = await window.syncAdapter.loadStories(this.currentDate);
+            if (cloudStories && cloudStories.length > 0) {
+                // 解析云端故事（content 字段存储了完整 JSON）
+                const parsed = cloudStories.map(s => {
+                    try {
+                        return JSON.parse(s.content);
+                    } catch (e) {
+                        return {
+                            title: s.title || '',
+                            story: s.content || '',
+                            value: s.value_dim || '',
+                            completed: s.completed == 1
+                        };
+                    }
+                });
+
+                // 云端数据覆盖本地
+                this.stories = parsed;
+
+                // 同步回 localStorage
+                try {
+                    const allData = localStorage.getItem(this.storageKey);
+                    const data = allData ? JSON.parse(allData) : {};
+                    data[this.currentDate] = this.stories;
+                    localStorage.setItem(this.storageKey, JSON.stringify(data));
+                } catch (e) {}
+
+                this.updateUI();
+                this.updateBadge();
+            }
+        } catch (e) {
+            console.warn('[Stories] 云端加载失败:', e);
         }
     }
     
@@ -90,11 +149,35 @@ class DailyStories {
             localStorage.setItem(this.storageKey, JSON.stringify(data));
             
             this.updateBadge();
+
+            // 同步到云端
+            this._syncToCloud();
+            
             return true;
         } catch (error) {
             console.error('保存今日故事失败:', error);
             return false;
         }
+    }
+
+    // 云端同步（debounced）
+    _syncToCloud() {
+        if (!window.syncAdapter || !window.cloudSync.isLoggedIn) return;
+
+        if (this._syncTimer) clearTimeout(this._syncTimer);
+
+        this._syncTimer = setTimeout(async () => {
+            const storiesForCloud = this.stories.map((story, idx) => ({
+                story_index: idx + 1,
+                title: story.title || '',
+                content: JSON.stringify(story),
+                value_dim: story.value || '',
+                completed: story.completed ? 1 : 0,
+                _localUpdatedAt: new Date().toISOString()
+            }));
+
+            await window.syncAdapter.saveStories(this.currentDate, storiesForCloud);
+        }, 500);
     }
     
     // 创建UI
@@ -274,6 +357,7 @@ class DailyStories {
         const card = document.createElement('div');
         card.className = `story-dimension-card ${allCompleted ? 'all-completed' : ''}`;
         card.dataset.value = def.name;
+        card.style.setProperty('--value-color', def.color);
 
         // 卡片头部
         const header = document.createElement('div');
@@ -301,7 +385,7 @@ class DailyStories {
 
         stories.forEach((story) => {
             const originalIndex = this.stories.indexOf(story);
-            const taskItem = this.createTaskItem(story, originalIndex);
+            const taskItem = this.createTaskItem(story, originalIndex, def);
             taskList.appendChild(taskItem);
         });
         card.appendChild(taskList);
@@ -321,16 +405,20 @@ class DailyStories {
     }
     
     // 创建任务项（截图风格：左侧标题+状态+时间，右侧圆形勾选框）
-    createTaskItem(story, index) {
+    createTaskItem(story, index, valueDef) {
         const item = document.createElement('div');
         item.className = `story-task-item ${story.completed ? 'completed' : ''}`;
         item.dataset.index = index;
+        
+        // 传递维度颜色
+        const color = valueDef ? valueDef.color : '#95a5a6';
+        item.style.setProperty('--value-color', color);
 
-        // 状态标签
-        const hasTime = !!(story.startDate || story.startTime);
+        // 状态标签：已开始且未完成=进行中，未到开始时间或无时间=待开始
+        const hasStarted = this.hasStoryStarted(story);
         const statusLabel = story.completed
             ? `<span class="story-task-status completed">✓ 已完成</span>`
-            : hasTime
+            : hasStarted
                 ? `<span class="story-task-status in-progress">○ 进行中</span>`
                 : `<span class="story-task-status pending">○ 待开始</span>`;
 
@@ -350,7 +438,7 @@ class DailyStories {
             <div class="story-task-left">
                 <div class="story-task-title-wrap">
                     <span class="${titleClass}">${story.title || '未命名故事'}</span>
-                    <span class="story-task-tag">${story.value || '未分类'}</span>
+                    <span class="story-task-tag" style="--value-color: ${color}">${story.value || '未分类'}</span>
                 </div>
                 <div class="story-task-meta">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
@@ -363,13 +451,36 @@ class DailyStories {
                 </div>
             </div>
             <div class="story-task-right">
-                <button class="story-task-checkbox ${story.completed ? 'checked' : ''}" data-index="${index}" title="${story.completed ? '标记未完成' : '标记完成'}">
+                <button class="story-task-checkbox ${story.completed ? 'checked' : ''}" data-index="${index}" title="${story.completed ? '标记未完成' : '标记完成'}" style="--value-color: ${color}">
                     ${story.completed ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
                 </button>
             </div>
         `;
 
         return item;
+    }
+    
+    // 判断故事是否已到开始时间
+    hasStoryStarted(story) {
+        if (!story.startDate && !story.startTime) return false;
+        const now = new Date();
+        if (story.startDate) {
+            const [y, m, d] = story.startDate.split('-').map(Number);
+            if (story.startTime) {
+                const [h, min] = story.startTime.split(':').map(Number);
+                const startAt = new Date(y, m - 1, d, h, min);
+                return now >= startAt;
+            }
+            const startAt = new Date(y, m - 1, d, 0, 0);
+            return now >= startAt;
+        }
+        // 只有 startTime，用今天的日期
+        if (story.startTime) {
+            const [h, min] = story.startTime.split(':').map(Number);
+            const startAt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, min);
+            return now >= startAt;
+        }
+        return false;
     }
     
     // 格式化时间
@@ -391,8 +502,9 @@ class DailyStories {
         if (totalEl) totalEl.textContent = total;
     }
     
-    // 更新徽章
+    // 更新徽章 - 显示进行中的故事数（已到开始时间且未完成）
     updateBadge() {
+        const inProgressCount = this.stories.filter(s => !s.completed && this.hasStoryStarted(s)).length;
         const uncompletedCount = this.stories.filter(s => !s.completed).length;
         const totalCount = this.stories.length;
         const badge = document.getElementById('storiesBadge');
@@ -408,8 +520,8 @@ class DailyStories {
                 badge.textContent = '👍';
                 badge.classList.add('completed');
             } else {
-                // 有未完成的故事
-                badge.textContent = uncompletedCount;
+                // 显示进行中的故事数
+                badge.textContent = inProgressCount;
             }
         }
     }
@@ -500,11 +612,86 @@ class DailyStories {
         const panel = document.getElementById('storiesPanel');
         
         if (this.isOpen) {
+            this.applyPanelBackground();
             panel.classList.add('active');
             this.updateUI();
         } else {
             panel.classList.remove('active');
         }
+    }
+    
+    // 根据当前页面背景智能调整面板背景色
+    applyPanelBackground() {
+        const panel = document.getElementById('storiesPanel');
+        if (!panel) return;
+        
+        const bodyStyle = window.getComputedStyle(document.body);
+        const bgImage = bodyStyle.backgroundImage;
+        
+        // 判断是否有背景图片
+        if (bgImage && bgImage !== 'none') {
+            // 有背景图：用半透明毛玻璃效果
+            const smartManager = window.smartColorManager;
+            if (smartManager && smartManager.currentMode === 'dark') {
+                panel.style.setProperty('--stories-panel-bg', 'linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.95) 100%)');
+                panel.style.setProperty('--stories-panel-text', '#f3f4f6');
+                panel.classList.add('dark-bg');
+            } else {
+                panel.style.setProperty('--stories-panel-bg', 'linear-gradient(180deg, rgba(248, 250, 252, 0.94) 0%, rgba(241, 245, 249, 0.96) 100%)');
+                panel.style.setProperty('--stories-panel-text', '#1f2937');
+                panel.classList.remove('dark-bg');
+            }
+            panel.style.backdropFilter = 'blur(20px)';
+            panel.style.webkitBackdropFilter = 'blur(20px)';
+            return;
+        }
+        
+        // 纯色背景：从背景色派生面板色系
+        const bgColor = bodyStyle.backgroundColor;
+        const rgb = this.parseColor(bgColor);
+        if (!rgb) return;
+        
+        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+        
+        if (brightness > 128) {
+            // 浅色背景 → 浅色面板
+            const lighter = this.adjustRgb(rgb, 50);
+            const lighter2 = this.adjustRgb(rgb, 35);
+            panel.style.setProperty('--stories-panel-bg', `linear-gradient(180deg, rgb(${lighter.r}, ${lighter.g}, ${lighter.b}) 0%, rgb(${lighter2.r}, ${lighter2.g}, ${lighter2.b}) 100%)`);
+            panel.style.setProperty('--stories-panel-text', '#1f2937');
+            panel.classList.remove('dark-bg');
+        } else {
+            // 深色背景 → 深色面板
+            const darker = this.adjustRgb(rgb, 20);
+            const darker2 = this.adjustRgb(rgb, 10);
+            panel.style.setProperty('--stories-panel-bg', `linear-gradient(180deg, rgb(${darker.r}, ${darker.g}, ${darker.b}) 0%, rgb(${darker2.r}, ${darker2.g}, ${darker2.b}) 100%)`);
+            panel.style.setProperty('--stories-panel-text', '#f3f4f6');
+            panel.classList.add('dark-bg');
+        }
+        panel.style.backdropFilter = 'none';
+        panel.style.webkitBackdropFilter = 'none';
+    }
+    
+    // 解析 CSS 颜色字符串为 RGB
+    parseColor(colorString) {
+        const rgbMatch = colorString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (rgbMatch) {
+            return { r: parseInt(rgbMatch[1]), g: parseInt(rgbMatch[2]), b: parseInt(rgbMatch[3]) };
+        }
+        const hexMatch = colorString.match(/#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
+        if (hexMatch) {
+            return { r: parseInt(hexMatch[1], 16), g: parseInt(hexMatch[2], 16), b: parseInt(hexMatch[3], 16) };
+        }
+        return null;
+    }
+    
+    // 调整 RGB 亮度
+    adjustRgb(rgb, amount) {
+        return {
+            r: Math.max(0, Math.min(255, rgb.r + amount)),
+            g: Math.max(0, Math.min(255, rgb.g + amount)),
+            b: Math.max(0, Math.min(255, rgb.b + amount))
+        };
     }
     
     // 关闭面板

@@ -112,6 +112,9 @@ class App {
         
         // 最后加载保存的设置（这会更新状态显示）
         this.loadSavedSettings();
+
+        // 初始化云端同步监听
+        this._initCloudSync();
     }
     
     // 初始化集成系统（设置 dailyStories 引用）
@@ -798,6 +801,48 @@ class App {
         }
     }
     
+    // 初始化云端同步
+    _initCloudSync() {
+        if (!window.cloudSync) return;
+
+        // 监听登录状态变化
+        window.cloudSync.onChange((isLoggedIn) => {
+            if (isLoggedIn) {
+                // 登录后触发同步
+                console.log('[App] 检测到登录，开始同步...');
+                this._syncFromCloud();
+            }
+        });
+
+        // 如果已登录，立即同步
+        if (window.cloudSync.isLoggedIn) {
+            this._syncFromCloud();
+        }
+    }
+
+    // 从云端同步数据
+    async _syncFromCloud() {
+        if (!window.syncAdapter) return;
+
+        const result = await window.syncAdapter.syncAfterLogin();
+        if (result && result.success) {
+            // 刷新设置
+            this.loadSavedSettings();
+
+            // 刷新故事
+            if (window.dailyStoriesManager) {
+                try {
+                    await window.dailyStoriesManager._loadFromCloud();
+                } catch (e) {}
+            }
+
+            // 刷新森林（如果已初始化）
+            if (this.forestSystem && this.forestSystem.updateUI) {
+                try { this.forestSystem.updateUI(); } catch (e) {}
+            }
+        }
+    }
+
     // 加载保存的设置
     loadSavedSettings() {
         const settings = this.settingsStorage.load();
@@ -872,6 +917,11 @@ class App {
         };
         
         this.settingsStorage.save(settings);
+        
+        // 推送到云端
+        if (window.syncAdapter && window.cloudSync.isLoggedIn) {
+            window.syncAdapter.pushChanges('flipClockSettings');
+        }
     }
 }
 

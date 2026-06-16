@@ -364,6 +364,8 @@ class AchievementSystem {
     saveData() {
         try {
             localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+            // 同步到云端
+            if (window.syncAdapter) window.syncAdapter.pushChanges(this.storageKey);
         } catch (error) {
             console.error('保存成就数据失败:', error);
         }

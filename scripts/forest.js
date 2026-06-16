@@ -46,6 +46,8 @@ class ForestSystem {
         localStorage.setItem('forestData', JSON.stringify({
             trees: this.trees
         }));
+        // 同步到云端
+        if (window.syncAdapter) window.syncAdapter.pushChanges('forestData');
     }
     
     createUI() {
