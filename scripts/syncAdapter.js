@@ -11,6 +11,8 @@ class SyncAdapter {
         this.cloudSync = window.cloudSync;
         this.debounceTimers = {};
         this.localTimestamps = {}; // 跟踪各 key 的本地最后更新时间
+        this._pollTimer = null;
+        this._pollIntervalMs = 30000; // 30 秒轮询一次
 
         // 数据 key 与 localStorage key 的映射
         this.keyMap = {
@@ -30,6 +32,94 @@ class SyncAdapter {
 
         // 初始化本地时间戳
         this._loadTimestamps();
+
+        // 页面回到前台时立即拉取一次（对手机 App 尤其重要）
+        this._setupVisibilityListener();
+    }
+
+    /**
+     * 监听页面可见性变化：从后台切回前台时立即同步
+     */
+    _setupVisibilityListener() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && this.cloudSync.isLoggedIn) {
+                console.log('[Sync] 页面回到前台，立即拉取增量更新...');
+                this._pullIncremental();
+            }
+        });
+    }
+
+    /**
+     * 启动定期轮询（登录后调用）
+     */
+    startPeriodicSync(intervalMs) {
+        if (intervalMs) this._pollIntervalMs = intervalMs;
+        this.stopPeriodicSync(); // 先清除旧的
+        this._pollTimer = setInterval(() => {
+            if (this.cloudSync.isLoggedIn) {
+                this._pullIncremental();
+            }
+        }, this._pollIntervalMs);
+        console.log(`[Sync] 定期同步已启动，间隔 ${this._pollIntervalMs / 1000}s`);
+    }
+
+    /**
+     * 停止定期轮询（登出时调用）
+     */
+    stopPeriodicSync() {
+        if (this._pollTimer) {
+            clearInterval(this._pollTimer);
+            this._pollTimer = null;
+            console.log('[Sync] 定期同步已停止');
+        }
+    }
+
+    /**
+     * 增量拉取云端更新（供轮询和前台恢复使用）
+     * 只拉取比本地最新时间戳更新的数据
+     */
+    async _pullIncremental() {
+        if (!this.cloudSync.isLoggedIn) return;
+        try {
+            // 使用上一次拉取时间作为 since 参数
+            const lastPull = this.localTimestamps['__lastIncrementalPull'];
+            const result = this.cloudSync.isSyncing
+                ? null
+                : (lastPull
+                    ? await this.cloudSync.pullSince(lastPull)
+                    : await this.cloudSync.pullAll());
+
+            if (!result || !result.success) return;
+            if (!result.data || Object.keys(result.data).length === 0) {
+                // 没有新数据，只更新时间戳
+                if (result.server_time) {
+                    this.localTimestamps['__lastIncrementalPull'] = result.server_time;
+                    this._saveTimestamps();
+                }
+                return;
+            }
+
+            console.log('[Sync] 增量拉取到数据:', Object.keys(result.data).join(', '));
+
+            // 合并云端数据到本地（数组用并集，对象直接覆盖）
+            this._mergeCloudToLocal(result.data);
+
+            // 更新所有时间戳
+            if (result.timestamps) {
+                for (const [key, ts] of Object.entries(result.timestamps)) {
+                    this.localTimestamps[key] = ts;
+                }
+            }
+            if (result.server_time) {
+                this.localTimestamps['__lastIncrementalPull'] = result.server_time;
+            }
+            this._saveTimestamps();
+
+            // 刷新 UI
+            this._reloadModuleState();
+        } catch (e) {
+            console.warn('[Sync] 增量拉取失败:', e);
+        }
     }
 
     /**
