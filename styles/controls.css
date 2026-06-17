@@ -59,6 +59,11 @@
     color: #4ade80;
 }
 
+/* 设置按钮及其后的按钮靠右 */
+#settingsToggle {
+    margin-left: auto;
+}
+
 .control-btn {
     width: 40px;
     height: 40px;

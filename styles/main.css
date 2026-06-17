@@ -76,6 +76,7 @@ body {
 
 /* 时钟样式 */
 .tick {
+    padding-top: 0.2em;
     padding-bottom: 1em;
     font-size: 15vw;
     font-family: 'Helvetica Neue', sans-serif;    

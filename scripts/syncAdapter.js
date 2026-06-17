@@ -21,7 +21,8 @@ class SyncAdapter {
             musicFavorites:   'musicFavorites',
             forestData:       'forestData',
             achievements:     'studyAchievements',
-            pomodoroData:     'pomodoroData'
+            pomodoroData:     'pomodoroData',
+            installedPlugins: 'installedPlugins'
         };
 
         // 反向映射
@@ -416,8 +417,8 @@ class SyncAdapter {
         if (window.app) {
             try { window.app.loadSavedSettings(); } catch (e) {}
         }
-        if (window.dailyStories) {
-            try { window.dailyStories.loadTodayStories(); window.dailyStories.updateUI(); } catch (e) {}
+        if (window.dailyStoriesManager) {
+            try { window.dailyStoriesManager.loadTodayStories(); window.dailyStoriesManager.updateUI(); } catch (e) {}
         }
     }
 

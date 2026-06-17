@@ -417,8 +417,8 @@ body.stories-dark .story-modal-delete:hover {
 /* 面板头部 - 截图风格标题栏 */
 .stories-panel-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
     padding: 16px 24px;
     background: transparent;
     position: sticky;
@@ -426,10 +426,28 @@ body.stories-dark .story-modal-delete:hover {
     z-index: 1;
 }
 
-.stories-header-left {
+/* ============ 第一行：标题 + 关闭按钮 ============ */
+
+.stories-header-top {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ============ 第二行：日期导航 + 焦点 + 功能按钮 ============ */
+
+.stories-header-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stories-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .stories-header-title {
@@ -488,40 +506,6 @@ body.stories-dark .story-modal-delete:hover {
     border-radius: 50%;
     font-size: 14px;
     font-weight: 700;
-}
-
-.stories-header-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* 标题旁添加按钮 */
-.stories-add-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background: #f9fafb;
-    color: #6b7280;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    padding: 0;
-    flex-shrink: 0;
-}
-
-.stories-add-btn:hover {
-    background: #eef2ff;
-    border-color: #c7d2fe;
-    color: #6366f1;
-}
-
-.stories-add-btn svg {
-    width: 18px;
-    height: 18px;
 }
 
 .stories-close-btn {
@@ -3046,7 +3030,11 @@ body.stories-dark .stories-review-panel .review-empty {
 }
 
 @media (max-width: 768px) {
-    .stories-header-right {
+    .stories-header-bottom {
+        gap: 8px;
+    }
+    
+    .stories-header-actions {
         gap: 4px;
     }
     

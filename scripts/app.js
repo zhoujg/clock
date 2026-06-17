@@ -84,7 +84,7 @@ class App {
         this.animationManager = new AnimationManager('animationCanvas');
         this.quoteManager = new QuoteManager();
         this.tickSoundManager = new TickSoundManager();
-        this.bgmPlayerManager = new BGMPlayerManager(this.tickSoundManager, this.quoteManager); // 传递滴答声管理器和谚语管理器
+        this.bgmPlayerManager = null; // 由音乐播放器插件管理生命周期
         this.achievementSystem = new AchievementSystem();
         this.forestSystem = new ForestSystem(this.achievementSystem);
         
@@ -96,20 +96,14 @@ class App {
         // 设置时钟管理器的滴答声引用
         clockManager.setTickSoundManager(this.tickSoundManager);
         
-        // 设置动画管理器的 BGM 播放器引用，用于音乐可视化
-        this.animationManager.setBGMPlayer(this.bgmPlayerManager);
-        
         this.initializeControls();
         this.initializeColorPanel();
         this.initializeImageInput();
         this.initializeBackgroundPanel();
         this.initializePicsumControls();
         this.initializeDateDisplay();
-        this.initializeBGMPlayer();
-        
-        // 延迟设置 dailyStories 引用
-        this.initializeIntegratedSystems();
-        
+        this._initPluginSystem();
+
         // 最后加载保存的设置（这会更新状态显示）
         this.loadSavedSettings();
 
@@ -117,32 +111,77 @@ class App {
         this._initCloudSync();
     }
     
-    // 初始化集成系统（设置 dailyStories 引用）
-    initializeIntegratedSystems() {
-        // 等待 dailyStoriesManager 创建完成
-        setTimeout(() => {
-            if (window.dailyStoriesManager) {
-                console.log('✅ 设置系统引用...');
-                
-                // 设置番茄钟的 dailyStories 引用
-                this.pomodoroTimer.dailyStories = window.dailyStoriesManager;
-                console.log('✅ 番茄钟→故事系统引用已设置');
-                
-                // 设置 dailyStories 的系统引用
-                if (window.dailyStoriesManager.setSystemReferences) {
-                    window.dailyStoriesManager.setSystemReferences(
-                        this.achievementSystem,
-                        this.forestSystem,
-                        this.pomodoroTimer
-                    );
-                    console.log('✅ 故事系统引用已设置');
-                } else {
-                    console.warn('⚠️ dailyStories.setSystemReferences 方法不存在');
+    // ============ 插件系统初始化 ============
+
+    _initPluginSystem() {
+        // 绑定插件库按钮（设置面板内）
+        const pluginSetting = document.getElementById('pluginLibrarySetting');
+        if (pluginSetting) {
+            pluginSetting.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (window.PluginLibraryUI) {
+                    // 关闭设置面板
+                    const settingsPanel = document.getElementById('settingsPanel');
+                    const settingsToggle = document.getElementById('settingsToggle');
+                    if (settingsPanel) settingsPanel.classList.remove('active');
+                    if (settingsToggle) settingsToggle.classList.remove('active');
+                    window.PluginLibraryUI.open();
                 }
-            } else {
-                console.error('❌ dailyStoriesManager 未初始化');
+            });
+        }
+
+        // 监听插件激活事件（用于设置跨系统引用）
+        window.addEventListener('plugin-activated', (e) => {
+            const id = e.detail.id;
+            if (id === 'daily-stories' && window.dailyStoriesManager) {
+                this._wireDailyStoriesRefs();
             }
-        }, 500);
+        });
+
+        // 监听插件停用事件
+        window.addEventListener('plugin-deactivated', (e) => {
+            // 可以在这里处理插件停用后的清理
+        });
+
+        // 初始化插件管理器（DOM 就绪后）
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                window.PluginManager.init();
+            });
+        } else {
+            window.PluginManager.init();
+        }
+    }
+
+    /**
+     * 设置 dailyStories 与其他系统的引用
+     */
+    _wireDailyStoriesRefs() {
+        if (!window.dailyStoriesManager) return;
+        console.log('✅ 设置故事系统引用...');
+
+        // 设置番茄钟的 dailyStories 引用
+        if (this.pomodoroTimer) {
+            this.pomodoroTimer.dailyStories = window.dailyStoriesManager;
+            console.log('✅ 番茄钟→故事系统引用已设置');
+        }
+
+        // 设置 dailyStories 的系统引用
+        if (window.dailyStoriesManager.setSystemReferences) {
+            window.dailyStoriesManager.setSystemReferences(
+                this.achievementSystem,
+                this.forestSystem,
+                this.pomodoroTimer
+            );
+            console.log('✅ 故事系统引用已设置');
+        }
+
+        // 如果已登录，触发一次故事云端同步
+        if (window.cloudSync && window.cloudSync.isLoggedIn) {
+            if (window.dailyStoriesManager._loadFromCloud) {
+                window.dailyStoriesManager._loadFromCloud().catch(e => {});
+            }
+        }
     }
 
     initializeDateDisplay() {
@@ -570,190 +609,6 @@ class App {
         this.picsumManager.checkCurrentBackground();
     }
 
-    initializeBGMPlayer() {
-        // 音乐播放器模态框
-        const musicBtn = document.getElementById('musicBtn');
-        const musicModal = document.getElementById('musicModal');
-        const musicModalClose = document.getElementById('musicModalClose');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const loopBtn = document.getElementById('loopBtn');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const volumeValue = document.getElementById('volumeValue');
-        const progressContainer = document.getElementById('progressContainer');
-        const musicFavoriteBtn = document.getElementById('musicFavoriteBtn');
-        
-        // 打开模态框
-        if (musicBtn) {
-            musicBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                musicModal.style.display = 'flex';
-                // 延迟添加 show 类以触发动画
-                setTimeout(() => {
-                    musicModal.classList.add('show');
-                }, 10);
-                
-                // 根据播放状态添加 class
-                if (this.bgmPlayerManager.isPlaying) {
-                    musicModal.classList.add('playing');
-                }
-            });
-        }
-        
-        // 关闭模态框
-        if (musicModalClose) {
-            musicModalClose.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.closeMusicModal();
-            });
-        }
-        
-        // 点击背景关闭
-        if (musicModal) {
-            musicModal.addEventListener('click', (e) => {
-                if (e.target === musicModal) {
-                    this.closeMusicModal();
-                }
-            });
-        }
-        
-        // 标签页切换
-        const musicTabs = document.querySelectorAll('.music-tab');
-        musicTabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const tabName = tab.dataset.tab;
-                
-                // 切换激活状态
-                musicTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // 切换内容
-                if (tabName === 'favorites') {
-                    this.bgmPlayerManager.showingFavorites = true;
-                    this.bgmPlayerManager.showFavoritesList();
-                } else {
-                    this.bgmPlayerManager.showingFavorites = false;
-                    this.bgmPlayerManager.renderMusicList();
-                }
-            });
-        });
-        
-        // 绑定浮动播放器的控制按钮
-        if (playPauseBtn) {
-            playPauseBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.bgmPlayerManager.togglePlay();
-                this.saveCurrentSettings();
-            });
-        }
-        
-        if (prevBtn) {
-            prevBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.bgmPlayerManager.playPrevious();
-                this.saveCurrentSettings();
-            });
-        }
-        
-        if (nextBtn) {
-            nextBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.bgmPlayerManager.playNext();
-                this.saveCurrentSettings();
-            });
-        }
-        
-        if (loopBtn) {
-            loopBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.bgmPlayerManager.toggleLoop();
-                this.saveCurrentSettings();
-            });
-        }
-        
-        if (volumeSlider) {
-            volumeSlider.addEventListener('input', (e) => {
-                const volume = parseInt(e.target.value);
-                this.bgmPlayerManager.setVolume(volume);
-                if (volumeValue) {
-                    volumeValue.textContent = volume + '%';
-                }
-                this.saveCurrentSettings();
-            });
-        }
-        
-        if (progressContainer) {
-            progressContainer.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const rect = progressContainer.getBoundingClientRect();
-                const percent = ((e.clientX - rect.left) / rect.width) * 100;
-                this.bgmPlayerManager.setProgress(percent);
-            });
-        }
-        
-        // 收藏按钮
-        if (musicFavoriteBtn) {
-            musicFavoriteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isFavorited = this.bgmPlayerManager.favoriteCurrentTrack();
-                
-                // 显示提示信息
-                if (isFavorited) {
-                    this.showNotification('❤️ 已收藏', 'success');
-                } else {
-                    this.showNotification('💔 已取消收藏', 'info');
-                }
-            });
-        }
-        
-        // 监听音乐播放状态变化，更新唱片旋转动画
-        window.addEventListener('musicPlayStateChanged', () => {
-            if (musicModal) {
-                if (this.bgmPlayerManager.isPlaying) {
-                    musicModal.classList.add('playing');
-                } else {
-                    musicModal.classList.remove('playing');
-                }
-            }
-        });
-        
-        // 监听音乐切换事件，更新收藏按钮和收藏数量显示
-        window.addEventListener('musicTrackChanged', () => {
-            this.bgmPlayerManager.updateFavoriteButton();
-            this.updateFavoritesCount();
-        });
-        
-        // 监听音乐列表更新事件，更新收藏数量显示
-        window.addEventListener('musicListUpdated', () => {
-            this.updateFavoritesCount();
-        });
-        
-        // 初始加载音乐列表
-        this.loadJamendoMusicForFloatingPlayer();
-    }
-    
-    // 关闭音乐模态框
-    closeMusicModal() {
-        const musicModal = document.getElementById('musicModal');
-        if (musicModal) {
-            musicModal.classList.remove('show');
-            setTimeout(() => {
-                musicModal.style.display = 'none';
-            }, 300);
-        }
-    }
-    
-    // 更新收藏数量显示
-    updateFavoritesCount() {
-        const favoritesCountBadge = document.getElementById('favoritesCountBadge');
-        if (favoritesCountBadge) {
-            const count = this.bgmPlayerManager.getFavoritesCount();
-            favoritesCountBadge.textContent = count;
-        }
-    }
-    
     // 显示通知消息
     showNotification(message, type = 'info') {
         // 创建通知元素
@@ -887,8 +742,8 @@ class App {
         // 恢复滴答声状态（直接设置，不 toggle）
         this.tickSoundManager.setEnabled(!!settings.tickSoundEnabled);
 
-        // 恢复BGM播放器设置
-        if (settings.bgmPlayer) {
+        // 恢复BGM播放器设置（由音乐插件管理）
+        if (settings.bgmPlayer && this.bgmPlayerManager) {
             this.bgmPlayerManager.restoreSettings(settings.bgmPlayer);
         }
 
@@ -919,7 +774,7 @@ class App {
             backgroundImage: backgroundImage,
             animationEnabled: this.animationManager.enabled,
             tickSoundEnabled: this.tickSoundManager.enabled,
-            bgmPlayer: this.bgmPlayerManager.getSettings(),
+            bgmPlayer: this.bgmPlayerManager ? this.bgmPlayerManager.getSettings() : null,
             picsumId: this.picsumManager.currentPicsumId,
             picsumUrl: this.picsumManager.currentPicsumUrl
         };

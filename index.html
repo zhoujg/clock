@@ -13,17 +13,17 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon.svg">
 
     <!-- 样式文件（?v= 用于突破 WebView 缓存） -->
-    <link rel="stylesheet" href="styles/flip.min.css?v=20260617" />
-    <link rel="stylesheet" href="styles/main.css?v=20260617" />
-    <link rel="stylesheet" href="styles/controls.css?v=20260617" />
-    <link rel="stylesheet" href="styles/animation.css?v=20260617" />
-    <link rel="stylesheet" href="styles/bgmPlayer.css?v=20260617" />
-    <link rel="stylesheet" href="styles/pomodoro.css?v=20260617" />
-    <link rel="stylesheet" href="styles/achievement.css?v=20260617" />
-    <link rel="stylesheet" href="styles/forest.css?v=20260617" />
-    <link rel="stylesheet" href="styles/weather.css?v=20260617" />
-    <link rel="stylesheet" href="styles/background-panel.css?v=20260617" />
-    <link rel="stylesheet" href="styles/dailyStories.css?v=20260617" />
+    <link rel="stylesheet" href="styles/flip.min.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/main.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/controls.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/animation.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/pomodoro.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/achievement.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/forest.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/weather.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/background-panel.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/pluginLibrary.css?v=20260620q" />
+    <link rel="stylesheet" href="styles/learningHub.css?v=20260620q" />
 </head>
 <body>
     <!-- 控制面板 -->
@@ -40,11 +40,6 @@
             <span class="pomodoro-status-indicator" id="statusIndicator"></span>
         </button>
         
-        <!-- 音乐播放器按钮 -->
-        <button id="musicBtn" class="control-btn" title="音乐播放器">
-            🎵
-        </button>
-        
         <!-- 设置按钮 -->
         <button id="settingsToggle" class="control-btn" title="设置">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -52,113 +47,6 @@
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
         </button>
-        
-        <!-- 音乐播放器全屏模态框 -->
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-        </button>
-        
-        <!-- 音乐播放器全屏模态框 -->
-        <div class="music-modal" id="musicModal">
-            <div class="music-modal-content">
-                <!-- 头部 -->
-                <div class="music-modal-header">
-                    <h1 class="music-modal-title">
-                        <span class="title-icon">🎵</span>
-                        音乐播放器
-                    </h1>
-                    <button class="music-modal-close" id="musicModalClose">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- 当前播放信息 -->
-                <div class="music-modal-current">
-                    <div class="current-track-cover">
-                        <div class="vinyl-record" id="vinylRecord">
-                            <div class="vinyl-center"></div>
-                        </div>
-                    </div>
-                    <div class="current-track-info">
-                        <div class="current-track-name" id="currentTrackName">未播放</div>
-                        <div class="current-artist" id="currentArtist" style="display: none;"></div>
-                    </div>
-                </div>
-
-                <!-- 进度条 -->
-                <div class="music-modal-progress">
-                    <span class="time-current" id="currentTime">0:00</span>
-                    <div class="progress-container" id="progressContainer">
-                        <div class="progress-bar" id="progressBar"></div>
-                    </div>
-                    <span class="time-duration" id="duration">0:00</span>
-                </div>
-
-                <!-- 播放控制 -->
-                <div class="music-modal-controls">
-                    <button class="control-btn-large" id="musicFavoriteBtn" title="收藏">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                    </button>
-                    <button class="control-btn-large" id="prevBtn" title="上一曲">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-                        </svg>
-                    </button>
-                    <button class="control-btn-xlarge play-pause" id="playPauseBtn" title="播放/暂停">
-                        <svg class="play-icon" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                        <svg class="pause-icon" width="40" height="40" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
-                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                        </svg>
-                    </button>
-                    <button class="control-btn-large" id="nextBtn" title="下一曲">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                        </svg>
-                    </button>
-                    <button class="control-btn-large" id="loopBtn" title="循环">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- 音量控制 -->
-                <div class="music-modal-volume">
-                    <span class="volume-icon">🔊</span>
-                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" />
-                    <span class="volume-value" id="volumeValue">50%</span>
-                </div>
-
-                <!-- 收藏/播放列表切换 -->
-                <div class="music-modal-tabs">
-                    <button class="music-tab active" data-tab="playlist">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/>
-                        </svg>
-                        播放列表
-                    </button>
-                    <button class="music-tab" data-tab="favorites">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        我的收藏
-                        <span class="favorites-count-badge" id="favoritesCountBadge">0</span>
-                    </button>
-                </div>
-
-                <!-- 音乐列表 -->
-                <div class="music-modal-list" id="musicListContainer">
-                    <div class="no-music">加载中...</div>
-                </div>
-            </div>
-        </div>
         
         <div class="settings-panel" id="settingsPanel">
             <div class="panel-header">
@@ -199,6 +87,10 @@
                     </span>
                     <span class="setting-text">滴答声音</span>
                     <span class="setting-status" id="tickSoundStatus">关闭</span>
+                </div>
+                <div class="setting-item" id="pluginLibrarySetting">
+                    <span class="setting-icon">🧩</span>
+                    <span class="setting-text">插件库</span>
                 </div>
             </div>
         </div>
@@ -447,30 +339,30 @@
         </div>
     </div>
 
-    <!-- BGM 音乐播放器 - 已移除，使用顶部音乐按钮代替 -->
-
     <!-- Pomodoro 番茄钟 - 由 pomodoro.js 动态创建 -->
 
     <!-- JavaScript 文件（?v= 用于突破 WebView 缓存） -->
-    <script src="scripts/flip.min.js?v=20260617"></script>
-    <script src="scripts/storage.js?v=20260617"></script>
-    <script src="scripts/particle.js?v=20260617"></script>
-    <script src="scripts/animation.js?v=20260617"></script>
-    <script src="scripts/background.js?v=20260617"></script>
-    <script src="scripts/quotes.js?v=20260617"></script>
-    <script src="scripts/tickSound.js?v=20260617"></script>
-    <script src="scripts/jamendoAPI.js?v=20260617"></script>
-    <script src="scripts/bgmPlayer.js?v=20260617"></script>
-    <script src="scripts/achievement.js?v=20260617"></script>
-    <script src="scripts/forest.js?v=20260617"></script>
-    <script src="scripts/pomodoro.js?v=20260617"></script>
-    <script src="scripts/weather.js?v=20260617"></script>
-    <script src="scripts/picsum.js?v=20260617"></script>
-    <script src="scripts/smartColor.js?v=20260617"></script>
-    <script src="scripts/dailyStories.js?v=20260617"></script>
-    <script src="scripts/cloudSync.js?v=20260617"></script>
-    <script src="scripts/syncAdapter.js?v=20260617"></script>
-    <script src="scripts/authUI.js?v=20260617"></script>
-    <script src="scripts/app.js?v=20260617"></script>
+    <script src="scripts/flip.min.js?v=20260620q"></script>
+    <script src="scripts/storage.js?v=20260620q"></script>
+    <script src="scripts/particle.js?v=20260620q"></script>
+    <script src="scripts/animation.js?v=20260620q"></script>
+    <script src="scripts/background.js?v=20260620q"></script>
+    <script src="scripts/quotes.js?v=20260620q"></script>
+    <script src="scripts/tickSound.js?v=20260620q"></script>
+    <script src="scripts/jamendoAPI.js?v=20260620q"></script>
+    <script src="scripts/bgmPlayer.js?v=20260620q"></script>
+    <script src="scripts/achievement.js?v=20260620q"></script>
+    <script src="scripts/forest.js?v=20260620q"></script>
+    <script src="scripts/pomodoro.js?v=20260620q"></script>
+    <script src="scripts/weather.js?v=20260620q"></script>
+    <script src="scripts/picsum.js?v=20260620q"></script>
+    <script src="scripts/smartColor.js?v=20260620q"></script>
+    <script src="scripts/pluginManager.js?v=20260620q"></script>
+    <script src="scripts/learningHub.js?v=20260620q"></script>
+    <script src="scripts/cloudSync.js?v=20260620q"></script>
+    <script src="scripts/syncAdapter.js?v=20260620q"></script>
+    <script src="scripts/authUI.js?v=20260620q"></script>
+    <script src="scripts/app.js?v=20260620q"></script>
+    <script src="scripts/pluginLibraryUI.js?v=20260620q"></script>
 </body>
 </html>

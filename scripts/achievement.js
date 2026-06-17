@@ -220,7 +220,7 @@ class AchievementSystem {
             perfectDay: {
                 id: 'perfectDay',
                 name: '完美一天',
-                description: '完成当天所有三个故事',
+                description: '完成当天所有故事',
                 icon: '🎯',
                 requirement: 1,
                 category: 'stories',
@@ -229,7 +229,7 @@ class AchievementSystem {
             storyWeek: {
                 id: 'storyWeek',
                 name: '故事之周',
-                description: '连续7天完成所有三个故事',
+                description: '累计7天完成所有故事',
                 icon: '📚',
                 requirement: 7,
                 category: 'stories',
@@ -258,15 +258,15 @@ class AchievementSystem {
     
     // 检查每日三个故事成就（由 DailyStories 系统调用）
     checkStoriesAchievements(stats) {
-        const { todayCompleted, perfectDays, totalStories } = stats;
+        const { todayCompleted, todayTotal, perfectDays, totalStories } = stats;
         
         // 检查"故事开端"
         if (totalStories >= 1 && !this.achievements.firstStory.unlocked) {
             this.unlockAchievement(this.achievements.firstStory);
         }
         
-        // 检查"完美一天"
-        if (todayCompleted === 3 && !this.achievements.perfectDay.unlocked) {
+        // 检查"完美一天"——当天有故事且全部完成
+        if (todayTotal > 0 && todayCompleted === todayTotal && !this.achievements.perfectDay.unlocked) {
             this.unlockAchievement(this.achievements.perfectDay);
         }
         

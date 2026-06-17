@@ -328,16 +328,27 @@ class DailyStories {
             <span class="stories-badge" id="storiesBadge">0/3</span>
         `;
         
-        // 直接添加到 body
+        // 直接添加到 body（先隐藏，等待 CSS 加载完成后显示）
+        toggleBtn.style.opacity = '0';
+        toggleBtn.style.visibility = 'hidden';
         document.body.appendChild(toggleBtn);
+        // 等待一帧，让 CSS 生效后再显示按钮（避免未样式化的闪烁）
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                toggleBtn.style.opacity = '';
+                toggleBtn.style.visibility = '';
+            });
+        });
         
-        // 创建全屏面板
+        // 创建全屏面板（内联隐藏，避免 CSS 未加载时闪烁）
         const panel = document.createElement('div');
         panel.id = 'storiesPanel';
         panel.className = 'stories-panel';
+        panel.style.opacity = '0';
+        panel.style.visibility = 'hidden';
         panel.innerHTML = `
             <div class="stories-panel-header">
-                <div class="stories-header-left">
+                <div class="stories-header-top">
                     <div class="stories-header-title">
                         <span class="stories-title-top">
                             <span class="stories-title-icon">📖</span>
@@ -348,6 +359,13 @@ class DailyStories {
                             已完成 <span class="stories-count-circle" id="storiesCompletedCount">0</span> / <span class="stories-count-circle" id="storiesTotalCount">0</span> 个故事
                         </span>
                     </div>
+                    <button class="stories-close-btn" id="storiesClose">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="stories-header-bottom">
                     <div class="stories-date-nav">
                         <button class="stories-date-btn stories-date-prev" id="storiesDatePrev" title="前一天">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
@@ -364,23 +382,18 @@ class DailyStories {
                     <div class="stories-focus-display" id="storiesFocusDisplay" title="点击修改焦点维度">
                         <!-- 焦点维度标签动态渲染 -->
                     </div>
-                </div>
-                <div class="stories-header-right">
-                    <button class="stories-stats-btn" id="storiesStatsBtn" title="统计数据">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-                        </svg>
-                    </button>
-                    <button class="stories-review-btn" id="storiesReviewBtn" title="周回顾">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                        </svg>
-                    </button>
-                    <button class="stories-close-btn" id="storiesClose">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
-                    </button>
+                    <div class="stories-header-actions">
+                        <button class="stories-stats-btn" id="storiesStatsBtn" title="统计数据">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                            </svg>
+                        </button>
+                        <button class="stories-review-btn" id="storiesReviewBtn" title="周回顾">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -887,6 +900,9 @@ class DailyStories {
             this.viewingDate = this.currentDate;
             this.stories = this.loadStoriesForDate(this.currentDate);
             this.applyPanelBackground();
+            // 清除内联隐藏样式（CSS 类接管控制）
+            panel.style.opacity = '';
+            panel.style.visibility = '';
             panel.classList.add('active');
             this.updateUI();
             this.updateDateNav();
@@ -2104,10 +2120,5 @@ class DailyStories {
     }
 }
 
-// 初始化
-let dailyStoriesManager;
-
-document.addEventListener('DOMContentLoaded', () => {
-    dailyStoriesManager = new DailyStories();
-    window.dailyStoriesManager = dailyStoriesManager;
-});
+// 挂载到全局，供插件系统引用
+window.DailyStories = DailyStories;
