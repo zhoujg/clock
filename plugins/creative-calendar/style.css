@@ -1,0 +1,290 @@
+/* 创意万年历 — 浅色温润主题 */
+
+/* ────── 遮罩 ────── */
+.cc-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    display: none;
+    animation: ccFadeIn 0.25s ease;
+}
+
+@keyframes ccFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ────── 弹窗主体 ────── */
+.cc-modal {
+    position: fixed;
+    z-index: 9999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(92vw, 420px);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: linear-gradient(170deg, #fefcf7 0%, #f8f3ea 100%);
+    border: 1px solid rgba(180, 160, 130, 0.25);
+    border-radius: 20px;
+    box-shadow:
+        0 8px 40px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.06),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    display: none;
+    flex-direction: column;
+    animation: ccModalIn 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes ccModalIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.92) translateY(10px); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1) translateY(0); }
+}
+
+/* ────── 头部 ────── */
+.cc-header {
+    display: flex;
+    align-items: center;
+    padding: 18px 14px 12px;
+    gap: 6px;
+    border-bottom: 1px solid rgba(180, 160, 130, 0.2);
+}
+
+.cc-nav {
+    background: none;
+    border: none;
+    color: #a89980;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    font-size: 15px;
+}
+.cc-nav:hover {
+    color: #5a4a32;
+    background: rgba(160, 130, 90, 0.1);
+}
+
+.cc-title-area {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+}
+
+.cc-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3a3022;
+    letter-spacing: 2px;
+    line-height: 1.3;
+}
+
+.cc-lunar-year {
+    font-size: 12px;
+    color: #9a8b78;
+    letter-spacing: 1px;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.cc-close {
+    background: none;
+    border: none;
+    color: #b8a890;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.15s;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.cc-close:hover {
+    color: #5a4a32;
+    background: rgba(160, 130, 90, 0.1);
+}
+
+/* ────── 星期标题行 ────── */
+.cc-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 10px 8px 4px;
+    text-align: center;
+    font-size: 11px;
+    color: #b0a090;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.cc-weekdays .cc-weekend {
+    color: #c08070;
+}
+
+/* ────── 日格网格 ────── */
+.cc-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 0 8px;
+    gap: 2px;
+}
+
+.cc-cell {
+    aspect-ratio: 1 / 1.1;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cc-cell-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 3px 1px;
+    border-radius: 10px;
+    transition: background 0.15s;
+    cursor: default;
+    position: relative;
+}
+
+.cc-cell-inner:hover {
+    background: rgba(160, 130, 90, 0.08);
+}
+
+/* 当天高亮 */
+.cc-today {
+    background: #fdf3d0 !important;
+    box-shadow: 0 0 0 2px #e8c45a inset;
+    position: relative;
+}
+.cc-today::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #d4a030;
+}
+
+/* 非当月 */
+.cc-other-month .cc-solar-day {
+    color: #c8beb0;
+}
+.cc-other-month .cc-lunar-day {
+    color: #d5cdc2;
+}
+.cc-other-month .cc-term {
+    color: #b5c8ae;
+}
+
+/* 周末 */
+.cc-weekend-cell .cc-solar-day {
+    color: #c05545;
+}
+
+/* 公历日数字 */
+.cc-solar-day {
+    font-size: 14px;
+    font-weight: 600;
+    color: #3a3022;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+}
+
+/* 节日 */
+.cc-holiday {
+    color: #e88730 !important;
+    font-weight: 700 !important;
+}
+.cc-lunar-holiday {
+    color: #d04030 !important;
+    font-weight: 600 !important;
+}
+.cc-important-holiday {
+    background: #fdf0e8 !important;
+}
+.cc-important-holiday.cc-today {
+    background: #fde4d2 !important;
+}
+
+/* 农历日 */
+.cc-lunar-day {
+    font-size: 10px;
+    color: #9a8b78;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    font-weight: 400;
+}
+
+.cc-lunar-month-start {
+    color: #7a6040;
+    font-weight: 600;
+}
+
+.cc-lunar-holiday-text {
+    color: #d04030 !important;
+    font-weight: 600;
+}
+
+/* 节气 */
+.cc-term {
+    font-size: 9px;
+    color: #388040;
+    line-height: 1.2;
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* ────── 底部 ────── */
+.cc-footer {
+    padding: 12px 14px 16px;
+    border-top: 1px solid rgba(180, 160, 130, 0.2);
+    margin-top: 4px;
+}
+
+.cc-terms-line {
+    font-size: 11px;
+    color: #5a8050;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.cc-holidays-line {
+    font-size: 11px;
+    color: #c07040;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* ────── 响应式：宽屏时微微放大 ────── */
+@media (min-width: 500px) {
+    .cc-modal { width: 400px; }
+    .cc-solar-day { font-size: 15px; }
+}
+
+/* ────── 超窄屏 ────── */
+@media (max-width: 360px) {
+    .cc-cell { min-height: 44px; }
+    .cc-solar-day { font-size: 12px; }
+    .cc-lunar-day { font-size: 9px; }
+    .cc-term { font-size: 8px; }
+}

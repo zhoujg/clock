@@ -39,6 +39,16 @@
       "author": "周墨欣时钟",
       "js": "plugins/halftime/plugin.js",
       "css": "plugins/halftime/style.css"
+    },
+    {
+      "id": "creative-calendar",
+      "name": "创意万年历",
+      "version": "1.0.0",
+      "description": "融合公历、农历、二十四节气的创意万年历，以中国风视觉语言呈现时间流转。",
+      "icon": "📅",
+      "author": "周墨欣时钟",
+      "js": "plugins/creative-calendar/plugin.js",
+      "css": "plugins/creative-calendar/style.css"
     }
   ]
 }

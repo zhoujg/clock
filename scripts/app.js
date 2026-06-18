@@ -201,6 +201,69 @@ class App {
         
         // 同时也立即执行一次
         this.updateDate();
+
+        // 长按日期弹出万年历
+        this._initDateLongPress();
+    }
+
+    _initDateLongPress() {
+        const dateEl = document.getElementById('dateText');
+        if (!dateEl) return;
+
+        let pressTimer = null;
+        let startX = 0, startY = 0;
+        const LONG_PRESS_MS = 500;
+        const MOVE_THRESHOLD = 10;
+
+        // 防止文本选择
+        dateEl.style.userSelect = 'none';
+        dateEl.style.webkitUserSelect = 'none';
+        dateEl.style.cursor = 'pointer';
+
+        const clearTimer = () => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+        };
+
+        dateEl.addEventListener('pointerdown', (e) => {
+            startX = e.clientX;
+            startY = e.clientY;
+            pressTimer = setTimeout(() => {
+                // 检查万年历插件是否已安装且激活
+                const pm = window.PluginManager;
+                if (pm && pm.isInstalled('creative-calendar') && pm.isEnabled('creative-calendar')) {
+                    // 触觉反馈
+                    if (navigator.vibrate) {
+                        navigator.vibrate(15);
+                    }
+                    // 打开万年历
+                    if (window.__creativeCalendar && window.__creativeCalendar.show) {
+                        window.__creativeCalendar.show();
+                    }
+                }
+                pressTimer = null;
+            }, LONG_PRESS_MS);
+        });
+
+        dateEl.addEventListener('pointermove', (e) => {
+            if (!pressTimer) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            if (Math.abs(dx) > MOVE_THRESHOLD || Math.abs(dy) > MOVE_THRESHOLD) {
+                clearTimer();
+            }
+        });
+
+        dateEl.addEventListener('pointerup', clearTimer);
+        dateEl.addEventListener('pointercancel', clearTimer);
+        dateEl.addEventListener('pointerleave', clearTimer);
+
+        // 防止长按弹出系统菜单（移动端）
+        dateEl.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
     }
 
     updateDate() {

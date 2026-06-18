@@ -230,6 +230,14 @@ const PluginLibraryUI = (() => {
                 description: '极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。内置生之钟·Life Progress。',
                 icon: '⏳',
                 author: '周墨欣时钟'
+            },
+            {
+                id: 'creative-calendar',
+                name: '创意万年历',
+                version: '1.0.0',
+                description: '融合公历、农历、二十四节气的创意万年历，以中国风视觉语言呈现时间流转。',
+                icon: '📅',
+                author: '周墨欣时钟'
             }
         ]
     };
