@@ -178,6 +178,7 @@
             const temp = document.createElement('div');
             temp.innerHTML = MUSIC_MODAL_HTML.trim();
             _modalEl = temp.firstChild;
+            _modalEl.style.display = 'none'; // 先隐藏，避免 CSS 加载延迟导致闪烁
             document.body.appendChild(_modalEl);
         } else {
             _modalEl = document.getElementById('musicModal');

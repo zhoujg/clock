@@ -4,8 +4,8 @@
     position: fixed;
     top: 80px;
     right: 20px;
-    width: 360px;
-    max-height: 600px;
+    width: 440px;
+    max-height: 75vh;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -304,10 +304,10 @@
 }
 
 .favorites-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    max-height: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: none;
     overflow-y: auto;
 }
 
@@ -324,79 +324,65 @@
     border-radius: 2px;
 }
 
-/* 收藏项 */
+/* 收藏项 — Flex 横排，宽松布局 */
 .favorite-item {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    border-radius: 8px;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.04);
     cursor: pointer;
-    transition: all 0.2s ease;
-    background-size: cover;
-    background-position: center;
+    transition: background 0.2s ease;
 }
 
 .favorite-item:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.08);
 }
 
-.favorite-item::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-    opacity: 0;
-    transition: opacity 0.2s ease;
+/* 收藏缩略图 — 默认大尺寸 */
+.favorite-preview {
+    width: 220px;
+    height: 124px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.06);
+    display: block;
 }
 
-.favorite-item:hover::before {
-    opacity: 1;
-}
-
+/* 收藏操作按钮（右侧） */
 .favorite-item-actions {
-    position: absolute;
-    bottom: 4px;
-    left: 4px;
-    right: 4px;
     display: flex;
-    gap: 4px;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
-.favorite-item:hover .favorite-item-actions {
-    opacity: 1;
-}
-
+/* 收藏操作按钮 */
 .favorite-item-btn {
-    flex: 1;
-    padding: 4px;
+    padding: 6px 12px;
     border: none;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.06);
+    color: rgba(29, 29, 31, 0.7);
     cursor: pointer;
-    font-size: 11px;
+    font-size: 13px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 2px;
+    gap: 4px;
     transition: all 0.2s ease;
 }
 
 .favorite-item-btn:hover {
-    background: white;
-    transform: scale(1.05);
-}
-
-.favorite-item-btn.delete {
-    background: rgba(239, 68, 68, 0.9);
-    color: white;
+    background: rgba(0, 113, 227, 0.1);
+    color: #0071e3;
 }
 
 .favorite-item-btn.delete:hover {
-    background: rgba(239, 68, 68, 1);
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
 }
 
 /* 空状态占位符 */
@@ -446,8 +432,8 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
     .background-panel {
-        width: 320px;
-        max-height: 500px;
+        width: 400px;
+        max-height: 65vh;
     }
     
     .color-grid {
@@ -455,20 +441,25 @@
         gap: 10px;
     }
     
-    .favorites-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .favorite-preview {
+        width: 160px;
+        height: 90px;
+    }
+
+    .favorite-item {
+        padding: 8px 10px;
     }
     
     .background-notification {
-        right: 340px;
+        right: 480px;
     }
 }
 
 @media (max-width: 480px) {
     .background-panel {
-        width: calc(100vw - 30px);
-        max-height: 450px;
-        right: 15px;
+        width: calc(100vw - 24px);
+        max-height: 70vh;
+        right: 12px;
     }
     
     .background-tabs {
@@ -500,8 +491,21 @@
     }
     
     .favorites-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: 6px;
+    }
+
+    .favorite-preview {
+        width: 160px;
+        height: 90px;
+    }
+
+    .favorite-item {
+        padding: 8px 10px;
+    }
+
+    .favorite-item-btn {
+        padding: 5px 10px;
+        font-size: 12px;
     }
     
     .background-notification {
@@ -559,6 +563,15 @@
     
     .favorites-grid {
         max-height: 200px;
+    }
+
+    .favorite-preview {
+        width: 160px;
+        height: 90px;
+    }
+
+    .favorite-item {
+        padding: 6px 8px;
     }
     
     .background-notification {

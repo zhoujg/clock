@@ -93,15 +93,15 @@
 }
 
 /* 收藏容器 */
+/* 收藏容器 — 改用垂直列表布局，彻底避免 Grid 在某些 WebView 中重叠 */
 .picsum-favorites-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 /* 无收藏状态 */
 .no-favorites {
-    grid-column: 1 / -1;
     text-align: center;
     padding: 40px 20px;
 }
@@ -124,57 +124,47 @@
     line-height: 1.5;
 }
 
-/* 收藏项 */
+/* 收藏项 — 水平横排：左边缩略图 + 右边操作按钮 */
 .favorite-item {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.05);
     cursor: pointer;
     transition: all 0.2s ease;
-    /* 确保 aspect-ratio 始终生效，不受子元素加载状态影响 */
-    min-height: 80px;
+    min-height: 90px !important;
+    padding: 8px 10px;
 }
 
 .favorite-item:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.1);
 }
 
-.favorite-item:hover .favorite-actions {
-    opacity: 1;
-}
-
-/* 收藏预览图 — 绝对定位填充父容器，避免 lazy 加载时影响布局 */
+/* 缩略图 — 16:9 比例，大尺寸 */
 .favorite-preview {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    width: 160px !important;
+    height: 90px !important;
+    min-width: 160px !important;
     object-fit: cover;
     object-position: center;
-    transition: filter 0.2s ease;
     display: block;
+    border-radius: 8px;
+    flex-shrink: 0;
 }
 
 .favorite-item:hover .favorite-preview {
     filter: brightness(0.7);
 }
 
-/* 收藏操作按钮 */
+/* 收藏操作按钮 — 改为右侧竖向排列，适配水平横排布局 */
 .favorite-actions {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
     display: flex;
-    justify-content: space-around;
-    padding: 8px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-    opacity: 0;
-    transition: opacity 0.2s ease;
+    flex-direction: column;
+    gap: 4px;
+    margin-left: auto; /* 推到最右边 */
+    padding: 4px;
+    opacity: 1 !important; /* 始终可见，适配手机触控 */
 }
 
 .favorite-use-btn,
@@ -233,6 +223,19 @@
     
     .picsum-favorites-container {
         grid-template-columns: 1fr;
+    }
+    
+    .favorite-item,
+    #favoritesGrid .favorite-item {
+        min-height: 80px !important;
+        padding: 6px 8px;
+    }
+    
+    .favorite-preview,
+    #favoritesGrid .favorite-preview {
+        width: 120px !important;
+        height: 67px !important;
+        min-width: 120px !important;
     }
     
     .picsum-notification {
@@ -305,4 +308,84 @@
         width: 14px;
         height: 14px;
     }
+}
+
+/* ===== app.js 收藏列表（#favoritesGrid）兼容样式 ===== */
+
+/* 容器：垂直列表 */
+#favoritesGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 无收藏占位 */
+.no-favorites-placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* 收藏项：水平横排，固定高度 */
+#favoritesGrid .favorite-item {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    min-height: 90px !important;
+    padding: 8px 10px;
+}
+
+#favoritesGrid .favorite-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 缩略图：16:9 比例，大尺寸 */
+#favoritesGrid .favorite-preview {
+    width: 160px !important;
+    height: 90px !important;
+    min-width: 160px !important;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+/* 操作按钮容器：推到最右边 */
+#favoritesGrid .favorite-item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-left: auto;
+    padding: 4px;
+}
+
+/* 操作按钮 */
+#favoritesGrid .favorite-item-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 10px;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s ease;
+}
+
+#favoritesGrid .favorite-item-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+#favoritesGrid .favorite-item-btn.use:hover {
+    background: rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+}
+
+#favoritesGrid .favorite-item-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
 }

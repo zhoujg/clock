@@ -47,7 +47,24 @@ class PicsumManager {
     loadFavorites() {
         try {
             const data = localStorage.getItem('picsumFavorites');
-            return data ? JSON.parse(data) : [];
+            if (!data) return [];
+            const parsed = JSON.parse(data);
+            // 数据迁移：为旧收藏补上 id 字段（从 url 提取 seed ID）
+            let migrated = false;
+            parsed.forEach(fav => {
+                if (!fav.id && fav.url) {
+                    const match = fav.url.match(/picsum\.photos\/seed\/(\d+)/);
+                    if (match) {
+                        fav.id = match[1];
+                        migrated = true;
+                    }
+                }
+            });
+            // 有迁移时存回 localStorage，下次直接读取
+            if (migrated) {
+                localStorage.setItem('picsumFavorites', JSON.stringify(parsed));
+            }
+            return parsed;
         } catch (error) {
             console.error('加载收藏图片失败:', error);
             return [];
@@ -63,6 +80,26 @@ class PicsumManager {
         } catch (error) {
             console.error('保存收藏图片失败:', error);
         }
+    }
+
+    // 从收藏项中获取缩略图 URL（用 16:9 比例，适配显示尺寸）
+    getThumbnailUrl(fav) {
+        let seedId = '';
+        // 优先使用 fav.id（纯数字 seed ID）
+        if (fav.id && /^\d+$/.test(String(fav.id))) {
+            seedId = fav.id;
+        }
+        // 从 fav.url 提取 seed ID（兼容旧数据）
+        if (!seedId && fav.url) {
+            const match = fav.url.match(/picsum\.photos\/seed\/(\d+)/);
+            if (match) seedId = match[1];
+        }
+        if (seedId) {
+            // 480x270 = 16:9，适配 CSS 显示尺寸（220x124 CSS px，retina 需 2x）
+            return `https://picsum.photos/seed/${seedId}/480/270`;
+        }
+        // 无法提取 seed ID，返回原图（降级处理）
+        return fav.url;
     }
 
     // 获取随机图片URL
@@ -88,9 +125,9 @@ class PicsumManager {
             finalHeight = height;
         }
         
-        // 将尺寸放大1.2倍以获得更高清的图片（适配高分辨率屏幕）
-        finalWidth = Math.round(finalWidth * 1.2);
-        finalHeight = Math.round(finalHeight * 1.2);
+        // 将尺寸放大1.5倍以获得更高清的图片（适配高分辨率屏幕）
+        finalWidth = Math.round(finalWidth * 1.5);
+        finalHeight = Math.round(finalHeight * 1.5);
         
         // 使用时间戳确保每次都是不同的图片
         const seed = Date.now();
@@ -239,7 +276,7 @@ class PicsumManager {
         const sortedFavorites = [...this.favorites].reverse();
         container.innerHTML = sortedFavorites.map((fav, index) => `
             <div class="favorite-item" data-id="${fav.id}" data-index="${this.favorites.length - 1 - index}">
-                <img class="favorite-preview" src="${fav.url}" loading="lazy" decoding="async" alt="收藏 ${index + 1}" />
+                <img class="favorite-preview" src="${this.getThumbnailUrl(fav)}" loading="lazy" decoding="async" alt="收藏 ${index + 1}" />
                 <div class="favorite-actions">
                     <button class="favorite-use-btn" title="使用此图片">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">

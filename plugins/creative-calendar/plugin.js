@@ -360,6 +360,9 @@
             <div class="cc-footer" id="ccFooter"></div>
         `;
 
+        // 先隐藏再插入 DOM，避免 CSS 加载延迟导致闪烁
+        _overlayEl.style.display = 'none';
+        _modalEl.style.display = 'none';
         document.body.appendChild(_overlayEl);
         document.body.appendChild(_modalEl);
 

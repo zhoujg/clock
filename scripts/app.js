@@ -578,12 +578,25 @@ class App {
             return;
         }
         
-        // 渲染收藏项（最新的在前面）
+        // 渲染收藏项（最新的在前面，使用 <img> 标签 + 缩略图 URL）
         const sortedFavorites = [...favorites].reverse();
         favoritesGrid.innerHTML = sortedFavorites.map((fav, index) => {
             const originalIndex = favorites.length - 1 - index;
+            // 获取缩略图 URL（用小尺寸加快加载）
+            let thumbUrl = '';
+            if (fav.id && /^\d+$/.test(String(fav.id))) {
+                thumbUrl = `https://picsum.photos/seed/${fav.id}/250/250`;
+            } else if (fav.url) {
+                const match = fav.url.match(/picsum\.photos\/seed\/(\d+)/);
+                if (match) {
+                    thumbUrl = `https://picsum.photos/seed/${match[1]}/250/250`;
+                } else {
+                    thumbUrl = fav.url;
+                }
+            }
             return `
-                <div class="favorite-item" style="background-image: url('${fav.url}');" data-index="${originalIndex}">
+                <div class="favorite-item" data-index="${originalIndex}">
+                    <img class="favorite-preview" src="${thumbUrl}" loading="lazy" decoding="async" alt="收藏 ${index + 1}" />
                     <div class="favorite-item-actions">
                         <button class="favorite-item-btn use">✓</button>
                         <button class="favorite-item-btn delete">✕</button>
