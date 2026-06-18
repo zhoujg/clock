@@ -151,7 +151,7 @@
         version: '1.0.0',
         description: '每天展示一句实用粤语，包含粤语汉字、粤拼注音和普通话翻译，支持发音。',
         icon: '🗣️',
-        author: '周墨欣时钟',
+        author: '滴答时钟',
         css: 'plugins/cantonese-daily/style.css',
 
         onInstall: async function () {

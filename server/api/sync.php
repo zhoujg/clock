@@ -81,10 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conflicts = [];   // 冲突的数据 key
     $saved = [];       // 成功保存的 key
     $now = date('Y-m-d H:i:s');
-    $validKeys = ['settings', 'picsumFavorites', 'musicFavorites', 'pomodoroData'];
 
     foreach ($inputData as $key => $value) {
-        if (!in_array($key, $validKeys, true)) {
+        // 安全校验：拒绝空 key 和过长 key
+        if (!is_string($key) || strlen($key) === 0 || strlen($key) > 100) {
             continue;
         }
 

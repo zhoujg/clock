@@ -271,9 +271,12 @@ class AuthUI {
                 </div>
 
                 <div style="margin-bottom:24px;">
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:2px;">
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:2px;"
+                         id="nicknameRow">
                         <span style="color:rgba(134,134,139,0.5); font-size:11px; min-width:28px;">昵称</span>
-                        <span style="color:#1d1d1f; font-size:16px; font-weight:500;">${nickname || '未设置'}</span>
+                        <span id="nicknameDisplay"
+                              style="color:#1d1d1f; font-size:16px; font-weight:500; cursor:pointer; border-bottom:1px dashed rgba(0,0,0,0.15); transition:border-color 0.2s;"
+                              title="点击修改昵称">${nickname || '未设置'}</span>
                     </div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
                         <span style="color:rgba(134,134,139,0.5); font-size:11px; min-width:28px;">号码</span>
@@ -316,6 +319,19 @@ class AuthUI {
             </button>
         `;
 
+        // 昵称点击编辑
+        const display = document.getElementById('nicknameDisplay');
+        const row = document.getElementById('nicknameRow');
+        if (display && row) {
+            display.addEventListener('mouseenter', () => {
+                display.style.borderBottomColor = '#0071e3';
+            });
+            display.addEventListener('mouseleave', () => {
+                display.style.borderBottomColor = 'rgba(0,0,0,0.15)';
+            });
+            display.addEventListener('click', () => this.startEditNickname(display, row));
+        }
+
         // 退出登录事件
         const logoutBtn = document.getElementById('authLogoutBtn');
         if (logoutBtn) {
@@ -328,6 +344,89 @@ class AuthUI {
                 }
             });
         }
+    }
+
+    async startEditNickname(display, row) {
+        const oldNickname = this.cloudSync.userNickname || '';
+
+        // 替换为输入框
+        row.innerHTML = `
+            <span style="color:rgba(134,134,139,0.5); font-size:11px; min-width:28px;">昵称</span>
+            <input type="text" id="nicknameInput"
+                   value="${this._escapeHtml(oldNickname)}"
+                   placeholder="输入昵称"
+                   maxlength="20"
+                   style="
+                       width:140px; padding:4px 8px;
+                       background: rgba(0,0,0,0.04);
+                       border: 1px solid #0071e3;
+                       border-radius: 6px;
+                       color: #1d1d1f; font-size:14px; font-weight:500;
+                       outline: none;
+                       box-sizing: border-box;
+                       text-align: center;
+                   " />
+        `;
+
+        const input = document.getElementById('nicknameInput');
+        if (!input) return;
+
+        input.focus();
+        input.select();
+
+        const save = async () => {
+            const newNickname = input.value.trim();
+            if (!newNickname) {
+                // 空值，恢复显示
+                this.renderProfile();
+                return;
+            }
+            if (newNickname === oldNickname) {
+                this.renderProfile();
+                return;
+            }
+
+            input.disabled = true;
+            input.style.opacity = '0.5';
+
+            try {
+                const res = await this.cloudSync.updateNickname(newNickname);
+                if (res.success) {
+                    this.renderProfile();
+                } else {
+                    input.disabled = false;
+                    input.style.opacity = '1';
+                    input.style.borderColor = '#ff3b30';
+                    input.title = res.error || '保存失败';
+                }
+            } catch (e) {
+                input.disabled = false;
+                input.style.opacity = '1';
+                input.style.borderColor = '#ff3b30';
+                input.title = '网络请求失败';
+            }
+        };
+
+        input.addEventListener('blur', () => {
+            // 延迟执行，避免点击事件冲突
+            setTimeout(save, 150);
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                input.blur();
+            } else if (e.key === 'Escape') {
+                input.value = oldNickname;
+                this.renderProfile();
+            }
+        });
+    }
+
+    _escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
 
     bindFormEvents() {

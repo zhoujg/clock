@@ -51,11 +51,12 @@ $userId = (int) $db->lastInsertId();
 // 生成 Token
 $token = Auth::generateToken($userId, $cleanPhone);
 
-// 初始化空的用户数据记录
-$keys = ['settings', 'picsumFavorites', 'musicFavorites', 'pomodoroData'];
+// 初始化空的用户数据记录（内置键，插件键由各自模块自行注册）
+$keys = ['settings', 'installedPlugins'];
 $stmt = $db->prepare('INSERT IGNORE INTO user_data (user_id, data_key, data_value) VALUES (?, ?, ?)');
 foreach ($keys as $key) {
-    $stmt->execute([$userId, $key, '{}']);
+    $defaultValue = ($key === 'installedPlugins') ? '[]' : '{}';
+    $stmt->execute([$userId, $key, $defaultValue]);
 }
 
 Auth::jsonSuccess([

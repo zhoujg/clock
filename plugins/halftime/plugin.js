@@ -54,6 +54,10 @@
                 birthday: _birthday,
                 lifespan: _lifespan
             }));
+            // 通知同步系统推送更新到云端
+            if (window.syncAdapter && window.cloudSync && window.cloudSync.isLoggedIn) {
+                window.syncAdapter.pushChanges('halftimeSettings');
+            }
         } catch (e) { /* ignore */ }
     }
 
@@ -312,7 +316,7 @@
         return grid;
     }
 
-    /* ────── 今日视图 (24小时) ────── */
+    /* ────── 今日视图 (24小时 · SVG 自适应) ────── */
 
     function _renderToday(container) {
         const p = _todayProgress();
@@ -321,40 +325,60 @@
         const wrapper = document.createElement('div');
         wrapper.className = 'halftime-clock-wrapper';
 
-        // 环形时钟：24 个点围成圆圈
-        const clock = document.createElement('div');
-        clock.className = 'halftime-clock';
+        // SVG 环形时钟 - viewBox 保证自适应
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const vb = 300; // viewBox 尺寸
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('class', 'halftime-clock');
+        svg.setAttribute('viewBox', `0 0 ${vb} ${vb}`);
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+
+        // 发光滤镜
+        const defs = document.createElementNS(svgNS, 'defs');
+        defs.innerHTML = `<filter id="halftimeGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+        svg.appendChild(defs);
 
         const radius = 130;
-        const centerX = 150;
-        const centerY = 150;
+        const cx = vb / 2, cy = vb / 2;
         const dotR = 10;
 
         for (let i = 0; i < 24; i++) {
-            const angle = (i / 24) * Math.PI * 2 - Math.PI / 2; // 从顶部开始
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
+            const angle = (i / 24) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + radius * Math.cos(angle);
+            const y = cy + radius * Math.sin(angle);
             const filled = i < Math.floor(p.elapsed);
             const isNow = (i === Math.floor(p.elapsed));
 
-            const dot = _createDot(filled, 210, 'large');
-            dot.style.position = 'absolute';
-            dot.style.left = (x - dotR) + 'px';
-            dot.style.top = (y - dotR) + 'px';
-            if (isNow && filled) dot.classList.add('pulse');
-            dot.title = `${i}:00`;
-            clock.appendChild(dot);
+            const circle = document.createElementNS(svgNS, 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', dotR);
+            circle.setAttribute('fill', filled ? 'hsl(210, 55%, 55%)' : 'rgba(0,0,0,0.08)');
+            if (filled) circle.setAttribute('filter', 'url(#halftimeGlow)');
+            if (isNow && filled) circle.classList.add('halftime-dot', 'pulse');
+            circle.innerHTML = `<title>${i}:00</title>`;
+            svg.appendChild(circle);
         }
 
         // 中心文字
-        const centerText = document.createElement('div');
-        centerText.className = 'halftime-clock-center';
-        const h = _now().getHours();
-        const m = _now().getMinutes();
-        centerText.innerHTML = `<span class="halftime-clock-time">${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}</span><span class="halftime-clock-pct">${Math.round(p.pct * 100)}%</span>`;
-        clock.appendChild(centerText);
+        const h = _now().getHours(), m = _now().getMinutes();
+        const txt = document.createElementNS(svgNS, 'text');
+        txt.setAttribute('x', cx); txt.setAttribute('y', cy - 6);
+        txt.setAttribute('text-anchor', 'middle');
+        txt.setAttribute('font-size', '42'); txt.setAttribute('font-weight', '300');
+        txt.setAttribute('fill', '#1d1d1f'); txt.setAttribute('font-family', 'Helvetica Neue, sans-serif');
+        txt.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        svg.appendChild(txt);
 
-        wrapper.appendChild(clock);
+        const pct = document.createElementNS(svgNS, 'text');
+        pct.setAttribute('x', cx); pct.setAttribute('y', cy + 16);
+        pct.setAttribute('text-anchor', 'middle');
+        pct.setAttribute('font-size', '14'); pct.setAttribute('fill', 'rgba(134,134,139,0.6)');
+        pct.textContent = `${Math.round(p.pct * 100)}%`;
+        svg.appendChild(pct);
+
+        wrapper.appendChild(svg);
         container.appendChild(wrapper);
     }
 
@@ -558,7 +582,7 @@
 
         displayArea.innerHTML = `
             <div class="halftime-life-ring-wrapper">
-                <svg class="halftime-life-ring" viewBox="0 0 260 260" width="260" height="260">
+                <svg class="halftime-life-ring" viewBox="0 0 260 260">
                     <circle class="halftime-life-ring-bg" cx="130" cy="130" r="110" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/>
                     <circle class="halftime-life-ring-fg" cx="130" cy="130" r="110" fill="none" stroke="url(#halftimeGradient)" stroke-width="8"
                         stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
@@ -621,7 +645,7 @@
         version: '1.0.0',
         description: '极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。',
         icon: '⏳',
-        author: '周墨欣时钟',
+        author: '滴答时钟',
         css: 'plugins/halftime/style.css',
 
         onInstall: async function () {
@@ -632,6 +656,10 @@
             console.log('[此间半刻] 激活...');
             _loadSettings();
             _createToolButton();
+            // 注册同步键（自包含，无需修改 syncAdapter 主代码）
+            if (window.syncAdapter) {
+                window.syncAdapter.registerSyncKey('halftimeSettings', 'halftime_settings', _loadSettings);
+            }
             console.log('[此间半刻] 已激活');
         },
 
@@ -639,6 +667,9 @@
             console.log('[此间半刻] 停用...');
             _hideModal();
             _removeToolButton();
+            if (window.syncAdapter) {
+                window.syncAdapter.unregisterSyncKey('halftimeSettings');
+            }
             console.log('[此间半刻] 已停用');
         },
 
@@ -647,6 +678,9 @@
             _removeToolButton();
             if (_modalEl) { _modalEl.remove(); _modalEl = null; }
             if (_overlayEl) { _overlayEl.remove(); _overlayEl = null; }
+            if (window.syncAdapter) {
+                window.syncAdapter.unregisterSyncKey('halftimeSettings');
+            }
             console.log('[此间半刻] 已卸载');
         }
     });

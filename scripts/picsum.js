@@ -10,6 +10,19 @@ class PicsumManager {
         
         // 监听屏幕方向变化
         this.setupOrientationListener();
+
+        // 注册同步键（自包含，无需修改 syncAdapter 主代码）
+        if (window.syncAdapter) {
+            window.syncAdapter.registerSyncKey('picsumFavorites', 'picsumFavorites', () => {
+                this.favorites = this.loadFavorites();
+                if (typeof this.updateFavoritesPanel === 'function') {
+                    this.updateFavoritesPanel();
+                }
+                if (window.app && typeof window.app.updateFavoritesGrid === 'function') {
+                    window.app.updateFavoritesGrid();
+                }
+            }, 'array');
+        }
     }
 
     // 设置屏幕方向变化监听

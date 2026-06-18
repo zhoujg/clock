@@ -85,8 +85,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $date = $body['date'] ?? null;
     $stories = $body['stories'] ?? [];
 
-    if (!$date || empty($stories)) {
-        Auth::jsonError(400, '缺少 date 或 stories 字段');
+    if (!$date) {
+        Auth::jsonError(400, '缺少 date 字段');
+    }
+
+    // stories 为空数组 = 用户删除了该日全部故事，清空服务端记录
+    if (empty($stories)) {
+        $delAllStmt = $db->prepare('DELETE FROM stories WHERE user_id = ? AND story_date = ?');
+        $delAllStmt->execute([$userId, $date]);
+
+        Auth::jsonSuccess([
+            'saved'       => [],
+            'conflicts'   => [],
+            'cleared'     => true,
+            'server_time' => nowISO8601()
+        ]);
     }
 
     // 验证日期格式
@@ -97,6 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $saved = [];
     $conflicts = [];
     $now = date('Y-m-d H:i:s');
+    $maxIndexSent = 0;
 
     $upsertStmt = $db->prepare(
         'INSERT INTO stories (user_id, story_date, story_index, title, content, value_dim, completed, updated_at)
@@ -141,6 +155,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $upsertStmt->execute([$userId, $date, $index, $title, $content, $dim, $done, $now]);
         $saved[] = ['story_date' => $date, 'story_index' => $index];
+        if ($index > $maxIndexSent) $maxIndexSent = $index;
+    }
+
+    // 删除不再存在的行（用户删除了某个中间故事，后续索引前移，旧高位索引行残留）
+    if ($maxIndexSent > 0) {
+        $delStmt = $db->prepare(
+            'DELETE FROM stories WHERE user_id = ? AND story_date = ? AND story_index > ?'
+        );
+        $delStmt->execute([$userId, $date, $maxIndexSent]);
     }
 
     Auth::jsonSuccess([

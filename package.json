@@ -1,7 +1,7 @@
 {
   "name": "zhoumoxin-clock",
   "version": "1.0.0",
-  "description": "周墨欣时钟 - 美观且功能丰富的翻转时钟应用",
+  "description": "滴答时钟 - 美观且功能丰富的翻转时钟应用",
   "main": "index.html",
   "scripts": {
     "copy": "mkdir -p www && cp index.html www/ && cp -r assets www/ && cp -r scripts www/ && cp -r styles www/",
@@ -15,7 +15,7 @@
     "timer",
     "pomodoro"
   ],
-  "author": "周墨欣时钟项目组",
+  "author": "滴答时钟项目组",
   "license": "ISC",
   "devDependencies": {
     "@capacitor/cli": "^6.0.0"

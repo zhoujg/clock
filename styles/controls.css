@@ -59,8 +59,8 @@
     color: #34c759;
 }
 
-/* 设置按钮及其后的按钮靠右 */
-#settingsToggle {
+/* 插件库按钮及其后面的按钮靠右 */
+#pluginLibraryBtn {
     margin-left: auto;
 }
 

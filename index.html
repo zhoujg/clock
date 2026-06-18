@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="format-detection" content="telephone=no" />
-    <title>周墨欣时钟</title>
+    <title>滴答时钟</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="./favicon.svg">
@@ -25,6 +25,17 @@
 <body>
     <!-- 控制面板 -->
     <div class="controls">
+        <!-- 插件库按钮 -->
+        <button id="pluginLibraryBtn" class="control-btn" title="插件库">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v8"/>
+                <path d="M12 14v8"/>
+                <path d="M2 12h8"/>
+                <path d="M14 12h8"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+        </button>
+
         <!-- 设置按钮 -->
         <button id="settingsToggle" class="control-btn" title="设置">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -63,10 +74,6 @@
                     </span>
                     <span class="setting-text">滴答声音</span>
                     <span class="setting-status" id="tickSoundStatus">关闭</span>
-                </div>
-                <div class="setting-item" id="pluginLibrarySetting">
-                    <span class="setting-icon">🧩</span>
-                    <span class="setting-text">插件库</span>
                 </div>
             </div>
         </div>

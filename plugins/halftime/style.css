@@ -124,6 +124,7 @@
 .halftime-body {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px 24px 24px;
     display: flex;
     flex-direction: column;
@@ -171,6 +172,8 @@
     gap: 4px;
     justify-content: center;
     padding: 8px;
+    max-width: 100%;
+    overflow: hidden;
 }
 .halftime-dots-grid:has(.halftime-tiny)  { gap: 2px; }
 .halftime-dots-grid:has(.halftime-small) { gap: 3px; }
@@ -204,11 +207,13 @@
     justify-content: center;
     align-items: center;
     padding: 10px 0;
+    width: 100%;
 }
 .halftime-clock {
-    position: relative;
-    width: 300px;
-    height: 300px;
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1;
+    height: auto;
 }
 .halftime-clock-center {
     position: absolute;
@@ -342,13 +347,15 @@
 /* 圆环进度 */
 .halftime-life-ring-wrapper {
     position: relative;
-    width: 260px;
-    height: 260px;
+    width: 100%;
+    max-width: 260px;
+    aspect-ratio: 1;
     margin: 0 auto;
 }
 .halftime-life-ring {
     width: 100%;
     height: 100%;
+    display: block;
 }
 .halftime-life-ring-center {
     position: absolute;
@@ -430,8 +437,7 @@
         padding: 16px 16px 20px;
     }
     .halftime-clock {
-        width: 240px;
-        height: 240px;
+        max-width: 240px;
     }
     .halftime-clock-time {
         font-size: 32px;
@@ -440,8 +446,7 @@
         gap: 14px;
     }
     .halftime-life-ring-wrapper {
-        width: 200px;
-        height: 200px;
+        max-width: 200px;
     }
     .halftime-life-ring-pct {
         font-size: 28px;

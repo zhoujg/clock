@@ -236,7 +236,7 @@
         version: '1.0.0',
         description: '每天展示一个中考核心英语单词，包含音标、释义、例句和发音功能。',
         icon: '🔤',
-        author: '周墨欣时钟',
+        author: '滴答时钟',
         css: 'plugins/english-daily/style.css',
 
         onInstall: async function () {

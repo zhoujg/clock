@@ -78,6 +78,21 @@ class CloudSync {
     }
 
     /**
+     * 更新昵称
+     */
+    async updateNickname(nickname) {
+        const res = await this._authFetch('/update_nickname.php', {
+            method: 'POST',
+            body: JSON.stringify({ nickname })
+        });
+        if (res.success && this.user) {
+            this.user.nickname = nickname;
+            localStorage.setItem(this.userKey, JSON.stringify(this.user));
+        }
+        return res;
+    }
+
+    /**
      * 登出
      */
     logout() {

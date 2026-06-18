@@ -98,7 +98,7 @@
         version: '1.0.0',
         description: '番茄钟完成后记录三个小故事，培养感恩心态。支持按日期查看、周回顾。',
         icon: '📖',
-        author: '周墨欣时钟',
+        author: '滴答时钟',
 
         onInstall: async function () {
             console.log('[每日故事] 首次安装');

@@ -94,8 +94,8 @@ body {
 /* 时钟样式 */
 .tick {
     padding-top: 0.2em;
-    padding-bottom: 1em;
-    font-size: max(18vw, 14vh);
+    padding-bottom: 0.3em;
+    font-size: 15vw;
     font-family: 'Helvetica Neue', sans-serif;    
     z-index: 10;
     position: relative;
@@ -264,9 +264,8 @@ body {
         white-space: nowrap;
     }
     
-    /* 时钟 - 缩小腾出空间 */
+    /* 时钟 */
     .tick {
-        font-size: 18vh;
         padding-bottom: 0.3em;
     }
     
@@ -312,11 +311,6 @@ body {
         font-size: 1.2vw;
         padding-left: 6px;
         white-space: nowrap;
-    }
-    
-    /* 时钟缩小 */
-    .tick {
-        font-size: 16vh;
     }
     
     .quote-container {
@@ -367,9 +361,8 @@ body {
     
     /* 时钟卡片上移 */
     .tick {
-        font-size: 16vh;
         padding-top: 0;
-        padding-bottom: 0.2em;
+        padding-bottom: 1em;
     }
     
     /* 谚语区域 - 更宽，更多底部空间 */

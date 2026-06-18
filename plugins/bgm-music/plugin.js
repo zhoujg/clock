@@ -423,11 +423,29 @@
             // 9. 更新收藏计数
             _updateFavCount();
 
+            // 10. 注册同步键（自包含，无需修改 syncAdapter 主代码）
+            if (window.syncAdapter) {
+                window.syncAdapter.registerSyncKey('musicFavorites', 'musicFavorites', () => {
+                    _manager.loadFavorites();
+                    if (typeof _manager.updateFavoriteButton === 'function') {
+                        _manager.updateFavoriteButton();
+                    }
+                    if (_manager.showingFavorites && typeof _manager.showFavoritesList === 'function') {
+                        _manager.showFavoritesList();
+                    }
+                }, 'array');
+            }
+
             console.log('[音乐播放器] ✅ 已激活');
         },
 
         onDeactivate: async function () {
             console.log('[音乐播放器] ⏹ 停用中...');
+
+            // 取消同步注册
+            if (window.syncAdapter) {
+                window.syncAdapter.unregisterSyncKey('musicFavorites');
+            }
 
             // 停止播放
             if (_manager) {
@@ -453,6 +471,11 @@
 
         onUninstall: async function () {
             console.log('[音乐播放器] 卸载中...');
+
+            // 取消同步注册
+            if (window.syncAdapter) {
+                window.syncAdapter.unregisterSyncKey('musicFavorites');
+            }
 
             if (_manager) {
                 try { _manager.stop(); } catch(e) {}

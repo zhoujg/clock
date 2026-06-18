@@ -6,7 +6,7 @@
       "version": "1.0.0",
       "description": "番茄钟完成后记录三个小故事，培养感恩心态。支持按日期查看、周回顾。",
       "icon": "📖",
-      "author": "周墨欣时钟",
+      "author": "滴答时钟",
       "js": "plugins/daily-stories/plugin.js",
       "css": "plugins/daily-stories/style.css"
     },
@@ -16,7 +16,7 @@
       "version": "1.0.0",
       "description": "每天展示一个中考核心英语单词，包含音标、释义、例句，支持发音。",
       "icon": "🔤",
-      "author": "周墨欣时钟",
+      "author": "滴答时钟",
       "js": "plugins/english-daily/plugin.js",
       "css": "plugins/english-daily/style.css"
     },
@@ -26,7 +26,7 @@
       "version": "1.0.0",
       "description": "每天展示一句实用粤语，包含汉字、粤拼、普通话翻译，支持发音。",
       "icon": "🗣️",
-      "author": "周墨欣时钟",
+      "author": "滴答时钟",
       "js": "plugins/cantonese-daily/plugin.js",
       "css": "plugins/cantonese-daily/style.css"
     },
@@ -36,7 +36,7 @@
       "version": "1.0.0",
       "description": "极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。",
       "icon": "⏳",
-      "author": "周墨欣时钟",
+      "author": "滴答时钟",
       "js": "plugins/halftime/plugin.js",
       "css": "plugins/halftime/style.css"
     },
@@ -46,7 +46,7 @@
       "version": "1.0.0",
       "description": "融合公历、农历、二十四节气的创意万年历，以中国风视觉语言呈现时间流转。",
       "icon": "📅",
-      "author": "周墨欣时钟",
+      "author": "滴答时钟",
       "js": "plugins/creative-calendar/plugin.js",
       "css": "plugins/creative-calendar/style.css"
     }

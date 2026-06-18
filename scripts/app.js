@@ -110,10 +110,10 @@ class App {
     // ============ 插件系统初始化 ============
 
     _initPluginSystem() {
-        // 绑定插件库按钮（设置面板内）
-        const pluginSetting = document.getElementById('pluginLibrarySetting');
-        if (pluginSetting) {
-            pluginSetting.addEventListener('click', (e) => {
+        // 绑定插件库按钮（顶部工具栏）
+        const pluginBtn = document.getElementById('pluginLibraryBtn');
+        if (pluginBtn) {
+            pluginBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (window.PluginLibraryUI) {
                     // 关闭设置面板

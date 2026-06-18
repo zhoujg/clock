@@ -14,14 +14,20 @@ class SyncAdapter {
         this._pollTimer = null;
         this._pollIntervalMs = 30000; // 30 秒轮询一次
 
-        // 数据 key 与 localStorage key 的映射
+        // 数据 key 与 localStorage key 的映射（内置键）
         this.keyMap = {
             settings:         'flipClockSettings',
-            picsumFavorites:  'picsumFavorites',
-            musicFavorites:   'musicFavorites',
-            pomodoroData:     'pomodoroData',
             installedPlugins: 'installedPlugins'
         };
+
+        // 插件/模块注册的同步键（自包含）
+        // 每个条目：{ cloudKey, storageKey, reloadFn, type }
+        // type: 'object' (直接覆盖) | 'array' (按 ID 并集合并)
+        this._pluginSyncKeys = [];
+        this._pluginReloadFns = {};
+
+        // 记录哪些键是数组类型（需要按 ID 合并）
+        this._arrayKeys = new Set();
 
         // 反向映射
         this.reverseKeyMap = {};
@@ -34,6 +40,40 @@ class SyncAdapter {
 
         // 页面回到前台时立即拉取一次（对手机 App 尤其重要）
         this._setupVisibilityListener();
+    }
+
+    /**
+     * 插件/模块自包含同步注册
+     * 在模块初始化时调用，将自身数据纳入同步体系，无需修改 syncAdapter 主代码。
+     * @param {string} cloudKey   - 云端 user_data 键名
+     * @param {string} storageKey - localStorage 键名
+     * @param {Function} reloadFn - 云端数据合并后刷新模块的回调（可选）
+     * @param {string} type       - 合并策略：'object'（直接覆盖，默认）| 'array'（按 ID 并集合并）
+     */
+    registerSyncKey(cloudKey, storageKey, reloadFn, type = 'object') {
+        this.keyMap[cloudKey] = storageKey;
+        this.reverseKeyMap[storageKey] = cloudKey;
+        if (reloadFn) {
+            this._pluginReloadFns[cloudKey] = reloadFn;
+        }
+        if (type === 'array') {
+            this._arrayKeys.add(cloudKey);
+        }
+        this._pluginSyncKeys.push({ cloudKey, storageKey, reloadFn, type });
+        console.log(`[Sync] 注册同步键: ${cloudKey} → ${storageKey} (${type})`);
+    }
+
+    /**
+     * 取消注册（模块停用/卸载时调用）
+     */
+    unregisterSyncKey(cloudKey) {
+        const storageKey = this.keyMap[cloudKey];
+        if (storageKey) delete this.reverseKeyMap[storageKey];
+        delete this.keyMap[cloudKey];
+        delete this._pluginReloadFns[cloudKey];
+        this._arrayKeys.delete(cloudKey);
+        this._pluginSyncKeys = this._pluginSyncKeys.filter(k => k.cloudKey !== cloudKey);
+        console.log(`[Sync] 取消同步键: ${cloudKey}`);
     }
 
     /**
@@ -295,15 +335,12 @@ class SyncAdapter {
      * - 数组类型（picsumFavorites, musicFavorites）：按 ID 并集合并
      */
     _mergeCloudToLocal(cloudData) {
-        // 数组类型的 key（需要按 ID 合并，不能直接覆盖）
-        const arrayKeys = ['picsumFavorites', 'musicFavorites'];
-
         for (const [cloudKey, value] of Object.entries(cloudData)) {
             const localKey = this.keyMap[cloudKey];
             if (!localKey) continue;
             if (value === null || value === undefined) continue;
 
-            if (arrayKeys.includes(cloudKey) && Array.isArray(value)) {
+            if (this._arrayKeys.has(cloudKey) && Array.isArray(value)) {
                 // 数组类型：按 ID 并集合并
                 const localRaw = localStorage.getItem(localKey);
                 const localArr = localRaw ? (() => {
@@ -349,35 +386,12 @@ class SyncAdapter {
      * 确保 UI 展示的是最新合并后的数据
      */
     _reloadModuleState() {
-        // 刷新 picsum 收藏（如果模块已加载）
-        if (window.picsumManager) {
+        // 刷新所有插件/模块注册的动态同步键
+        for (const [cloudKey, reloadFn] of Object.entries(this._pluginReloadFns)) {
             try {
-                window.picsumManager.favorites = window.picsumManager.loadFavorites();
-                if (typeof window.picsumManager.updateFavoritesPanel === 'function') {
-                    window.picsumManager.updateFavoritesPanel();
-                }
-                // 同时刷新 app 中的收藏网格（背景面板标签页）
-                if (window.app && typeof window.app.updateFavoritesGrid === 'function') {
-                    window.app.updateFavoritesGrid();
-                }
-                console.log('[Sync] picsum 收藏已刷新');
-            } catch (e) { console.warn('[Sync] picsum 刷新失败:', e); }
-        }
-
-        // 刷新音乐收藏（如果模块已加载）
-        const bgmPlayer = window.bgmPlayer || (window.app && window.app.bgmPlayerManager);
-        if (bgmPlayer) {
-            try {
-                bgmPlayer.loadFavorites();
-                if (typeof bgmPlayer.updateFavoriteButton === 'function') {
-                    bgmPlayer.updateFavoriteButton();
-                }
-                // 如果当前正在显示收藏列表，也刷新收藏列表
-                if (bgmPlayer.showingFavorites && typeof bgmPlayer.showFavoritesList === 'function') {
-                    bgmPlayer.showFavoritesList();
-                }
-                console.log('[Sync] 音乐收藏已刷新');
-            } catch (e) { console.warn('[Sync] 音乐收藏刷新失败:', e); }
+                reloadFn();
+                console.log(`[Sync] ${cloudKey} 状态已刷新`);
+            } catch (e) { console.warn(`[Sync] ${cloudKey} 刷新失败:`, e); }
         }
     }
 
@@ -386,13 +400,11 @@ class SyncAdapter {
      * 数组类型按 ID 并集合并，避免丢失本地独有的数据
      */
     _handleConflicts(conflicts) {
-        const arrayKeys = ['picsumFavorites', 'musicFavorites'];
-
         for (const [cloudKey, value] of Object.entries(conflicts)) {
             const localKey = this.keyMap[cloudKey];
             if (!localKey || !value) continue;
 
-            if (arrayKeys.includes(cloudKey) && Array.isArray(value)) {
+            if (this._arrayKeys.has(cloudKey) && Array.isArray(value)) {
                 // 数组类型：云端 + 本地并集合并
                 const localRaw = localStorage.getItem(localKey);
                 const localArr = localRaw ? (() => {

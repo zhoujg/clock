@@ -305,13 +305,13 @@ window.DailyStories = class DailyStories {
         }
     }
 
-    // 云端同步（debounced）
-    _syncToCloud() {
+    // 云端同步（debounced），可通过 immediate=true 跳过 debounce
+    _syncToCloud(immediate = false) {
         if (!window.syncAdapter || !window.cloudSync.isLoggedIn) return;
 
         if (this._syncTimer) clearTimeout(this._syncTimer);
 
-        this._syncTimer = setTimeout(async () => {
+        const doSync = async () => {
             const storiesForCloud = this.stories.map((story, idx) => ({
                 story_index: idx + 1,
                 title: story.title || '',
@@ -322,7 +322,13 @@ window.DailyStories = class DailyStories {
             }));
 
             await window.syncAdapter.saveStories(this.currentDate, storiesForCloud);
-        }, 500);
+        };
+
+        if (immediate) {
+            doSync();
+        } else {
+            this._syncTimer = setTimeout(doSync, 500);
+        }
     }
     
     // 创建UI
@@ -1587,13 +1593,31 @@ window.DailyStories = class DailyStories {
             const allData = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
             allData[this._editSourceDate] = this.stories;
             localStorage.setItem(this.storageKey, JSON.stringify(allData));
+            // 立即同步删除后的数据到云端（用当前 stories 数组）
+            this._pushStoriesToCloud(this.stories, this._editSourceDate);
             this.stories = this.loadStoriesForDate(this.viewingDate);
         } else {
             this.saveTodayStories();
+            // 删除需要立即同步到云端，避免刷新后旧数据回写
+            this._syncToCloud(true);
         }
         
         this.updateUI();
         this.updateBadge();
+    }
+
+    // 直接将一组故事推送到云端指定日期
+    async _pushStoriesToCloud(stories, date) {
+        if (!window.syncAdapter || !window.cloudSync.isLoggedIn) return;
+        const storiesForCloud = stories.map((s, idx) => ({
+            story_index: idx + 1,
+            title: s.title || '',
+            content: JSON.stringify(s),
+            value_dim: s.value || '',
+            completed: s.completed ? 1 : 0,
+            _localUpdatedAt: new Date().toISOString()
+        }));
+        await window.syncAdapter.saveStories(date, storiesForCloud);
     }
     
     // 切换故事完成状态
