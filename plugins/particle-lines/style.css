@@ -127,3 +127,43 @@
     color: rgba(160, 190, 255, 0.85);
     font-weight: 500;
 }
+
+/* 透明模式复选框行 */
+.algo-checkbox-item {
+    cursor: pointer;
+}
+.algo-checkbox-item .algo-desc {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-left: auto;
+}
+
+/* 自定义 checkbox */
+.algo-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    position: relative;
+}
+.algo-checkbox:checked {
+    border-color: rgba(130, 160, 255, 0.8);
+    background: rgba(100, 140, 255, 0.3);
+}
+.algo-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid rgba(160, 190, 255, 0.95);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}

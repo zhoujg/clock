@@ -222,6 +222,14 @@ const PluginLibraryUI = (() => {
                 description: '每天展示一句实用粤语，包含汉字、粤拼、普通话翻译，支持发音。',
                 icon: '🗣️',
                 author: '周墨欣时钟'
+            },
+            {
+                id: 'halftime',
+                name: '此间半刻',
+                version: '1.0.0',
+                description: '极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。内置生之钟·Life Progress。',
+                icon: '⏳',
+                author: '周墨欣时钟'
             }
         ]
     };

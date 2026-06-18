@@ -57,6 +57,7 @@
     let _bgmPlayer = null;
     let _algoIndex = 0;            // 当前选中的算法索引（-1 = 自动轮播）
     let _autoCycle = false;        // 自动轮播模式（循环切换所有算法）
+    let _transparent = false;      // 透明模式（不遮盖背景，默认不透明=有拖尾）
     let _transitionStart = 0;
     let _transitionDuration = 8000; // 自动轮播时每 8 秒切换
 
@@ -310,8 +311,13 @@
     function _animate(timestamp) {
         if (!_enabled) return;
 
-        // 完全清除每帧，不遮盖原有背景
-        _ctx.clearRect(0, 0, _w(), _h());
+        // 透明模式：完全清除；不透明模式：拖尾残影效果
+        if (_transparent) {
+            _ctx.clearRect(0, 0, _w(), _h());
+        } else {
+            _ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+            _ctx.fillRect(0, 0, _w(), _h());
+        }
         _time += 0.016;
 
         // 自动轮播模式：定时循环切换算法
@@ -376,7 +382,7 @@
         }
 
         _algoIndex = 0;
-        _autoCycle = false;
+        _autoCycle = true;
         _transitionStart = Date.now();
         _time = 0;
 
@@ -454,6 +460,21 @@
         `;
         listEl.appendChild(autoItem);
 
+        // 分隔线 + "透明模式" 复选框
+        const sep2 = document.createElement('div');
+        sep2.className = 'algo-picker-sep';
+        listEl.appendChild(sep2);
+
+        const transparentItem = document.createElement('label');
+        transparentItem.className = 'particle-algo-item algo-checkbox-item';
+        transparentItem.innerHTML = `
+            <input type="checkbox" class="algo-checkbox" id="algoTransparent">
+            <span class="algo-icon">👁️</span>
+            <span class="algo-name">透明模式</span>
+            <span class="algo-desc">不遮盖背景</span>
+        `;
+        listEl.appendChild(transparentItem);
+
         // 关闭按钮
         picker.querySelector('.algo-picker-close').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -482,14 +503,37 @@
 
         const picker = _createAlgoPicker();
         const btnRect = _settingItemEl.getBoundingClientRect();
+        const pickerW = 220, pickerH = 310;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const margin = 8;
 
-        const pickerW = 220, pickerH = 260;
-        let top = btnRect.top - 10;
-        let left = btnRect.left - pickerW - 12;
+        // 水平位置：优先级 左侧 > 右侧 > 居中（竖屏手机场景）
+        let left;
+        const roomLeft = btnRect.left - margin;
+        const roomRight = vw - btnRect.right - margin;
 
-        if (left < 8) left = btnRect.right + 12;
-        if (top + pickerH > window.innerHeight - 16) top = window.innerHeight - pickerH - 16;
-        if (top < 8) top = 8;
+        if (roomLeft >= pickerW + margin) {
+            left = btnRect.left - pickerW - margin;
+        } else if (roomRight >= pickerW + margin) {
+            left = btnRect.right + margin;
+        } else {
+            left = (vw - pickerW) / 2;
+        }
+
+        // 垂直位置：优先级 按钮上方 > 按钮下方 > 垂直居中
+        let top;
+        if (btnRect.top - pickerH - margin >= 0) {
+            top = btnRect.top - pickerH - margin;
+        } else if (btnRect.bottom + pickerH + margin <= vh) {
+            top = btnRect.bottom + margin;
+        } else {
+            top = (vh - pickerH) / 2;
+        }
+
+        // 确保不超出屏幕边界
+        top = Math.max(margin, Math.min(top, vh - pickerH - margin));
+        left = Math.max(margin, Math.min(left, vw - pickerW - margin));
 
         picker.style.top = top + 'px';
         picker.style.left = left + 'px';
@@ -524,6 +568,15 @@
                 }
             };
         });
+
+        // 同步透明模式复选框
+        const transparentCB = picker.querySelector('#algoTransparent');
+        if (transparentCB) {
+            transparentCB.checked = _transparent;
+            transparentCB.onchange = function () {
+                _transparent = this.checked;
+            };
+        }
     }
 
     function _hideAlgoPicker() {
@@ -552,10 +605,10 @@
             <span class="setting-text">粒子线条</span>
         `;
 
-        // 插入到插件库按钮之前
+        // 插入到插件库按钮之后
         const pluginLibItem = document.getElementById('pluginLibrarySetting');
-        if (pluginLibItem) {
-            panelContent.insertBefore(item, pluginLibItem);
+        if (pluginLibItem && pluginLibItem.nextSibling) {
+            panelContent.insertBefore(item, pluginLibItem.nextSibling);
         } else {
             panelContent.appendChild(item);
         }

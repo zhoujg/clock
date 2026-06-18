@@ -1,0 +1,455 @@
+/* ========================================
+   Halftime · 此间半刻 — 点阵视觉语言
+   ======================================== */
+
+/* ── 遮罩层 ── */
+.halftime-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 9998;
+    backdrop-filter: blur(4px);
+    animation: halftimeFadeIn 0.25s ease;
+}
+@keyframes halftimeFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ── 弹窗主体 ── */
+.halftime-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 440px;
+    max-width: 94vw;
+    max-height: 90vh;
+    background: rgba(18, 18, 32, 0.97);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 9999;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    animation: halftimeDialogIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    -webkit-user-select: none;
+}
+.halftime-modal[style*="display: block"] {
+    display: flex !important;
+}
+@keyframes halftimeDialogIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ── 头部 ── */
+.halftime-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px 12px;
+    gap: 12px;
+    flex-shrink: 0;
+}
+.halftime-header-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.5px;
+}
+.halftime-header-sub {
+    flex: 1;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.halftime-close {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.halftime-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── 标签导航 ── */
+.halftime-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 0 20px 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+.halftime-tab {
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+}
+.halftime-tab:hover {
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.04);
+}
+.halftime-tab.active {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 -2px 0 rgba(100, 180, 255, 0.6);
+}
+
+/* ── 内容区域 ── */
+.halftime-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 280px;
+}
+.halftime-body::-webkit-scrollbar {
+    width: 4px;
+}
+.halftime-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+/* ── 点阵通用 ── */
+.halftime-dot {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+}
+.halftime-dot.filled {
+    background: hsl(var(--dot-hue, 210), 60%, 65%);
+    box-shadow: 0 0 6px hsla(var(--dot-hue, 210), 60%, 65%, 0.35);
+}
+.halftime-dot.pulse {
+    animation: halftimePulse 2s ease-in-out infinite;
+}
+@keyframes halftimePulse {
+    0%, 100% { box-shadow: 0 0 6px hsla(var(--dot-hue, 210), 60%, 65%, 0.35); }
+    50% { box-shadow: 0 0 14px hsla(var(--dot-hue, 210), 60%, 65%, 0.7); transform: scale(1.08); }
+}
+
+/* 尺寸 */
+.halftime-tiny     { width: 5px; height: 5px; min-width: 5px; }
+.halftime-small    { width: 8px; height: 8px; min-width: 8px; }
+.halftime-medium   { width: 12px; height: 12px; min-width: 12px; }
+.halftime-large    { width: 20px; height: 20px; min-width: 20px; }
+.halftime-xlarge   { width: 28px; height: 28px; min-width: 28px; }
+
+/* ── 点阵网格 ── */
+.halftime-dots-grid {
+    display: grid;
+    gap: 4px;
+    justify-content: center;
+    padding: 8px;
+}
+.halftime-dots-grid:has(.halftime-tiny)  { gap: 2px; }
+.halftime-dots-grid:has(.halftime-small) { gap: 3px; }
+
+/* ── 底部说明 ── */
+.halftime-legend {
+    margin-top: 12px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+    text-align: center;
+    letter-spacing: 0.3px;
+}
+.halftime-hint {
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.halftime-hint:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── 今日时钟视图 ── */
+.halftime-clock-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}
+.halftime-clock {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+.halftime-clock-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.halftime-clock-time {
+    display: block;
+    font-size: 42px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+}
+.halftime-clock-pct {
+    display: block;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 4px;
+}
+
+/* ── 本周视图 ── */
+.halftime-week-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+}
+.halftime-week-row {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+.halftime-week-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.halftime-week-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── 生之钟设置 ── */
+.halftime-lifesettings {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.halftime-lifesetting-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.halftime-lifesetting-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+    min-width: 70px;
+    white-space: nowrap;
+}
+.halftime-lifesetting-val {
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 500;
+}
+.halftime-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    color-scheme: dark;
+}
+.halftime-input:focus {
+    border-color: rgba(100, 180, 255, 0.4);
+}
+.halftime-range {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    outline: none;
+}
+.halftime-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(100, 180, 255, 0.8);
+    cursor: pointer;
+}
+
+/* ── 生之钟展示 ── */
+.halftime-lifedisplay {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 空状态 */
+.halftime-life-empty {
+    text-align: center;
+    padding: 30px 0;
+}
+.halftime-life-empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.6;
+}
+.halftime-life-empty p {
+    margin: 0 0 6px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 14px;
+}
+.halftime-life-empty-sub {
+    font-size: 12px !important;
+    opacity: 0.6;
+}
+
+/* 圆环进度 */
+.halftime-life-ring-wrapper {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 0 auto;
+}
+.halftime-life-ring {
+    width: 100%;
+    height: 100%;
+}
+.halftime-life-ring-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.halftime-life-ring-pct {
+    font-size: 36px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 1px;
+}
+.halftime-life-ring-age {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
+}
+
+/* 统计 */
+.halftime-life-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    justify-content: center;
+    width: 100%;
+}
+.halftime-life-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    min-width: 80px;
+}
+.halftime-life-stat-val {
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    font-variant-numeric: tabular-nums;
+}
+.halftime-life-stat-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 4px;
+}
+
+/* 文案 */
+.halftime-life-quote {
+    margin-top: 20px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+    text-align: center;
+    font-style: italic;
+    letter-spacing: 1px;
+}
+
+/* ── 响应式 ── */
+@media (max-width: 480px) {
+    .halftime-modal {
+        width: 96vw;
+        max-height: 88vh;
+        border-radius: 16px;
+    }
+    .halftime-header {
+        padding: 16px 16px 10px;
+    }
+    .halftime-tabs {
+        padding: 0 12px 4px;
+        gap: 0;
+    }
+    .halftime-tab {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    .halftime-body {
+        padding: 16px 16px 20px;
+    }
+    .halftime-clock {
+        width: 240px;
+        height: 240px;
+    }
+    .halftime-clock-time {
+        font-size: 32px;
+    }
+    .halftime-week-row {
+        gap: 14px;
+    }
+    .halftime-life-ring-wrapper {
+        width: 200px;
+        height: 200px;
+    }
+    .halftime-life-ring-pct {
+        font-size: 28px;
+    }
+    .halftime-life-stats {
+        gap: 12px;
+    }
+    .halftime-life-stat {
+        min-width: 60px;
+        padding: 8px 10px;
+    }
+}

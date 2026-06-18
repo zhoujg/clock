@@ -29,6 +29,16 @@
       "author": "周墨欣时钟",
       "js": "plugins/cantonese-daily/plugin.js",
       "css": "plugins/cantonese-daily/style.css"
+    },
+    {
+      "id": "halftime",
+      "name": "此间半刻",
+      "version": "1.0.0",
+      "description": "极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。",
+      "icon": "⏳",
+      "author": "周墨欣时钟",
+      "js": "plugins/halftime/plugin.js",
+      "css": "plugins/halftime/style.css"
     }
   ]
 }

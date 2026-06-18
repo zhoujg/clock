@@ -275,6 +275,13 @@ class PluginManager {
             console.log('[PluginManager] 核心插件：已自动安装「粒子动画」');
         }
 
+        // 核心插件：此间半刻作为内置功能默认安装（仅首次，尊重用户卸载选择）
+        if (!this.installed['halftime'] && !this._wasUninstalled('halftime')) {
+            this.installed['halftime'] = { enabled: true, installDate: Date.now(), default: true };
+            this._saveState();
+            console.log('[PluginManager] 核心插件：已自动安装「此间半刻」');
+        }
+
         const ids = Object.keys(this.installed).filter(
             id => this.installed[id] && this.installed[id].enabled
         );
