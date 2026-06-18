@@ -139,7 +139,7 @@
         }
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = 'plugins/bgm-music/style.css?v=20260617';
+        link.href = 'plugins/bgm-music/style.css?v=20260618a';
         link.dataset.pluginCss = PLUGIN_ID;
         document.head.appendChild(link);
         _cssInjected = true;

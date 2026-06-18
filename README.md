@@ -74,7 +74,6 @@ clock/
 └── styles/               # CSS 样式文件
     ├── main.css          # 主样式
     ├── controls.css      # 控制面板样式
-    ├── bgmPlayer.css     # BGM 播放器样式 🎵
     ├── dailyStories.css  # 每日三个故事样式 🎯
     ├── pomodoro.css      # 番茄钟样式
     ├── achievement.css   # 成就系统样式 ⭐

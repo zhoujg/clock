@@ -1,5 +1,5 @@
 /**
- * 天气显示样式
+ * 天气显示样式 — Apple Light Theme
  */
 
 /* 天气显示容器 - 集成到日期显示中 */
@@ -13,7 +13,7 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
     transition: all 0.5s ease, background 0.5s ease, border-color 0.5s ease;
     cursor: pointer;
     opacity: 1;
@@ -23,7 +23,7 @@
 .weather-display:hover {
     background: rgba(255, 255, 255, 0.18);
     transform: translateY(-2px);
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
 /* 温度显示 */
@@ -128,7 +128,7 @@
 
 /* 阴天背景效果 */
 body.weather-cloudy {
-    filter: brightness(0.85);
+    filter: brightness(0.92);
 }
 
 /* 响应式设计 - 平板 */

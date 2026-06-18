@@ -1,29 +1,30 @@
-/* 成就系统样式 */
+/* 成就系统样式 — Apple Light Theme */
 
 /* 成就按钮 */
 .achievement-toggle {
     width: 40px;
     height: 40px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 50%;
-    border: none;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(29, 29, 31, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-size: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     position: relative;
     box-sizing: border-box;
 }
 
 .achievement-toggle:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.85);
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 /* 成就数量徽章 */
@@ -31,7 +32,7 @@
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #ff4757;
+    background: #ff3b30;
     color: white;
     font-size: 12px;
     font-weight: bold;
@@ -47,10 +48,10 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.8);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0071e3 0%, #00a2ff 100%);
     padding: 25px 30px;
     border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 40px rgba(0, 113, 227, 0.3);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -260,7 +261,7 @@
 }
 
 
-/* ===== 成就模态框样式 ===== */
+/* ===== 成就模态框样式 — Apple Light ===== */
 
 .achievement-modal {
     display: none;
@@ -269,8 +270,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     z-index: 10000;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -284,14 +286,14 @@
 }
 
 .achievement-modal-content {
-    background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
+    background: #ffffff;
     border-radius: 20px;
     max-width: 1200px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
     padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
     transform: scale(0.9);
     transition: transform 0.3s ease;
 }
@@ -306,17 +308,17 @@
 }
 
 .achievement-modal-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 4px;
 }
 
 .achievement-modal-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 215, 0, 0.5);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 4px;
 }
 
 .achievement-modal-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 215, 0, 0.7);
+    background: rgba(0, 0, 0, 0.25);
 }
 
 /* 模态框头部 */
@@ -330,18 +332,15 @@
 .achievement-modal-title {
     font-size: 36px;
     margin: 0;
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #1d1d1f;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
 .achievement-modal-close {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -350,19 +349,20 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: white;
+    color: #1d1d1f;
     padding: 0;
 }
 
 .achievement-modal-close:hover {
-    background: rgba(244, 67, 54, 0.2);
-    border-color: rgba(244, 67, 54, 0.5);
+    background: rgba(255, 59, 48, 0.1);
+    border-color: rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
     transform: rotate(90deg);
 }
 
 .achievement-modal-subtitle {
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(134, 134, 139, 0.9);
     text-align: center;
     margin-bottom: 30px;
 }
@@ -376,8 +376,8 @@
 }
 
 .modal-stat-card {
-    background: rgba(255, 215, 0, 0.1);
-    border: 2px solid rgba(255, 215, 0, 0.3);
+    background: rgba(0, 113, 227, 0.06);
+    border: 1px solid rgba(0, 113, 227, 0.12);
     border-radius: 15px;
     padding: 20px;
     display: flex;
@@ -388,13 +388,12 @@
 
 .modal-stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
-    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 8px 24px rgba(0, 113, 227, 0.12);
+    border-color: rgba(0, 113, 227, 0.2);
 }
 
 .modal-stat-icon-large {
     font-size: 48px;
-    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
 }
 
 .modal-stat-info {
@@ -403,25 +402,25 @@
 
 .modal-stat-label {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(134, 134, 139, 0.8);
     margin-bottom: 5px;
 }
 
 .modal-stat-value-large {
     font-size: 32px;
     font-weight: bold;
-    color: #FFD700;
+    color: #0071e3;
     margin-bottom: 3px;
 }
 
 .modal-stat-sublabel {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(134, 134, 139, 0.7);
 }
 
 /* 经验进度条 */
 .modal-exp-progress-section {
-    background: rgba(255, 215, 0, 0.05);
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 15px;
     padding: 20px;
     margin-bottom: 30px;
@@ -432,28 +431,28 @@
     justify-content: space-between;
     margin-bottom: 10px;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(29, 29, 31, 0.8);
 }
 
 .modal-exp-label-center {
-    color: #FFD700;
+    color: #0071e3;
     font-weight: bold;
 }
 
 .modal-exp-bar-container {
     position: relative;
     height: 20px;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.06);
     border-radius: 10px;
     overflow: hidden;
 }
 
 .modal-exp-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #FFD700, #FFA500);
+    background: linear-gradient(90deg, #0071e3, #00a2ff);
     border-radius: 10px;
     transition: width 0.5s ease;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 10px rgba(0, 113, 227, 0.3);
 }
 
 .modal-exp-bar-shine {
@@ -462,7 +461,7 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     animation: shine 2s ease-in-out infinite;
 }
 
@@ -479,8 +478,9 @@
 
 .modal-section-title {
     font-size: 20px;
-    color: rgba(255, 255, 255, 0.9);
+    color: #1d1d1f;
     margin-bottom: 15px;
+    font-weight: 600;
 }
 
 .modal-today-stats {
@@ -490,8 +490,8 @@
 }
 
 .modal-today-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 10px;
     padding: 15px;
     text-align: center;
@@ -500,7 +500,7 @@
 .modal-today-label {
     display: block;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(134, 134, 139, 0.8);
     margin-bottom: 8px;
 }
 
@@ -508,7 +508,7 @@
     display: block;
     font-size: 20px;
     font-weight: bold;
-    color: #FFD700;
+    color: #0071e3;
 }
 
 /* 成就分类导航 */
@@ -522,8 +522,8 @@
 .modal-nav-btn {
     flex: 1;
     min-width: 100px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+    border: 2px solid rgba(0, 0, 0, 0.05);
     border-radius: 10px;
     padding: 12px;
     display: flex;
@@ -532,19 +532,19 @@
     gap: 5px;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(134, 134, 139, 0.9);
 }
 
 .modal-nav-btn:hover {
-    background: rgba(255, 215, 0, 0.1);
-    border-color: rgba(255, 215, 0, 0.3);
+    background: rgba(0, 113, 227, 0.06);
+    border-color: rgba(0, 113, 227, 0.15);
     transform: translateY(-2px);
 }
 
 .modal-nav-btn.active {
-    background: rgba(255, 215, 0, 0.2);
-    border-color: rgba(255, 215, 0, 0.5);
-    color: white;
+    background: rgba(0, 113, 227, 0.1);
+    border-color: rgba(0, 113, 227, 0.3);
+    color: #0071e3;
 }
 
 .modal-nav-icon {
@@ -558,7 +558,7 @@
 
 .modal-nav-count {
     font-size: 14px;
-    color: #FFD700;
+    color: #0071e3;
 }
 
 /* 成就网格 */
@@ -569,8 +569,8 @@
 }
 
 .modal-achievement-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 15px;
     padding: 20px;
     display: flex;
@@ -581,8 +581,8 @@
 }
 
 .modal-achievement-card.unlocked {
-    border-color: rgba(255, 215, 0, 0.4);
-    background: rgba(255, 215, 0, 0.05);
+    border-color: rgba(0, 113, 227, 0.2);
+    background: rgba(0, 113, 227, 0.04);
 }
 
 .modal-achievement-card.locked {
@@ -591,12 +591,11 @@
 
 .modal-achievement-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .modal-achievement-icon {
     font-size: 48px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .modal-achievement-info {
@@ -606,13 +605,13 @@
 .modal-achievement-name {
     font-size: 16px;
     font-weight: bold;
-    color: white;
+    color: #1d1d1f;
     margin-bottom: 5px;
 }
 
 .modal-achievement-desc {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(134, 134, 139, 0.9);
     margin-bottom: 10px;
 }
 
@@ -622,7 +621,7 @@
 
 .modal-achievement-progress-bar {
     height: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.06);
     border-radius: 3px;
     overflow: hidden;
     margin-bottom: 5px;
@@ -630,19 +629,19 @@
 
 .modal-achievement-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #FFD700, #FFA500);
+    background: linear-gradient(90deg, #0071e3, #00a2ff);
     border-radius: 3px;
     transition: width 0.5s ease;
 }
 
 .modal-achievement-progress-text {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(134, 134, 139, 0.7);
 }
 
 .modal-achievement-unlocked {
     font-size: 13px;
-    color: #4CAF50;
+    color: #34c759;
     font-weight: bold;
 }
 

@@ -668,10 +668,10 @@ class App {
             top: 20px;
             right: 20px;
             padding: 12px 20px;
-            background: rgba(30, 30, 35, 0.95);
-            color: white;
+            background: rgba(255, 255, 255, 0.92);
+            color: #1d1d1f;
             border-radius: 8px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
             z-index: 10000;
             animation: slideInRight 0.3s ease;
             backdrop-filter: blur(10px);

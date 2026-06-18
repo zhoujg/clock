@@ -90,9 +90,9 @@ class AuthUI {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             z-index: 10000;
             align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         `;
 
         // 点击背景关闭
@@ -104,17 +104,17 @@ class AuthUI {
         const container = document.createElement('div');
         container.className = 'auth-container';
         container.style.cssText = `
-            background: rgba(30,30,30,0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(0,0,0,0.06);
             border-radius: 16px;
             padding: 32px;
             max-width: 380px;
             width: 90%;
-            color: #fff;
+            color: #1d1d1f;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         `;
         container.addEventListener('click', (e) => e.stopPropagation());
 
@@ -123,12 +123,12 @@ class AuthUI {
         closeBtn.innerHTML = '✕';
         closeBtn.style.cssText = `
             position: absolute; top: 16px; right: 16px;
-            background: none; border: none; color: rgba(255,255,255,0.5);
+            background: none; border: none; color: rgba(134,134,139,0.6);
             font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 4px;
             transition: color 0.2s;
         `;
-        closeBtn.addEventListener('mouseenter', () => { closeBtn.style.color = '#fff'; });
-        closeBtn.addEventListener('mouseleave', () => { closeBtn.style.color = 'rgba(255,255,255,0.5)'; });
+        closeBtn.addEventListener('mouseenter', () => { closeBtn.style.color = '#1d1d1f'; });
+        closeBtn.addEventListener('mouseleave', () => { closeBtn.style.color = 'rgba(134,134,139,0.6)'; });
         closeBtn.addEventListener('click', () => this.close());
 
         const formWrapper = document.createElement('div');
@@ -149,14 +149,14 @@ class AuthUI {
             <h2 style="margin:0 0 8px; font-size:22px; font-weight:600;">
                 ${isLogin ? '登录同步' : '注册账号'}
             </h2>
-            <p style="margin:0 0 24px; color: rgba(255,255,255,0.5); font-size:13px;">
+            <p style="margin:0 0 24px; color: rgba(134,134,139,0.8); font-size:13px;">
                 ${isLogin ? '登录后可在多设备间同步数据' : '注册后可跨设备同步你的所有数据'}
             </p>
 
             <form id="authForm" style="display:flex; flex-direction:column; gap:16px;">
                 ${!isLogin ? `
                 <div>
-                    <label style="display:block; margin-bottom:6px; font-size:13px; color: rgba(255,255,255,0.6);">
+                    <label style="display:block; margin-bottom:6px; font-size:13px; color: rgba(134,134,139,0.8);">
                         昵称
                     </label>
                     <input type="text" id="authNickname"
@@ -164,17 +164,17 @@ class AuthUI {
                         maxlength="20"
                         style="
                             width:100%; padding:10px 12px;
-                            background: rgba(255,255,255,0.08);
-                            border: 1px solid rgba(255,255,255,0.15);
+                            background: rgba(0,0,0,0.04);
+                            border: 1px solid rgba(0,0,0,0.08);
                             border-radius: 8px;
-                            color: #fff; font-size:14px;
+                            color: #1d1d1f; font-size:14px;
                             outline: none; transition: border-color 0.2s;
                             box-sizing: border-box;
                         " />
                 </div>
                 ` : ''}
                 <div>
-                    <label style="display:block; margin-bottom:6px; font-size:13px; color: rgba(255,255,255,0.6);">
+                    <label style="display:block; margin-bottom:6px; font-size:13px; color: rgba(134,134,139,0.8);">
                         手机号
                     </label>
                     <input type="tel" id="authPhone" required
@@ -182,27 +182,27 @@ class AuthUI {
                         maxlength="13"
                         style="
                             width:100%; padding:10px 12px;
-                            background: rgba(255,255,255,0.08);
-                            border: 1px solid rgba(255,255,255,0.15);
+                            background: rgba(0,0,0,0.04);
+                            border: 1px solid rgba(0,0,0,0.08);
                             border-radius: 8px;
-                            color: #fff; font-size:14px;
+                            color: #1d1d1f; font-size:14px;
                             outline: none; transition: border-color 0.2s;
                             box-sizing: border-box;
                         " />
                 </div>
 
                 <div>
-                    <label style="display:block; margin-bottom:6px; font-size:13px; color: rgba(255,255,255,0.6);">
+                    <label style="display:block; margin-bottom:6px; font-size:13px; color: rgba(134,134,139,0.8);">
                         密码
                     </label>
                     <input type="password" id="authPassword" required
                         placeholder="至少 6 个字符"
                         style="
                             width:100%; padding:10px 12px;
-                            background: rgba(255,255,255,0.08);
-                            border: 1px solid rgba(255,255,255,0.15);
+                            background: rgba(0,0,0,0.04);
+                            border: 1px solid rgba(0,0,0,0.08);
                             border-radius: 8px;
-                            color: #fff; font-size:14px;
+                            color: #1d1d1f; font-size:14px;
                             outline: none; transition: border-color 0.2s;
                             box-sizing: border-box;
                         " />
@@ -213,7 +213,7 @@ class AuthUI {
                 <button type="submit"
                     style="
                         width:100%; padding:12px;
-                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                        background: #0071e3;
                         border: none; border-radius: 8px;
                         color: #fff; font-size:14px; font-weight:600;
                         cursor: pointer; transition: opacity 0.2s;
@@ -226,7 +226,7 @@ class AuthUI {
             <div style="text-align:center; margin-top:20px;">
                 <button id="authSwitchMode" style="
                     background: none; border: none;
-                    color: rgba(255,255,255,0.5); font-size:13px;
+                    color: rgba(134,134,139,0.8); font-size:13px;
                     cursor: pointer; transition: color 0.2s;
                 ">
                     ${isLogin ? '没有账号？注册 →' : '已有账号？登录 →'}
@@ -234,13 +234,13 @@ class AuthUI {
             </div>
 
             ${this.cloudSync.isLoggedIn ? `
-                <div style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);">
+                <div style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(0,0,0,0.06);">
                     <button id="authLogoutBtn" style="
                         width:100%; padding:10px;
-                        background: rgba(255,255,255,0.08);
-                        border: 1px solid rgba(255,255,255,0.15);
+                        background: rgba(0,0,0,0.04);
+                        border: 1px solid rgba(0,0,0,0.08);
                         border-radius: 8px;
-                        color: rgba(255,255,255,0.6); font-size:13px;
+                        color: rgba(134,134,139,0.8); font-size:13px;
                         cursor: pointer; transition: all 0.2s;
                     ">
                         退出登录
@@ -272,33 +272,33 @@ class AuthUI {
 
                 <div style="margin-bottom:24px;">
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:2px;">
-                        <span style="color:rgba(255,255,255,0.35); font-size:11px; min-width:28px;">昵称</span>
-                        <span style="color:#fff; font-size:16px; font-weight:500;">${nickname || '未设置'}</span>
+                        <span style="color:rgba(134,134,139,0.5); font-size:11px; min-width:28px;">昵称</span>
+                        <span style="color:#1d1d1f; font-size:16px; font-weight:500;">${nickname || '未设置'}</span>
                     </div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
-                        <span style="color:rgba(255,255,255,0.35); font-size:11px; min-width:28px;">号码</span>
-                        <span style="color:rgba(255,255,255,0.55); font-size:14px;">${phone}</span>
+                        <span style="color:rgba(134,134,139,0.5); font-size:11px; min-width:28px;">号码</span>
+                        <span style="color:rgba(134,134,139,0.7); font-size:14px;">${phone}</span>
                     </div>
                 </div>
             </div>
 
             <div style="
-                background: rgba(255,255,255,0.05);
-                border: 1px solid rgba(255,255,255,0.08);
+                background: rgba(0,0,0,0.03);
+                border: 1px solid rgba(0,0,0,0.06);
                 border-radius: 12px;
                 padding: 16px;
                 margin-bottom: 20px;
             ">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-                    <span style="color: rgba(255,255,255,0.5); font-size:13px;">状态</span>
-                    <span style="display:flex; align-items:center; gap:6px; color:#4ade80; font-size:13px;">
-                        <span style="width:8px; height:8px; background:#4ade80; border-radius:50%; display:inline-block;"></span>
+                    <span style="color: rgba(134,134,139,0.7); font-size:13px;">状态</span>
+                    <span style="display:flex; align-items:center; gap:6px; color:#34c759; font-size:13px;">
+                        <span style="width:8px; height:8px; background:#34c759; border-radius:50%; display:inline-block;"></span>
                         已登录
                     </span>
                 </div>
                 <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <span style="color: rgba(255,255,255,0.5); font-size:13px;">同步</span>
-                    <span style="color: rgba(255,255,255,0.35); font-size:13px;">
+                    <span style="color: rgba(134,134,139,0.7); font-size:13px;">同步</span>
+                    <span style="color: rgba(134,134,139,0.5); font-size:13px;">
                         跨设备自动同步
                     </span>
                 </div>
@@ -416,10 +416,10 @@ class AuthUI {
             const el = document.getElementById(id);
             if (el) {
                 el.addEventListener('focus', () => {
-                    el.style.borderColor = '#6366f1';
+                    el.style.borderColor = '#0071e3';
                 });
                 el.addEventListener('blur', () => {
-                    el.style.borderColor = 'rgba(255,255,255,0.15)';
+                    el.style.borderColor = 'rgba(0,0,0,0.08)';
                 });
             }
         });

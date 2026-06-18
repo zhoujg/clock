@@ -1,4 +1,4 @@
-/* 控制面板样式 */
+/* 控制面板样式 — Apple Light Theme */
 .controls {
     position: fixed;
     top: 24px;
@@ -18,23 +18,23 @@
     height: 40px;
     min-width: 40px;
     padding: 0;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 50%;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(29, 29, 31, 0.5);
     cursor: pointer;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     box-sizing: border-box;
 }
 
 .auth-entrance-btn:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.25);
-    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: rgba(29, 29, 31, 0.8);
 }
 
 .auth-entrance-btn:active {
@@ -49,14 +49,14 @@
 
 /* 已登录：绿色 */
 .auth-entrance-btn.logged-in {
-    border-color: rgba(74, 222, 128, 0.4);
-    color: rgba(74, 222, 128, 0.85);
+    border-color: rgba(52, 199, 89, 0.4);
+    color: rgba(52, 199, 89, 0.85);
 }
 
 .auth-entrance-btn.logged-in:hover {
-    background: rgba(74, 222, 128, 0.12);
-    border-color: rgba(74, 222, 128, 0.6);
-    color: #4ade80;
+    background: rgba(52, 199, 89, 0.1);
+    border-color: rgba(52, 199, 89, 0.5);
+    color: #34c759;
 }
 
 /* 设置按钮及其后的按钮靠右 */
@@ -68,16 +68,17 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    border: none;
-    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    color: rgba(29, 29, 31, 0.85);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
     padding: 0;
 }
@@ -87,9 +88,9 @@
 }
 
 .control-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.85);
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .control-btn:active {
@@ -97,7 +98,7 @@
 }
 
 #settingsToggle.active {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.08);
     transform: rotate(90deg);
 }
 
@@ -110,7 +111,8 @@
 }
 
 #musicBtn.active {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(0, 113, 227, 0.1);
+    color: #0071e3;
 }
 
 /* 设置面板 */
@@ -119,11 +121,12 @@
     top: 35px;
     right: 0;
     width: 240px;
-    background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px) scale(0.95);
@@ -143,11 +146,12 @@
     top: 35px;
     right: 40px;
     width: 280px;
-    background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px) scale(0.95);
@@ -168,13 +172,13 @@
 
 .music-current-track {
     padding: 12px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     text-align: center;
 }
 
 #musicPanelTrackName {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(134, 134, 139, 0.9);
     font-weight: 500;
 }
 
@@ -184,16 +188,16 @@
     justify-content: center;
     gap: 8px;
     padding: 12px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .music-control-btn {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.05);
     border: none;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(29, 29, 31, 0.7);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -203,7 +207,7 @@
 }
 
 .music-control-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.08);
     transform: scale(1.1);
 }
 
@@ -242,17 +246,17 @@
 }
 
 .music-panel-list::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 3px;
 }
 
 .music-panel-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 3px;
 }
 
 .music-panel-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.25);
 }
 
 .music-panel-track {
@@ -267,26 +271,26 @@
 }
 
 .music-panel-track:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.04);
 }
 
 .music-panel-track.active {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
-    border-left: 3px solid #667eea;
+    background: rgba(0, 113, 227, 0.08);
+    border-left: 3px solid #0071e3;
 }
 
 .music-panel-track .track-icon {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(134, 134, 139, 0.8);
 }
 
 .music-panel-track.active .track-icon {
-    color: #667eea;
+    color: #0071e3;
 }
 
 .music-panel-track .track-name {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(29, 29, 31, 0.85);
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -296,9 +300,9 @@
 .panel-header {
     padding: 18px 20px;
     font-size: 15px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    color: #1d1d1f;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     letter-spacing: 0.5px;
     display: flex;
     align-items: center;
@@ -314,7 +318,7 @@
 .panel-close-btn {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(134, 134, 139, 0.8);
     cursor: pointer;
     padding: 4px;
     display: flex;
@@ -326,12 +330,12 @@
 }
 
 .panel-close-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(29, 29, 31, 0.9);
 }
 
 .panel-close-btn:active {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.08);
     transform: scale(0.95);
 }
 
@@ -349,11 +353,11 @@
 }
 
 .setting-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.04);
 }
 
 .setting-item:active {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.06);
 }
 
 .setting-icon {
@@ -365,27 +369,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(134, 134, 139, 0.9);
 }
 
 .setting-text {
     flex: 1;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(29, 29, 31, 0.85);
     font-weight: 400;
 }
 
 .setting-status {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(134, 134, 139, 0.8);
     padding: 2px 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.05);
     border-radius: 10px;
 }
 
 .setting-status.active {
-    color: #4ade80;
-    background: rgba(74, 222, 128, 0.15);
+    color: #34c759;
+    background: rgba(52, 199, 89, 0.12);
 }
 
 /* 颜色选择器面板 */
@@ -393,12 +397,13 @@
     position: absolute;
     top: 35px;
     right: 250px;
-    background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
     padding: 20px;
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     z-index: 1001;
     opacity: 0;
     visibility: hidden;
@@ -419,14 +424,14 @@
     margin: 5px;
     cursor: pointer;
     display: inline-block;
-    border: 3px solid rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .color-option:hover {
     transform: scale(1.15);
-    border-color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(0, 0, 0, 0.2);
 }
 
 .color-option:active {

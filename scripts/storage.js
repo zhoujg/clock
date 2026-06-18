@@ -40,7 +40,7 @@ class SettingsStorage {
     // 获取默认设置
     getDefaultSettings() {
         return {
-            backgroundColor: '#1a1a1a',
+            backgroundColor: '#34495e',
             backgroundImage: null,
             tickSoundEnabled: false,
             picsumId: null,  // 当前 Picsum 图片ID

@@ -21,6 +21,16 @@
 - Safari 时间卡片缩小：移除 `data-layout` 中的 `fit` 关键字
 - iPad 滴答声不均：Web Audio API 替代 HTML5 Audio
 
+## 视觉主题（Apple 浅色风格，2026-06-17 启用）
+- 主文字 `#1d1d1f`，次要文字 `#86868b`，次级元素 `rgba(134,134,139,*）`
+- 强调蓝 `#0071e3`，成功绿 `#34c759`，错误红 `#ff3b30`，警告橙 `#ff9500`
+- 毛玻璃面板：`rgba(255,255,255,0.85)` + `backdrop-filter: blur(40px) saturate(180%)`
+- 阴影：`0 2px 12px rgba(0,0,0,0.08)`，边框：`1px solid rgba(0,0,0,0.06)`
+- 默认背景：`#f5f5f7`（storage.js getDefaultSettings）
+- smartColor.js 动态调色（背景亮度≥60→深文字，<60→浅文字）
+- iOS 状态栏：`default`（深色文字状态栏）
+- 新增样式禁止使用旧的深色 rgb/rgba 值；全部 JS/CSS 文件已统一改造
+
 ## 部署
 - 参见 `DEPLOYMENT.md`
 - API 路径：`/api/*.php`

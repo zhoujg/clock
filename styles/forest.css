@@ -1,4 +1,4 @@
-/* 森林系统样式 */
+/* 森林系统样式 — Apple Light Theme */
 .forest-container {
     position: fixed;
     top: 20px;
@@ -9,8 +9,8 @@
 .forest-toggle {
     width: 40px;
     height: 40px;
-    background: rgba(76, 175, 80, 0.15);
-    border: 2px solid rgba(76, 175, 80, 0.3);
+    background: rgba(52, 199, 89, 0.12);
+    border: 2px solid rgba(52, 199, 89, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -18,21 +18,22 @@
     cursor: pointer;
     font-size: 20px;
     transition: all 0.3s ease;
-    backdrop-filter: blur(15px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     position: relative;
 }
 
 .forest-toggle:hover {
-    background: rgba(76, 175, 80, 0.25);
-    border-color: rgba(76, 175, 80, 0.5);
+    background: rgba(52, 199, 89, 0.18);
+    border-color: rgba(52, 199, 89, 0.35);
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    box-shadow: 0 4px 16px rgba(52, 199, 89, 0.2);
 }
 
 .forest-toggle.active {
-    background: rgba(76, 175, 80, 0.3);
-    border-color: rgba(76, 175, 80, 0.6);
+    background: rgba(52, 199, 89, 0.2);
+    border-color: rgba(52, 199, 89, 0.4);
     transform: scale(1);
 }
 
@@ -40,7 +41,7 @@
     position: absolute;
     top: -8px;
     right: -8px;
-    background: linear-gradient(135deg, #4CAF50, #45a049);
+    background: linear-gradient(135deg, #34c759, #30b84e);
     color: white;
     font-size: 12px;
     font-weight: bold;
@@ -51,7 +52,7 @@
     align-items: center;
     justify-content: center;
     padding: 0 6px;
-    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5);
+    box-shadow: 0 2px 8px rgba(52, 199, 89, 0.4);
     animation: pulse 2s ease-in-out infinite;
 }
 
@@ -67,11 +68,12 @@
     left: 0;
     width: 380px;
     max-height: 600px;
-    background: rgba(30, 30, 30, 0.95);
-    border: 1px solid rgba(76, 175, 80, 0.3);
-    border-radius: 15px;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -102,8 +104,8 @@
 }
 
 .stat-item {
-    background: rgba(76, 175, 80, 0.1);
-    border: 1px solid rgba(76, 175, 80, 0.2);
+    background: rgba(52, 199, 89, 0.08);
+    border: 1px solid rgba(52, 199, 89, 0.12);
     border-radius: 10px;
     padding: 12px;
     text-align: center;
@@ -112,7 +114,7 @@
 .stat-label {
     display: block;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(134, 134, 139, 0.8);
     margin-bottom: 5px;
 }
 
@@ -120,13 +122,13 @@
     display: block;
     font-size: 24px;
     font-weight: bold;
-    color: #4CAF50;
+    color: #34c759;
 }
 
 /* 当前成长的树 */
 .current-tree {
-    background: rgba(76, 175, 80, 0.1);
-    border: 2px solid rgba(76, 175, 80, 0.3);
+    background: rgba(52, 199, 89, 0.06);
+    border: 1px solid rgba(52, 199, 89, 0.12);
     border-radius: 12px;
     padding: 15px;
     margin-bottom: 20px;
@@ -135,7 +137,7 @@
 .current-tree-header {
     font-size: 14px;
     font-weight: bold;
-    color: #4CAF50;
+    color: #34c759;
     margin-bottom: 12px;
     text-align: center;
 }
@@ -164,14 +166,14 @@
 .tree-type {
     font-size: 14px;
     font-weight: bold;
-    color: white;
+    color: #1d1d1f;
     margin-bottom: 8px;
 }
 
 .tree-progress-bar {
     width: 100%;
     height: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.06);
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -179,23 +181,23 @@
 
 .tree-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    background: linear-gradient(90deg, #34c759, #8BC34A);
     border-radius: 4px;
     transition: width 0.3s ease;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    box-shadow: 0 0 8px rgba(52, 199, 89, 0.3);
 }
 
 .tree-time {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(134, 134, 139, 0.9);
 }
 
 .tree-tip {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(134, 134, 139, 0.7);
     text-align: center;
     padding: 8px;
-    background: rgba(76, 175, 80, 0.05);
+    background: rgba(52, 199, 89, 0.04);
     border-radius: 6px;
 }
 
@@ -207,19 +209,19 @@
 .forest-view-btn {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #4CAF50, #45a049);
+    background: #34c759;
     border: none;
     border-radius: 10px;
     color: white;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .forest-view-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
 }
 
 .forest-view-btn:active {
@@ -230,7 +232,7 @@
 .recent-trees-header {
     font-size: 14px;
     font-weight: bold;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(29, 29, 31, 0.85);
     margin-bottom: 10px;
 }
 
@@ -243,7 +245,7 @@
 .no-trees {
     text-align: center;
     padding: 30px;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(134, 134, 139, 0.6);
     font-size: 13px;
 }
 
@@ -252,15 +254,15 @@
     align-items: center;
     gap: 12px;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 8px;
     transition: all 0.3s ease;
 }
 
 .tree-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(76, 175, 80, 0.3);
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(52, 199, 89, 0.2);
 }
 
 .tree-item.dead {
@@ -278,13 +280,13 @@
 .tree-item-name {
     font-size: 13px;
     font-weight: bold;
-    color: white;
+    color: #1d1d1f;
     margin-bottom: 3px;
 }
 
 .tree-item-time {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(134, 134, 139, 0.7);
 }
 
 .tree-item-status {
@@ -299,13 +301,13 @@
 }
 
 .tree-item-status.completed {
-    background: rgba(76, 175, 80, 0.2);
-    color: #4CAF50;
+    background: rgba(52, 199, 89, 0.15);
+    color: #34c759;
 }
 
 .tree-item-status.dead {
-    background: rgba(244, 67, 54, 0.2);
-    color: #f44336;
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
 }
 
 /* 森林通知 */
@@ -314,14 +316,15 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.8);
-    background: rgba(30, 30, 30, 0.95);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 15px;
     padding: 25px 30px;
     display: flex;
     align-items: center;
     gap: 15px;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     z-index: 10000;
     opacity: 0;
     transition: all 0.3s ease;
@@ -333,11 +336,11 @@
 }
 
 .forest-notification.success {
-    border: 2px solid rgba(76, 175, 80, 0.5);
+    border: 2px solid rgba(52, 199, 89, 0.4);
 }
 
 .forest-notification.failed {
-    border: 2px solid rgba(244, 67, 54, 0.5);
+    border: 2px solid rgba(255, 59, 48, 0.4);
 }
 
 .forest-notification .notification-icon {
@@ -351,13 +354,13 @@
 .notification-title {
     font-size: 18px;
     font-weight: bold;
-    color: white;
+    color: #1d1d1f;
     margin-bottom: 5px;
 }
 
 .notification-desc {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(134, 134, 139, 0.9);
 }
 
 /* 响应式设计 */
@@ -485,7 +488,7 @@
 .tree-icon-large {
     font-size: 80px;
     animation: treeGrowPulse 2s ease-in-out infinite;
-    filter: drop-shadow(0 4px 10px rgba(76, 175, 80, 0.3));
+    filter: drop-shadow(0 4px 10px rgba(52, 199, 89, 0.2));
     transition: font-size 0.5s ease, transform 0.3s ease;
 }
 
@@ -506,35 +509,35 @@
 .tree-type-name {
     font-size: 16px;
     font-weight: bold;
-    color: #4CAF50;
+    color: #34c759;
     margin-bottom: 10px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
 }
 
 .tree-progress-mini {
     width: 120px;
     height: 10px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.08);
     border-radius: 5px;
     overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .tree-progress-mini-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
+    background: linear-gradient(90deg, #34c759, #8BC34A, #CDDC39);
     border-radius: 5px;
     transition: width 0.3s ease;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    box-shadow: 0 0 8px rgba(52, 199, 89, 0.4);
     animation: progressGlow 2s ease-in-out infinite;
 }
 
 @keyframes progressGlow {
     0%, 100% {
-        box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+        box-shadow: 0 0 8px rgba(52, 199, 89, 0.4);
     }
     50% {
-        box-shadow: 0 0 20px rgba(76, 175, 80, 0.9);
+        box-shadow: 0 0 16px rgba(52, 199, 89, 0.6);
     }
 }
 
@@ -649,7 +652,7 @@
 }
 
 
-/* ===== 森林模态框样式 ===== */
+/* ===== 森林模态框样式 — Apple Light ===== */
 
 .forest-modal {
     display: none;
@@ -658,8 +661,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     z-index: 10000;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -673,14 +677,14 @@
 }
 
 .forest-modal-content {
-    background: linear-gradient(135deg, #1a4d2e 0%, #0d2818 100%);
+    background: #ffffff;
     border-radius: 20px;
     max-width: 1200px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
     padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
     transform: scale(0.9);
     transition: transform 0.3s ease;
 }
@@ -695,17 +699,17 @@
 }
 
 .forest-modal-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 4px;
 }
 
 .forest-modal-content::-webkit-scrollbar-thumb {
-    background: rgba(76, 175, 80, 0.5);
+    background: rgba(52, 199, 89, 0.3);
     border-radius: 4px;
 }
 
 .forest-modal-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(76, 175, 80, 0.7);
+    background: rgba(52, 199, 89, 0.5);
 }
 
 /* 模态框头部 */
@@ -719,10 +723,7 @@
 .forest-modal-title {
     font-size: 36px;
     margin: 0;
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #1d1d1f;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -730,12 +731,11 @@
 
 .title-icon {
     font-size: 32px;
-    filter: drop-shadow(0 2px 4px rgba(76, 175, 80, 0.5));
 }
 
 .forest-modal-close {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -744,19 +744,20 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: white;
+    color: #1d1d1f;
     padding: 0;
 }
 
 .forest-modal-close:hover {
-    background: rgba(244, 67, 54, 0.2);
-    border-color: rgba(244, 67, 54, 0.5);
+    background: rgba(255, 59, 48, 0.1);
+    border-color: rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
     transform: rotate(90deg);
 }
 
 .forest-modal-subtitle {
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(134, 134, 139, 0.9);
     text-align: center;
     margin-bottom: 30px;
 }
@@ -770,8 +771,8 @@
 }
 
 .modal-stat-card {
-    background: rgba(76, 175, 80, 0.15);
-    border: 2px solid rgba(76, 175, 80, 0.3);
+    background: rgba(52, 199, 89, 0.08);
+    border: 1px solid rgba(52, 199, 89, 0.15);
     border-radius: 15px;
     padding: 20px;
     text-align: center;
@@ -780,20 +781,20 @@
 
 .modal-stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
-    border-color: rgba(76, 175, 80, 0.5);
+    box-shadow: 0 8px 24px rgba(52, 199, 89, 0.12);
+    border-color: rgba(52, 199, 89, 0.25);
 }
 
 .modal-stat-label {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(134, 134, 139, 0.8);
     margin-bottom: 10px;
 }
 
 .modal-stat-value {
     font-size: 32px;
     font-weight: bold;
-    color: #4CAF50;
+    color: #34c759;
 }
 
 /* 森林网格 */
@@ -805,8 +806,8 @@
 
 .modal-tree-card {
     aspect-ratio: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+    border: 2px solid rgba(0, 0, 0, 0.05);
     border-radius: 15px;
     display: flex;
     flex-direction: column;
@@ -839,15 +840,15 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at center, rgba(76, 175, 80, 0.1), transparent);
+    background: radial-gradient(circle at center, rgba(52, 199, 89, 0.08), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .modal-tree-card:hover {
     transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
-    border-color: rgba(76, 175, 80, 0.5);
+    box-shadow: 0 8px 24px rgba(52, 199, 89, 0.12);
+    border-color: rgba(52, 199, 89, 0.25);
 }
 
 .modal-tree-card:hover::before {
@@ -855,16 +856,16 @@
 }
 
 .modal-tree-card.healthy {
-    border-color: rgba(76, 175, 80, 0.4);
+    border-color: rgba(52, 199, 89, 0.2);
 }
 
 .modal-tree-card.dead {
     opacity: 0.5;
-    border-color: rgba(244, 67, 54, 0.3);
+    border-color: rgba(255, 59, 48, 0.15);
 }
 
 .modal-tree-card.dead:hover {
-    box-shadow: 0 10px 30px rgba(244, 67, 54, 0.2);
+    box-shadow: 0 8px 24px rgba(255, 59, 48, 0.1);
 }
 
 .modal-tree-emoji {
@@ -881,14 +882,14 @@
 .modal-tree-name {
     font-size: 13px;
     font-weight: bold;
-    color: white;
+    color: #1d1d1f;
     margin-bottom: 5px;
     text-align: center;
 }
 
 .modal-tree-date {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(134, 134, 139, 0.7);
     text-align: center;
 }
 
@@ -915,13 +916,13 @@
 
 .forest-modal-empty h2 {
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(29, 29, 31, 0.7);
     margin-bottom: 10px;
 }
 
 .forest-modal-empty p {
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(134, 134, 139, 0.7);
 }
 
 /* 响应式设计 */

@@ -1,4 +1,4 @@
-/* 番茄钟样式 */
+/* 番茄钟样式 — Apple Light Theme */
 
 /* 番茄钟按钮的状态指示器 */
 .pomodoro-status-indicator {
@@ -53,11 +53,12 @@
     top: 60px;
     right: 0;
     width: 320px;
-    background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px) scale(0.95);
@@ -86,7 +87,7 @@
 .pomodoro-custom label {
     display: block;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(134, 134, 139, 0.9);
     margin-bottom: 8px;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
@@ -99,10 +100,10 @@
 .custom-input-wrapper input {
     flex: 1;
     padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 10px;
-    color: white;
+    color: #1d1d1f;
     font-size: 14px;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
     outline: none;
@@ -110,22 +111,22 @@
 }
 
 .custom-input-wrapper input:focus {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(102, 126, 234, 0.5);
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 113, 227, 0.4);
 }
 
 .custom-input-wrapper input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(174, 174, 178, 0.6);
 }
 
 .custom-start-btn {
     padding: 10px 18px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #0071e3;
     border: none;
     border-radius: 10px;
     color: white;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -133,7 +134,7 @@
 
 .custom-start-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
 }
 
 .custom-start-btn:active {
@@ -151,8 +152,8 @@
     padding: 10px 6px;
     border: none;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(134, 134, 139, 0.9);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -173,27 +174,27 @@
 }
 
 .mode-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.08);
 }
 
 .mode-btn.active {
-    background: rgba(255, 107, 107, 0.8);
+    background: rgba(255, 107, 107, 0.85);
     color: white;
     font-weight: 500;
 }
 
 .mode-btn[data-mode="shortBreak"].active {
-    background: rgba(78, 205, 196, 0.8);
+    background: rgba(78, 205, 196, 0.85);
 }
 
 .mode-btn[data-mode="longBreak"].active {
-    background: rgba(102, 126, 234, 0.8);
+    background: rgba(0, 113, 227, 0.85);
 }
 
 /* 进度条 */
 .pomodoro-progress-bar {
     height: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.06);
     border-radius: 3px;
     overflow: hidden;
     margin-bottom: 15px;
@@ -240,19 +241,19 @@
 }
 
 .pomodoro-btn.reset {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(134, 134, 139, 0.9);
 }
 
 .pomodoro-btn:hover {
     transform: scale(1.08);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
 }
 
 .pomodoro-sessions {
     text-align: center;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(134, 134, 139, 0.9);
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
@@ -354,8 +355,6 @@
         padding: 10px;
     }
     
-
-    
     .pomodoro-custom {
         margin-bottom: 10px;
     }
@@ -445,8 +444,6 @@
     .pomodoro-panel .panel-content {
         padding: 8px;
     }
-    
-
     
     .pomodoro-custom {
         margin-bottom: 8px;
