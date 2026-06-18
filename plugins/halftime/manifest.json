@@ -1,0 +1,10 @@
+{
+  "id": "halftime",
+  "name": "此间半刻",
+  "version": "1.0.0",
+  "description": "极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。",
+  "icon": "⏳",
+  "author": "滴答时钟",
+  "main": "plugin.js",
+  "default": true
+}

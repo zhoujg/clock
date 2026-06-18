@@ -1,0 +1,10 @@
+{
+  "id": "particle-lines",
+  "name": "粒子动画",
+  "version": "2.0.0",
+  "description": "极简数字流派艺术粒子动画。内置秩序之息、虚空引力、生物脉冲、万向之门四套算法模组，搭载 HSL 全彩光谱、辉光特效和动态拖尾，粒子在数学波形牵引下往复律动。",
+  "icon": "✨",
+  "author": "时钟应用",
+  "main": "plugin.js",
+  "default": true
+}

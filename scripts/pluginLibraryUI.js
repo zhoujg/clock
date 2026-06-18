@@ -131,11 +131,13 @@ const PluginLibraryUI = (() => {
 
         list.innerHTML = allIds.map(id => {
             const plugin  = pm.getPlugin(id);
+            const manifest = pm.getManifest(id);
             const isOn   = pm.isEnabled(id);
-            const name    = plugin ? plugin.name : id;
-            const desc    = plugin ? plugin.description : '';
-            const icon    = plugin ? plugin.icon : '🧩';
-            const version = plugin ? plugin.version : '';
+            // 优先用 descriptor，其次用 manifest
+            const name    = (plugin ? plugin.name : null) || (manifest ? manifest.name : null) || id;
+            const desc    = (plugin ? plugin.description : null) || (manifest ? manifest.description : null) || '';
+            const icon    = (plugin ? plugin.icon : null) || (manifest ? manifest.icon : null) || '🧩';
+            const version = (plugin ? plugin.version : null) || (manifest ? manifest.version : null) || '';
 
             return `
                 <div class="plugin-card installed" data-id="${id}">
@@ -179,64 +181,42 @@ const PluginLibraryUI = (() => {
         });
     }
 
-    /* ============ 插件注册表（内嵌，无需 fetch）============ */
+    /* ============ 插件市场（从 manifest 动态加载）============ */
 
-    const _REGISTRY = {
-        plugins: [
-            {
-                id: 'particle-lines',
-                name: '粒子动画',
-                version: '2.0.0',
-                description: '极简数字流派艺术。内置秩序之息、虚空引力、生物脉冲、万向之门四套算法，搭载 HSL 全彩光谱和辉光拖尾特效。',
-                icon: '✨',
-                author: '时钟应用'
-            },
-            {
-                id: 'daily-stories',
-                name: '每日故事',
-                version: '1.0.0',
-                description: '番茄钟完成后记录三个小故事，培养感恩心态。支持按日期查看、周回顾。',
-                icon: '📖',
-                author: '滴答时钟'
-            },
-            {
-                id: 'bgm-music',
-                name: '音乐播放器',
-                version: '1.0.0',
-                description: '在线音乐播放器，支持播放/暂停、收藏、音量调节、云端同步。',
-                icon: '🎵',
-                author: '时钟应用'
-            },
-            {
-                id: 'halftime',
-                name: '此间半刻',
-                version: '1.0.0',
-                description: '极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。内置生之钟·Life Progress。',
-                icon: '⏳',
-                author: '滴答时钟'
-            },
-            {
-                id: 'creative-calendar',
-                name: '万年历',
-                version: '1.0.0',
-                description: '融合公历、农历、二十四节气的创意万年历，以中国风视觉语言呈现时间流转。',
-                icon: '📅',
-                author: '滴答时钟'
-            }
-        ]
-    };
+    async function _loadMarketPlugins() {
+        const pm = window.PluginManager;
+        
+        // 确保 manifest 已发现
+        if (Object.keys(pm.manifests).length === 0) {
+            await pm.discoverPlugins();
+        }
+
+        // 从 manifest 构建市场列表
+        const manifests = pm.getAllManifests();
+        return manifests.map(m => ({
+            id: m.id,
+            name: m.name,
+            version: m.version,
+            description: m.description,
+            icon: m.icon || '🧩',
+            author: m.author || '未知'
+        }));
+    }
 
     /* ============ 加载插件市场 ============ */
 
-    function _renderMarket() {
+    async function _renderMarket() {
         const list = document.getElementById('pluginMarketList');
         const loading = document.getElementById('pluginMarketLoading');
         if (!list) return;
 
+        // 动态加载插件列表
+        const marketPlugins = await _loadMarketPlugins();
+
         if (loading) loading.style.display = 'none';
 
         const pm = window.PluginManager;
-        list.innerHTML = (_REGISTRY.plugins || []).map(p => {
+        list.innerHTML = (marketPlugins || []).map(p => {
             const installed = pm.isInstalled(p.id);
             const enabled   = pm.isEnabled(p.id);
             return `

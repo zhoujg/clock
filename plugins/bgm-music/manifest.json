@@ -1,0 +1,10 @@
+{
+  "id": "bgm-music",
+  "name": "音乐播放器",
+  "version": "1.0.0",
+  "description": "Jamendo 在线音乐播放器，支持播放/暂停/收藏/云端同步。",
+  "icon": "🎵",
+  "author": "时钟应用",
+  "main": "plugin.js",
+  "default": true
+}

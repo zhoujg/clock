@@ -1,0 +1,10 @@
+{
+  "id": "creative-calendar",
+  "name": "创意万年历",
+  "version": "1.0.0",
+  "description": "融合公历、农历、二十四节气的创意万年历，以中国风视觉语言呈现时间流转。",
+  "icon": "📅",
+  "author": "时钟应用",
+  "main": "plugin.js",
+  "default": true
+}

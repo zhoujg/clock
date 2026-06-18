@@ -1,0 +1,11 @@
+{
+  "id": "daily-stories",
+  "name": "每日故事",
+  "version": "1.0.0",
+  "description": "番茄钟完成后记录三个小故事，培养感恩心态。支持按日期查看、周回顾。",
+  "icon": "📖",
+  "author": "滴答时钟",
+  "main": "plugin.js",
+  "class": "DailyStories",
+  "default": true
+}

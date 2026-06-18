@@ -24,6 +24,7 @@
 class PluginManager {
     constructor() {
         this.plugins      = {};       // id → descriptor
+        this.manifests    = {};       // id → manifest（从 manifest.json 自动发现）
         this.installed    = {};       // id → { enabled, installDate }
         this._cssLinks   = {};       // id → link element（当前已注入的 CSS）
         this._loadState();
@@ -57,6 +58,11 @@ class PluginManager {
      */
     async install(id) {
         if (this.installed[id]) return false;
+
+        // 确保 manifest 已加载（用于后续 UI 显示）
+        if (!this.manifests[id]) {
+            await this._loadManifest(id);
+        }
 
         // 如果插件尚未注册，动态加载脚本
         if (!this.plugins[id]) {
@@ -242,58 +248,116 @@ class PluginManager {
         stray.forEach(l => l.remove());
     }
 
+    /* ============ 插件自动发现 ============ */
+
+    /**
+     * 扫描 plugins/manifest.json，自动发现所有可用插件
+     * 返回 manifest 列表
+     */
+    async discoverPlugins() {
+        // 已发现过则直接返回缓存
+        if (Object.keys(this.manifests).length > 0) {
+            return Object.values(this.manifests);
+        }
+
+        // 通过扫描已知插件目录下的 manifest.json 来发现
+        // 由于浏览器无法直接列出目录，我们尝试加载所有可能的插件路径
+        // 这里用一个内置的"种子列表"来定位目录，然后加载每个目录的 manifest
+        const seedIds = ['daily-stories', 'bgm-music', 'particle-lines', 'halftime', 'creative-calendar'];
+
+        const results = await Promise.allSettled(
+            seedIds.map(id => this._loadManifest(id))
+        );
+
+        // 扫描发现到的插件
+        const discovered = [];
+        for (const result of results) {
+            if (result.status === 'fulfilled' && result.value) {
+                discovered.push(result.value);
+            }
+        }
+
+        // 也检查 installed 中可能有但种子列表里没有的插件
+        const installedIds = Object.keys(this.installed);
+        const extraIds = installedIds.filter(id => !this.manifests[id] && !seedIds.includes(id));
+        if (extraIds.length > 0) {
+            const extraResults = await Promise.allSettled(
+                extraIds.map(id => this._loadManifest(id))
+            );
+            for (const result of extraResults) {
+                if (result.status === 'fulfilled' && result.value) {
+                    discovered.push(result.value);
+                }
+            }
+        }
+
+        console.log(`[PluginManager] 发现 ${Object.keys(this.manifests).length} 个插件`);
+        return Object.values(this.manifests);
+    }
+
+    /**
+     * 加载单个插件的 manifest.json
+     */
+    async _loadManifest(id) {
+        if (this.manifests[id]) return this.manifests[id];
+
+        try {
+            const resp = await fetch(`plugins/${id}/manifest.json?v=${Date.now()}`);
+            if (!resp.ok) return null;
+            const manifest = await resp.json();
+            if (!manifest.id) return null;
+            this.manifests[manifest.id] = manifest;
+            return manifest;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取指定插件的 manifest
+     */
+    getManifest(id) {
+        return this.manifests[id] || null;
+    }
+
+    /**
+     * 获取所有已发现的 manifest 列表
+     */
+    getAllManifests() {
+        return Object.values(this.manifests);
+    }
+
     /* ============ 初始化（DOMContentLoaded 后调用）============ */
 
     /**
      * 初始化插件系统：
-     * 1. 迁移：旧用户已有 dailyStories 数据则自动安装每日故事插件
-     * 2. 激活所有已安装且启用的插件
-     * 3. 如果某个已安装插件尚未注册（JS 未加载），则动态加载
+     * 1. 自动发现所有插件（读取 manifest.json）
+     * 2. 将标记为 default 的插件自动安装（仅首次，尊重用户卸载选择）
+     * 3. 激活所有已安装且启用的插件
      */
     async init() {
-        // 核心插件：每日故事作为内置功能默认安装（仅首次，尊重用户卸载选择）
-        if (!this.installed['daily-stories'] && !this._wasUninstalled('daily-stories')) {
-            this.installed['daily-stories'] = { enabled: true, installDate: Date.now(), default: true };
-            this._saveState();
-        }
+        // 第一步：自动发现所有插件
+        await this.discoverPlugins();
 
-        // 核心插件：音乐播放器作为内置功能默认安装（仅首次，尊重用户卸载选择）
-        if (!this.installed['bgm-music'] && !this._wasUninstalled('bgm-music')) {
-            this.installed['bgm-music'] = { enabled: true, installDate: Date.now(), default: true };
-            this._saveState();
+        // 第二步：自动安装标记为 default 的插件（仅首次，尊重用户卸载选择）
+        for (const manifest of Object.values(this.manifests)) {
+            if (manifest.default && !this.installed[manifest.id] && !this._wasUninstalled(manifest.id)) {
+                this.installed[manifest.id] = { enabled: true, installDate: Date.now(), default: true };
+            }
         }
+        this._saveState();
 
-        // 核心插件：粒子动画作为内置功能默认安装（仅首次，尊重用户卸载选择）
-        if (!this.installed['particle-lines'] && !this._wasUninstalled('particle-lines')) {
-            this.installed['particle-lines'] = { enabled: true, installDate: Date.now(), default: true };
-            this._saveState();
-        }
-
-        // 核心插件：此间半刻作为内置功能默认安装（仅首次，尊重用户卸载选择）
-        if (!this.installed['halftime'] && !this._wasUninstalled('halftime')) {
-            this.installed['halftime'] = { enabled: true, installDate: Date.now(), default: true };
-            this._saveState();
-        }
-
-        // 核心插件：万年历作为内置功能默认安装（仅首次，尊重用户卸载选择）
-        if (!this.installed['creative-calendar'] && !this._wasUninstalled('creative-calendar')) {
-            this.installed['creative-calendar'] = { enabled: true, installDate: Date.now(), default: true };
-            this._saveState();
-        }
-
+        // 第三步：激活所有已安装且启用的插件
         const ids = Object.keys(this.installed).filter(
             id => this.installed[id] && this.installed[id].enabled
         );
 
         for (const id of ids) {
             if (this.plugins[id]) {
-                // 已注册，直接激活
                 await this._activate(id);
             } else {
-                // 未注册，动态加载脚本
                 try {
                     await this._loadPluginScript(id);
-                    // _loadPluginScript 完成后 register() 已调用，_activate 已在 register() 中触发
                 } catch (e) {
                     console.error(`[PluginManager] 动态加载失败 ${id}:`, e);
                 }
