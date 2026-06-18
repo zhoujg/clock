@@ -18,15 +18,15 @@
         if (_loadPromise)  return _loadPromise;
 
         _loadPromise = new Promise((resolve, reject) => {
-            // 如果已在其他地方加载过
-            if (window.DailyStories) {
+            // 如果已在其他地方加载过（检查全局作用域和 window）
+            if (typeof DailyStories !== 'undefined' || typeof window.DailyStories !== 'undefined') {
                 _classLoaded = true;
                 resolve();
                 return;
             }
 
             const script = document.createElement('script');
-            script.src = CLASS_JS + '?v=20260620q';
+            script.src = CLASS_JS + '?v=' + Date.now();
             script.onload = () => {
                 if (window.DailyStories) {
                     _classLoaded = true;

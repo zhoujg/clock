@@ -417,8 +417,8 @@ body.stories-dark .story-modal-delete:hover {
 /* 面板头部 - 截图风格标题栏 */
 .stories-panel-header {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
     padding: 16px 24px;
     background: transparent;
     position: sticky;
@@ -426,28 +426,10 @@ body.stories-dark .story-modal-delete:hover {
     z-index: 1;
 }
 
-/* ============ 第一行：标题 + 关闭按钮 ============ */
-
-.stories-header-top {
+.stories-header-left {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* ============ 第二行：日期导航 + 焦点 + 功能按钮 ============ */
-
-.stories-header-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.stories-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .stories-header-title {
@@ -506,6 +488,40 @@ body.stories-dark .story-modal-delete:hover {
     border-radius: 50%;
     font-size: 14px;
     font-weight: 700;
+}
+
+.stories-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 标题旁添加按钮 */
+.stories-add-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.stories-add-btn:hover {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: #6366f1;
+}
+
+.stories-add-btn svg {
+    width: 18px;
+    height: 18px;
 }
 
 .stories-close-btn {
@@ -3030,11 +3046,7 @@ body.stories-dark .stories-review-panel .review-empty {
 }
 
 @media (max-width: 768px) {
-    .stories-header-bottom {
-        gap: 8px;
-    }
-    
-    .stories-header-actions {
+    .stories-header-right {
         gap: 4px;
     }
     
@@ -3060,5 +3072,130 @@ body.stories-dark .stories-review-panel .review-empty {
     
     .stories-main-text {
         font-size: 8px;
+    }
+}
+
+/* ============================
+   视图切换Tab
+   ============================ */
+.stories-view-tabs {
+    display: flex;
+    gap: 0;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 2px;
+    margin-top: 6px;
+}
+
+.stories-view-tab {
+    flex: 1;
+    padding: 5px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.stories-view-tab:hover {
+    color: #555;
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.stories-view-tab.active {
+    background: #fff;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+/* 深色模式 - 视图Tab */
+.stories-panel.dark-bg .stories-view-tabs {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.stories-panel.dark-bg .stories-view-tab {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.stories-panel.dark-bg .stories-view-tab:hover {
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.stories-panel.dark-bg .stories-view-tab.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================
+   全局视图 - 日期分组
+   ============================ */
+.stories-global-date-group {
+    margin-bottom: 16px;
+}
+
+.stories-global-date-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    margin-bottom: 4px;
+}
+
+.stories-global-date-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.stories-global-date-count {
+    font-size: 11px;
+    color: #9ca3af;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* 深色模式 - 日期分组 */
+.stories-panel.dark-bg .stories-global-date-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.stories-panel.dark-bg .stories-global-date-count {
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 只读故事详情弹窗 */
+.story-modal-overlay .story-modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #999;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.story-modal-overlay .story-modal-close-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+@media (max-width: 480px) {
+    .stories-view-tabs {
+        margin-top: 4px;
+    }
+    
+    .stories-view-tab {
+        padding: 4px 8px;
+        font-size: 11px;
     }
 }

@@ -1,10 +1,11 @@
 // 每日三个故事目标管理系统
-class DailyStories {
+window.DailyStories = class DailyStories {
     constructor() {
         this.storageKey = 'dailyStories';
         this.focusKey = 'dailyStoriesFocus'; // 焦点维度存储键
         this.currentDate = this.getTodayString();
         this.viewingDate = this.currentDate; // 当前查看的日期
+        this.currentView = 'today'; // 当前视图模式：today / inProgress / pending
         this.stories = this.loadTodayStories();
         this.isOpen = false;
         this.focusValues = this.loadFocusValues(); // 焦点维度列表
@@ -348,7 +349,7 @@ class DailyStories {
         panel.style.visibility = 'hidden';
         panel.innerHTML = `
             <div class="stories-panel-header">
-                <div class="stories-header-top">
+                <div class="stories-header-left">
                     <div class="stories-header-title">
                         <span class="stories-title-top">
                             <span class="stories-title-icon">📖</span>
@@ -359,13 +360,6 @@ class DailyStories {
                             已完成 <span class="stories-count-circle" id="storiesCompletedCount">0</span> / <span class="stories-count-circle" id="storiesTotalCount">0</span> 个故事
                         </span>
                     </div>
-                    <button class="stories-close-btn" id="storiesClose">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="stories-header-bottom">
                     <div class="stories-date-nav">
                         <button class="stories-date-btn stories-date-prev" id="storiesDatePrev" title="前一天">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
@@ -382,18 +376,28 @@ class DailyStories {
                     <div class="stories-focus-display" id="storiesFocusDisplay" title="点击修改焦点维度">
                         <!-- 焦点维度标签动态渲染 -->
                     </div>
-                    <div class="stories-header-actions">
-                        <button class="stories-stats-btn" id="storiesStatsBtn" title="统计数据">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-                            </svg>
-                        </button>
-                        <button class="stories-review-btn" id="storiesReviewBtn" title="周回顾">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                            </svg>
-                        </button>
+                    <div class="stories-view-tabs" id="storiesViewTabs">
+                        <button class="stories-view-tab active" data-view="today">今天</button>
+                        <button class="stories-view-tab" data-view="inProgress">进行中</button>
+                        <button class="stories-view-tab" data-view="pending">待开始</button>
                     </div>
+                </div>
+                <div class="stories-header-right">
+                    <button class="stories-stats-btn" id="storiesStatsBtn" title="统计数据">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                        </svg>
+                    </button>
+                    <button class="stories-review-btn" id="storiesReviewBtn" title="周回顾">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                    </button>
+                    <button class="stories-close-btn" id="storiesClose">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
             
@@ -447,6 +451,12 @@ class DailyStories {
     
     // 更新UI - 双列卡片网格布局
     updateUI() {
+        // 非今天视图走全局渲染
+        if (this.currentView !== 'today') {
+            this.updateUIForGlobalView(this.currentView);
+            return;
+        }
+        
         const listContainer = document.getElementById('storiesList');
         if (!listContainer) return;
 
@@ -796,30 +806,59 @@ class DailyStories {
         
         // 事件委托：故事列表交互（新版卡片）
         document.getElementById('storiesList')?.addEventListener('click', (e) => {
-            const isToday = this.isViewingToday();
+            const isGlobalView = this.currentView !== 'today';
+            const isToday = this.isViewingToday() && !isGlobalView;
             const checkbox = e.target.closest('.story-task-checkbox');
             const pomodoroBtn = e.target.closest('.story-task-pomodoro');
             const editBtn = e.target.closest('.story-dimension-edit');
             const taskItem = e.target.closest('.story-task-item');
             
             if (pomodoroBtn) {
-                const index = parseInt(pomodoroBtn.dataset.index);
-                this.linkToPomodoro(index);
+                if (isGlobalView) {
+                    // 全局视图：通过sourceDate定位故事
+                    const sourceDate = pomodoroBtn.dataset.sourceDate || pomodoroBtn.closest('.story-dimension-card')?.dataset.sourceDate;
+                    const index = parseInt(pomodoroBtn.dataset.index);
+                    if (sourceDate) {
+                        this.linkToPomodoroGlobal(sourceDate, index);
+                    }
+                } else {
+                    const index = parseInt(pomodoroBtn.dataset.index);
+                    this.linkToPomodoro(index);
+                }
             } else if (checkbox) {
-                if (!isToday) return; // 过往日期不可切换完成
-                const index = parseInt(checkbox.dataset.index);
-                this.toggleStoryCompletion(index);
+                if (isGlobalView) {
+                    // 全局视图：可以标记完成
+                    const sourceDate = checkbox.dataset.sourceDate || checkbox.closest('.story-dimension-card')?.dataset.sourceDate;
+                    const index = parseInt(checkbox.dataset.index);
+                    if (sourceDate) {
+                        this.toggleStoryCompletionGlobal(sourceDate, index);
+                    }
+                } else if (!isToday) {
+                    return; // 过往日期不可切换完成
+                } else {
+                    const index = parseInt(checkbox.dataset.index);
+                    this.toggleStoryCompletion(index);
+                }
             } else if (editBtn) {
-                if (!isToday) return; // 过往日期不可编辑
+                if (!isToday && !isGlobalView) return; // 过往日期不可编辑
+                if (isGlobalView) return; // 全局视图不可编辑
                 const value = editBtn.closest('.story-dimension-card')?.dataset.value;
                 if (value) {
                     this.showAddStoryModal(null, value);
                 }
             } else if (taskItem && !e.target.closest('.story-task-checkbox')) {
-                // 过往日期：点击任务项可查看详情（只读模式打开模态框）
-                const index = parseInt(taskItem.dataset.index);
-                if (!isNaN(index)) {
-                    this.showAddStoryModal(isToday ? index : index);
+                if (isGlobalView) {
+                    // 全局视图：只读详情
+                    const sourceDate = taskItem.dataset.sourceDate || taskItem.closest('.story-dimension-card')?.dataset.sourceDate;
+                    const index = parseInt(taskItem.dataset.index);
+                    if (sourceDate && !isNaN(index)) {
+                        this.showStoryDetailGlobal(sourceDate, index);
+                    }
+                } else {
+                    const index = parseInt(taskItem.dataset.index);
+                    if (!isNaN(index)) {
+                        this.showAddStoryModal(isToday ? index : index);
+                    }
                 }
             }
         });
@@ -888,6 +927,295 @@ class DailyStories {
         document.getElementById('storiesFocusDisplay')?.addEventListener('click', () => {
             this.showFocusEditor();
         });
+        
+        // 视图切换tab
+        document.getElementById('storiesViewTabs')?.addEventListener('click', (e) => {
+            const tab = e.target.closest('.stories-view-tab');
+            if (tab) {
+                this.switchView(tab.dataset.view);
+            }
+        });
+    }
+    
+    // 切换视图模式（today / inProgress / pending）
+    switchView(view) {
+        if (this.currentView === view) return;
+        this.currentView = view;
+        
+        // 更新tab激活状态
+        document.querySelectorAll('.stories-view-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.view === view);
+        });
+        
+        const isTodayView = view === 'today';
+        const dateNav = document.querySelector('.stories-date-nav');
+        const focusDisplay = document.getElementById('storiesFocusDisplay');
+        
+        // 非今天视图隐藏日期导航和焦点维度
+        if (dateNav) dateNav.style.display = isTodayView ? '' : 'none';
+        if (focusDisplay) focusDisplay.style.display = isTodayView ? '' : 'none';
+        
+        // 更新头部计数显示
+        if (isTodayView) {
+            this.stories = this.loadStoriesForDate(this.viewingDate);
+        }
+        
+        this.updateUI();
+    }
+    
+    // 获取全局进行中/待开始的故事
+    getAllStoriesGlobal(filter) {
+        const allData = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+        const today = this.getTodayString();
+        const results = [];
+        
+        Object.keys(allData).sort().reverse().forEach(dateStr => {
+            const stories = allData[dateStr] || [];
+            stories.forEach(story => {
+                if (story.completed) return; // 已完成的不管
+                const started = this.hasStoryStarted(story);
+                
+                if (filter === 'inProgress' && started) {
+                    results.push({ story, dateStr });
+                } else if (filter === 'pending' && !started) {
+                    results.push({ story, dateStr });
+                }
+            });
+        });
+        
+        return results;
+    }
+    
+    // 渲染全局视图（进行中/待开始）
+    updateUIForGlobalView(filter) {
+        const listContainer = document.getElementById('storiesList');
+        if (!listContainer) return;
+        
+        listContainer.innerHTML = '';
+        
+        const allItems = this.getAllStoriesGlobal(filter);
+        
+        if (allItems.length === 0) {
+            const emptyIcon = filter === 'inProgress' ? '🎉' : '📋';
+            const emptyTitle = filter === 'inProgress' ? '没有进行中的故事' : '没有待开始的故事';
+            const emptyDesc = filter === 'inProgress' 
+                ? '所有故事都已完成，干得漂亮！' 
+                : '还没有设定未来的故事目标';
+            listContainer.innerHTML = `
+                <div class="stories-empty-card">
+                    <div class="stories-empty-icon">${emptyIcon}</div>
+                    <div class="stories-empty-title">${emptyTitle}</div>
+                    <div class="stories-empty-desc">${emptyDesc}</div>
+                </div>
+            `;
+            return;
+        }
+        
+        // 按日期分组
+        const groups = {};
+        allItems.forEach(({ story, dateStr }) => {
+            if (!groups[dateStr]) groups[dateStr] = [];
+            groups[dateStr].push(story);
+        });
+        
+        const today = this.getTodayString();
+        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        
+        // 按日期倒序渲染
+        Object.keys(groups).sort().reverse().forEach(dateStr => {
+            const groupEl = document.createElement('div');
+            groupEl.className = 'stories-global-date-group';
+            
+            // 日期标题
+            let dateLabel;
+            if (dateStr === today) dateLabel = '今天';
+            else if (dateStr === yesterday) dateLabel = '昨天';
+            else {
+                const d = new Date(dateStr);
+                const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+                dateLabel = `${d.getMonth() + 1}月${d.getDate()}日 周${weekdays[d.getDay()]}`;
+            }
+            
+            const headerEl = document.createElement('div');
+            headerEl.className = 'stories-global-date-header';
+            headerEl.innerHTML = `
+                <span class="stories-global-date-label">${dateLabel}</span>
+                <span class="stories-global-date-count">${groups[dateStr].length}个故事</span>
+            `;
+            groupEl.appendChild(headerEl);
+            
+            // 按维度分组渲染卡片
+            const dateStories = groups[dateStr];
+            const valueGroups = {};
+            
+            dateStories.forEach(story => {
+                const vName = story.value || '未分类';
+                if (!valueGroups[vName]) valueGroups[vName] = [];
+                valueGroups[vName].push(story);
+            });
+            
+            Object.keys(valueGroups).forEach(vName => {
+                const vDef = this.values.find(v => v.name === vName) || 
+                    { name: '未分类', color: '#95a5a6', emoji: '⭐', subtitle: '' };
+                const vStories = valueGroups[vName];
+                const completedCount = vStories.filter(s => s.completed).length;
+                
+                const card = this.createDimensionCard({
+                    def: vDef,
+                    stories: vStories,
+                    completedCount,
+                    totalCount: vStories.length,
+                    isFocus: this.focusValues.includes(vDef.name)
+                });
+                
+                // 标记来源日期（用于操作时定位）
+                card.dataset.sourceDate = dateStr;
+                card.querySelectorAll('.story-task-item').forEach(item => {
+                    item.dataset.sourceDate = dateStr;
+                });
+                card.querySelectorAll('.story-task-checkbox').forEach(cb => {
+                    cb.dataset.sourceDate = dateStr;
+                });
+                
+                // 进行中视图：添加番茄钟按钮
+                if (filter === 'inProgress') {
+                    card.querySelectorAll('.story-task-item').forEach(item => {
+                        const idx = parseInt(item.dataset.index);
+                        const story = vStories[card.querySelectorAll('.story-task-item').length > 1 ? 
+                            Array.from(card.querySelectorAll('.story-task-item')).indexOf(item) : 0];
+                    });
+                }
+                
+                groupEl.appendChild(card);
+            });
+            
+            listContainer.appendChild(groupEl);
+        });
+        
+        // 更新头部计数
+        this.updateGlobalProgress(allItems.length, 0, filter);
+    }
+    
+    // 更新全局视图的头部进度
+    updateGlobalProgress(total, completed, filter) {
+        const completedEl = document.getElementById('storiesCompletedCount');
+        const totalEl = document.getElementById('storiesTotalCount');
+        const statusEl = document.querySelector('.stories-title-status');
+        
+        if (completedEl) completedEl.textContent = completed;
+        if (totalEl) totalEl.textContent = total;
+        if (statusEl) {
+            const viewLabel = filter === 'inProgress' ? '进行中' : '待开始';
+            statusEl.innerHTML = `${viewLabel} <span class="stories-count-circle" id="storiesTotalCount">${total}</span> 个故事`;
+        }
+    }
+    
+    
+    // 全局视图：标记完成
+    toggleStoryCompletionGlobal(dateStr, index) {
+        const allData = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+        const stories = allData[dateStr];
+        if (!stories || !stories[index]) return;
+        
+        stories[index].completed = !stories[index].completed;
+        if (stories[index].completed) {
+            stories[index].completedAt = new Date().toISOString();
+        } else {
+            stories[index].completedAt = null;
+        }
+        
+        localStorage.setItem(this.storageKey, JSON.stringify(allData));
+        
+        // 同步到云端
+        if (window.syncAdapter && window.cloudSync.isLoggedIn) {
+            const storiesForCloud = stories.map((s, idx) => ({
+                story_index: idx + 1,
+                title: s.title || '',
+                content: JSON.stringify(s),
+                value_dim: s.value || '',
+                completed: s.completed ? 1 : 0,
+                _localUpdatedAt: new Date().toISOString()
+            }));
+            window.syncAdapter.saveStories(dateStr, storiesForCloud).catch(() => {});
+        }
+        
+        // 重新渲染当前视图
+        this.updateUIForGlobalView(this.currentView);
+        this.updateBadge();
+        
+        // 成就检查
+        if (stories[index].completed && this.achievementSystem) {
+            this.achievementSystem.addExp(10);
+        }
+    }
+    
+    // 全局视图：番茄钟
+    linkToPomodoroGlobal(dateStr, index) {
+        const allData = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+        const stories = allData[dateStr];
+        if (!stories || !stories[index]) return;
+        
+        const story = stories[index];
+        if (this.pomodoroTimer) {
+            if (this.pomodoroTimer.isRunning) {
+                alert('番茄钟正在运行中');
+                return;
+            }
+            this.pomodoroTimer._currentStoryDate = dateStr;
+            this.pomodoroTimer._currentStoryIndex = index;
+            this.pomodoroTimer.startPomodoro();
+        }
+    }
+    
+    // 全局视图：查看故事详情（只读弹窗）
+    showStoryDetailGlobal(dateStr, index) {
+        const allData = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+        const stories = allData[dateStr];
+        if (!stories || !stories[index]) return;
+        
+        const story = stories[index];
+        const vDef = this.values.find(v => v.name === story.value) || 
+            { name: '未分类', color: '#95a5a6', emoji: '⭐' };
+        
+        const overlay = document.getElementById('storyModalOverlay');
+        if (!overlay) return;
+        
+        overlay.classList.add('active');
+        
+        const titleInput = document.getElementById('storyModalTitle');
+        const storyInput = document.getElementById('storyModalStory');
+        const deleteBtn = document.getElementById('storyModalDelete');
+        const saveBtn = document.getElementById('storyModalSave');
+        
+        if (titleInput) titleInput.value = story.title || '';
+        if (storyInput) storyInput.value = story.story || '';
+        
+        // 只读模式
+        if (titleInput) titleInput.readOnly = true;
+        if (storyInput) storyInput.readOnly = true;
+        if (deleteBtn) deleteBtn.style.display = 'none';
+        if (saveBtn) saveBtn.style.display = 'none';
+        
+        // 设置维度
+        document.querySelectorAll('#storyModalValues .value-tag').forEach(tag => {
+            tag.classList.toggle('active', tag.dataset.value === story.value);
+        });
+        
+        // 添加来源日期信息
+        const existingInfo = document.getElementById('storyModalDateInfo');
+        if (existingInfo) existingInfo.remove();
+        
+        const dateInfo = document.createElement('div');
+        dateInfo.id = 'storyModalDateInfo';
+        dateInfo.style.cssText = 'text-align:center;font-size:12px;color:#999;margin-top:8px;';
+        const today = this.getTodayString();
+        let dateLabel = dateStr === today ? '今天' : this.formatDate(dateStr);
+        dateInfo.textContent = `📅 来源：${dateLabel}`;
+        
+        const storyInputEl = document.getElementById('storyModalStory');
+        if (storyInputEl && storyInputEl.parentElement) {
+            storyInputEl.parentElement.appendChild(dateInfo);
+        }
     }
     
     // 切换面板显示
@@ -896,10 +1224,12 @@ class DailyStories {
         const panel = document.getElementById('storiesPanel');
         
         if (this.isOpen) {
-            // 每次打开都回到今天
+            // 每次打开都回到今天视图
+            this.currentView = 'today';
             this.viewingDate = this.currentDate;
             this.stories = this.loadStoriesForDate(this.currentDate);
             this.applyPanelBackground();
+            
             // 清除内联隐藏样式（CSS 类接管控制）
             panel.style.opacity = '';
             panel.style.visibility = '';
@@ -908,6 +1238,16 @@ class DailyStories {
             this.updateDateNav();
             this.updateFocusDisplay();
             
+            // 重置视图tab激活状态
+            document.querySelectorAll('.stories-view-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.view === 'today');
+            });
+            // 恢复日期导航和焦点显示
+            const dateNav = document.querySelector('.stories-date-nav');
+            const focusDisplay = document.getElementById('storiesFocusDisplay');
+            if (dateNav) dateNav.style.display = '';
+            if (focusDisplay) focusDisplay.style.display = '';
+
             // 首次打开且未设置焦点维度，弹出引导
             if (!this.hasFocusValues()) {
                 setTimeout(() => this.showFocusGuide(), 400);
@@ -2120,5 +2460,3 @@ class DailyStories {
     }
 }
 
-// 挂载到全局，供插件系统引用
-window.DailyStories = DailyStories;
