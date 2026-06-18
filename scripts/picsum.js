@@ -212,8 +212,15 @@ class PicsumManager {
         }, 100);
     }
 
-    // 更新收藏夹面板
+    // 更新收藏夹面板（带防抖）
     updateFavoritesPanel() {
+        if (this._updateFavTimer) clearTimeout(this._updateFavTimer);
+        this._updateFavTimer = setTimeout(() => {
+            this._doUpdateFavoritesPanel();
+        }, 50);
+    }
+
+    _doUpdateFavoritesPanel() {
         const container = document.getElementById('picsumFavoritesContainer');
         if (!container) return;
 
@@ -228,11 +235,11 @@ class PicsumManager {
             return;
         }
 
-        // 显示收藏的图片（最新的在前面）
+        // 显示收藏的图片（最新的在前面），使用 <img loading="lazy"> 懒加载
         const sortedFavorites = [...this.favorites].reverse();
         container.innerHTML = sortedFavorites.map((fav, index) => `
             <div class="favorite-item" data-id="${fav.id}" data-index="${this.favorites.length - 1 - index}">
-                <div class="favorite-preview" style="background-image: url('${fav.url}');"></div>
+                <img class="favorite-preview" src="${fav.url}" loading="lazy" decoding="async" alt="收藏 ${index + 1}" />
                 <div class="favorite-actions">
                     <button class="favorite-use-btn" title="使用此图片">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -248,24 +255,28 @@ class PicsumManager {
             </div>
         `).join('');
 
-        // 绑定事件
-        container.querySelectorAll('.favorite-use-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const item = e.target.closest('.favorite-item');
-                const index = parseInt(item.dataset.index);
-                this.useFavoriteImage(index);
+        // 事件委托：只在首次绑定一次，后续不再重复绑定
+        if (!this._favPanelDelegated) {
+            container.addEventListener('click', (e) => {
+                const useBtn = e.target.closest('.favorite-use-btn');
+                if (useBtn) {
+                    e.stopPropagation();
+                    const item = useBtn.closest('.favorite-item');
+                    const index = parseInt(item.dataset.index);
+                    this.useFavoriteImage(index);
+                    return;
+                }
+                const deleteBtn = e.target.closest('.favorite-delete-btn');
+                if (deleteBtn) {
+                    e.stopPropagation();
+                    const item = deleteBtn.closest('.favorite-item');
+                    const index = parseInt(item.dataset.index);
+                    this.deleteFavorite(index);
+                    return;
+                }
             });
-        });
-
-        container.querySelectorAll('.favorite-delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const item = e.target.closest('.favorite-item');
-                const index = parseInt(item.dataset.index);
-                this.deleteFavorite(index);
-            });
-        });
+            this._favPanelDelegated = true;
+        }
     }
 
     // 使用收藏的图片

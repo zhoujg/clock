@@ -204,6 +204,12 @@ body {
 }
 
 @media (max-width: 480px) {
+    /* 时钟上移到约 1/3 处，避免与励志语重叠 */
+    body {
+        align-items: flex-start;
+        padding-top: 26vh;
+    }
+
     .date-display {
         flex-direction: column;
         gap: 6px;
