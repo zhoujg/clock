@@ -123,7 +123,6 @@ class WeatherModule {
         if (dateDisplay && weekText) {
             const weatherHTML = `
                 <div class="weather-display" id="weatherDisplay">
-                    <div class="weather-icon" id="weatherIcon">☀️</div>
                     <div class="weather-info">
                         <div class="weather-temp" id="weatherTemp">--°</div>
                         <div class="weather-desc" id="weatherDesc">加载中...</div>

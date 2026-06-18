@@ -409,22 +409,8 @@ class SmartColorManager {
     
     // 调整天气组件颜色
     adjustWeatherColors(textColor, shadowColor) {
-        // 使用正确的选择器
         const weatherDisplay = document.querySelector('.weather-display');
-        if (!weatherDisplay) {
-            return;
-        }
-        
-        // 调整天气容器背景（根据模式调整透明度和模糊效果）
-        if (this.currentMode === 'dark') {
-            // 深色背景 - 使用浅色半透明容器
-            weatherDisplay.style.background = 'rgba(255, 255, 255, 0.12)';
-            weatherDisplay.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-        } else {
-            // 浅色背景 - 使用深色半透明容器
-            weatherDisplay.style.background = 'rgba(0, 0, 0, 0.12)';
-            weatherDisplay.style.borderColor = 'rgba(0, 0, 0, 0.2)';
-        }
+        if (!weatherDisplay) return;
         
         // 温度文字
         const tempElement = weatherDisplay.querySelector('.weather-temp');
@@ -438,14 +424,6 @@ class SmartColorManager {
         if (descElement) {
             descElement.style.color = textColor;
             descElement.style.textShadow = `0 1px 6px ${shadowColor}`;
-        }
-        
-        // 天气图标
-        const iconElement = weatherDisplay.querySelector('.weather-icon');
-        if (iconElement) {
-            iconElement.style.filter = this.currentMode === 'dark' 
-                ? 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5))' 
-                : 'drop-shadow(0 2px 8px rgba(255, 255, 255, 0.8))';
         }
     }
     
