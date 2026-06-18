@@ -382,6 +382,13 @@
                 _hideModal();
             }
         });
+
+        // 监听故事数据变更，自动刷新日历中的故事标记
+        document.addEventListener('stories-updated', () => {
+            if (_modalEl && _modalEl.style.display === 'flex') {
+                _render();
+            }
+        });
     }
 
     function _showModal() {
@@ -440,6 +447,16 @@
         const holidays = _getMonthHolidays(year, month, daysInMonth, _solarToLunar);
         const holidayMap = {};
         holidays.forEach(h => { holidayMap[h.day] = { name: h.name, type: h.type }; });
+
+        // 读取每日故事数据（松耦合，无数据则跳过）
+        let storiesData = {};
+        const hasStoriesInstalled = window.PluginManager && window.PluginManager.isInstalled('daily-stories');
+        if (hasStoriesInstalled) {
+            try {
+                const raw = localStorage.getItem('dailyStories');
+                if (raw) { storiesData = JSON.parse(raw); }
+            } catch (e) { /* 忽略解析错误 */ }
+        }
 
         // 构建日格
         const gridEl = document.getElementById('ccGrid');
@@ -540,6 +557,43 @@
                 termSpan.className = 'cc-term';
                 termSpan.textContent = termMap[dayNum];
                 inner.appendChild(termSpan);
+            }
+
+            // 故事标记点（松耦合，仅当 daily-stories 已安装且有数据时显示）
+            if (isCurrent && hasStoriesInstalled) {
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+                const dayStories = storiesData[dateStr];
+                if (dayStories && dayStories.length > 0) {
+                    const completed = dayStories.filter(s => s.completed).length;
+                    const total = dayStories.length;
+                    const allDone = completed === total;
+
+                    const dot = document.createElement('span');
+                    dot.className = 'cc-story-dot' + (allDone ? ' cc-story-done' : '');
+                    dot.textContent = allDone ? '' : String(total);
+                    dot.title = allDone
+                        ? `${total} 个故事全部完成 ✓`
+                        : `${completed}/${total} 个故事已完成`;
+
+                    // 点击跳转到每日故事
+                    cell.style.cursor = 'pointer';
+                    cell.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        _hideModal();
+                        if (window.dailyStoriesManager) {
+                            window.dailyStoriesManager.navigateToDate(dateStr);
+                            // 确保面板打开
+                            setTimeout(() => {
+                                const panel = document.getElementById('storiesPanel');
+                                if (panel && panel.style.display !== 'flex') {
+                                    window.dailyStoriesManager.togglePanel();
+                                }
+                            }, 150);
+                        }
+                    });
+
+                    inner.appendChild(dot);
+                }
             }
 
             cell.appendChild(inner);

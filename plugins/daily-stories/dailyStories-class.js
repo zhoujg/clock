@@ -283,6 +283,9 @@ window.DailyStories = class DailyStories {
             
             this.updateBadge();
 
+            // 通知其他插件数据已更新（如万年历刷新故事标记）
+            document.dispatchEvent(new CustomEvent('stories-updated'));
+
             // 同步到云端
             this._syncToCloud();
             

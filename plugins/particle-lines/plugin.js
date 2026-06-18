@@ -57,7 +57,7 @@
     let _bgmPlayer = null;
     let _algoIndex = 0;            // 当前选中的算法索引（-1 = 自动轮播）
     let _autoCycle = false;        // 自动轮播模式（循环切换所有算法）
-    let _transparent = false;      // 透明模式（不遮盖背景，默认不透明=有拖尾）
+    let _transparent = true;       // 透明模式（不遮盖背景，默认透明）
     let _transitionStart = 0;
     let _transitionDuration = 8000; // 自动轮播时每 8 秒切换
 
