@@ -84,11 +84,8 @@ class App {
         this.quoteManager = new QuoteManager();
         this.tickSoundManager = new TickSoundManager();
         this.bgmPlayerManager = null; // 由音乐播放器插件管理生命周期
-        this.achievementSystem = new AchievementSystem();
-        this.forestSystem = new ForestSystem(this.achievementSystem);
         
-        // 先创建一个占位的番茄钟（不传 dailyStories）
-        this.pomodoroTimer = new PomodoroTimer(clockManager, this.achievementSystem, this.forestSystem, null);
+        this.pomodoroTimer = new PomodoroTimer(clockManager, null);
         
         this.picsumManager = new PicsumManager(this.backgroundManager, this.settingsStorage);
         
@@ -176,8 +173,6 @@ class App {
         // 设置 dailyStories 的系统引用
         if (window.dailyStoriesManager.setSystemReferences) {
             window.dailyStoriesManager.setSystemReferences(
-                this.achievementSystem,
-                this.forestSystem,
                 this.pomodoroTimer
             );
             console.log('✅ 故事系统引用已设置');
@@ -354,7 +349,8 @@ class App {
             
             if (!e.target.closest('.controls') && 
                 !e.target.closest('.background-panel') && 
-                !e.target.closest('.pomodoro-container')) {
+                !e.target.closest('.pomodoro-container') &&
+                !e.target.closest('.bottom-toolbar')) {
                 settingsPanel.classList.remove('active');
                 settingsToggle.classList.remove('active');
                 if (backgroundPanel) {
@@ -751,10 +747,6 @@ class App {
                 } catch (e) {}
             }
 
-            // 刷新森林（如果已初始化）
-            if (this.forestSystem && this.forestSystem.updateUI) {
-                try { this.forestSystem.updateUI(); } catch (e) {}
-            }
         }
     }
 

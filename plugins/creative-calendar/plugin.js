@@ -298,16 +298,17 @@
 
     /* ────── UI ────── */
 
-    function _createSettingItem() {
+    function _createToolButton() {
         if (_settingItemEl) return;
-        const panelContent = document.querySelector('.settings-panel .panel-content');
-        if (!panelContent) return;
+        const toolbar = document.querySelector('.bottom-toolbar');
+        if (!toolbar) return;
 
-        _settingItemEl = document.createElement('div');
-        _settingItemEl.className = 'setting-item';
-        _settingItemEl.setAttribute('data-plugin-setting', PLUGIN_ID);
+        _settingItemEl = document.createElement('button');
+        _settingItemEl.id = 'ccToolBtn';
+        _settingItemEl.className = 'bottom-tool-btn';
+        _settingItemEl.title = '万年历';
         _settingItemEl.innerHTML = `
-            <span class="setting-icon">
+            <span class="tool-btn-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -315,16 +316,16 @@
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
             </span>
-            <span class="setting-text">万年历</span>
+            <span class="tool-btn-label">日历</span>
         `;
         _settingItemEl.addEventListener('click', (e) => {
             e.stopPropagation();
             _showModal();
         });
-        panelContent.appendChild(_settingItemEl);
+        toolbar.appendChild(_settingItemEl);
     }
 
-    function _removeSettingItem() {
+    function _removeToolButton() {
         if (_settingItemEl) { _settingItemEl.remove(); _settingItemEl = null; }
     }
 
@@ -627,18 +628,18 @@
 
         onActivate: async function () {
             _ensureCSS();
-            _createSettingItem();
+            _createToolButton();
         },
 
         onDeactivate: async function () {
             _hideModal();
-            _removeSettingItem();
+            _removeToolButton();
         },
 
         onUninstall: async function () {
             _hideModal();
             _removeCSS();
-            _removeSettingItem();
+            _removeToolButton();
             if (_modalEl) { _modalEl.remove(); _modalEl = null; }
             if (_overlayEl) { _overlayEl.remove(); _overlayEl = null; }
         }

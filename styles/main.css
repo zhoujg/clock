@@ -116,7 +116,7 @@ body {
 /* 励志语样式 */
 .quote-container {
     position: fixed;
-    bottom: 12%;
+    bottom: 16%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;
@@ -264,7 +264,7 @@ body {
     
     /* 励志语 - 缩小并降低位置 */
     .quote-container {
-        bottom: 5%;
+        bottom: 8%;
         max-width: 70%;
     }
     
@@ -311,7 +311,7 @@ body {
     }
     
     .quote-container {
-        bottom: 3%;
+        bottom: 6%;
         max-width: 65%;
     }
     

@@ -1,18 +1,15 @@
 /* 每日三个故事 - 浅色扁平现代风格 */
 
 /* ============================
-   故事按钮（右下角）
+   故事按钮（底部工具栏内）
    ============================ */
 .stories-main-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
     width: 56px;
     height: 56px;
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    color: #374151;
+    border: none;
+    background: none;
+    color: #86868b;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -20,21 +17,18 @@
     justify-content: center;
     gap: 2px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    z-index: 1500;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 0;
+    position: relative;
 }
 
 .stories-main-btn:hover {
-    transform: scale(1.08) translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    background: rgba(255, 255, 255, 1);
+    transform: scale(1.08);
+    color: #1d1d1f;
 }
 
 .stories-main-btn:active {
-    transform: scale(1.03) translateY(-1px);
+    transform: scale(0.95);
     transition: all 0.1s ease;
 }
 
@@ -42,7 +36,7 @@
     width: 24px;
     height: 24px;
     line-height: 1;
-    color: #6366f1;
+    color: currentColor;
 }
 
 .stories-main-text {
@@ -50,7 +44,7 @@
     font-weight: 500;
     letter-spacing: 0.5px;
     line-height: 1;
-    color: #6b7280;
+    color: currentColor;
 }
 
 /* 徽章 */
@@ -414,29 +408,24 @@ body.stories-dark .story-modal-delete:hover {
 /* 面板头部 */
 .stories-panel-header {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    padding: 20px 24px 14px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px 10px;
     background: transparent;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 10;
 }
 
-/* 头部左侧内容区 - 完整宽度，垂直排列 */
-.stories-header-left {
+/* 头部右侧操作按钮组 */
+.stories-header-actions {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    padding-right: 44px; /* 仅关闭按钮占位 */
+    align-items: center;
+    gap: 6px;
 }
 
-/* 关闭按钮 - 绝对定位右上角 */
+/* 关闭按钮 */
 .stories-close-btn {
-    position: absolute;
-    top: 18px;
-    right: 18px;
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -449,7 +438,7 @@ body.stories-dark .story-modal-delete:hover {
     justify-content: center;
     transition: all 0.2s ease;
     padding: 0;
-    z-index: 2;
+    flex-shrink: 0;
 }
 
 .stories-close-btn:hover {
@@ -457,23 +446,22 @@ body.stories-dark .story-modal-delete:hover {
     color: #ff3b30;
 }
 
-/* 统计/回顾按钮 - 内嵌于 date-nav 行内 */
+/* 统计/回顾按钮 */
 .stories-stats-btn,
 .stories-review-btn {
     width: 32px;
-    height: 30px;
+    height: 32px;
     border-radius: 8px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     background: transparent;
     color: #86868b;
     cursor: pointer;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
     padding: 0;
     flex-shrink: 0;
-    vertical-align: middle;
 }
 
 .stories-stats-btn:hover {
@@ -490,13 +478,11 @@ body.stories-dark .story-modal-delete:hover {
 
 /* 分隔线：状态按钮与统计/回顾按钮之间 */
 .stories-header-sep {
-    display: inline-block;
     width: 1px;
     height: 18px;
     background: rgba(0, 0, 0, 0.1);
     margin: 0 4px;
-    align-self: center;
-    vertical-align: middle;
+    flex-shrink: 0;
 }
 
 .stories-panel.dark-bg .stories-header-sep {
@@ -600,7 +586,7 @@ body.stories-dark .story-modal-delete:hover {
    故事列表 - 双列卡片网格
    ============================ */
 .stories-list {
-    padding: 16px 24px 40px;
+    padding: 10px 24px 100px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
@@ -2398,26 +2384,26 @@ body.stories-dark .stories-review-panel .review-empty {
    ============================ */
 @media (max-width: 768px) {
     .stories-main-btn {
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
+        width: 48px;
+        height: 48px;
         border-radius: 14px;
     }
     
     .stories-main-icon {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
     }
     
     .stories-main-text {
         font-size: 9px;
     }
     
-    .stories-panel-header,
+    .stories-panel-header {
+        padding: 14px 16px 8px;
+    }
+    
     .stories-list {
-        padding-left: 16px;
-        padding-right: 16px;
+        padding: 8px 16px 100px;
     }
     
     /* 标题已移除 */
@@ -2441,11 +2427,9 @@ body.stories-dark .stories-review-panel .review-empty {
 
 @media (max-width: 480px) {
     .stories-main-btn {
-        bottom: 15px;
-        right: 15px;
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
     }
     
     .stories-main-icon {
@@ -2463,9 +2447,15 @@ body.stories-dark .stories-review-panel .review-empty {
         min-width: 16px;
     }
     
-    /* 手机竖屏：标题更紧凑 */
-    .stories-panel-header {
-        padding: 10px 12px;
+    /* 手机竖屏：底部工具栏更紧凑 */
+    .stories-bottom-bar {
+        padding: 8px 12px;
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+    
+    .stories-bottom-nav {
+        gap: 4px;
+        padding: 3px 6px;
     }
     
     .stories-header-title {
@@ -2508,11 +2498,32 @@ body.stories-dark .stories-review-panel .review-empty {
     }
 }
     
-/* 日期导航 */
-.stories-date-nav {
+/* ============================
+   底部工具栏
+   ============================ */
+.stories-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 24px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+}
+
+.stories-bottom-nav {
     display: flex;
     align-items: center;
     gap: 6px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 14px;
+    padding: 4px 8px;
 }
 
 .stories-date-btn {
@@ -2548,13 +2559,14 @@ body.stories-dark .stories-review-panel .review-empty {
     font-size: 14px;
     font-weight: 600;
     color: var(--stories-panel-text, #1d1d1f);
-    min-width: 100px;
+    min-width: 80px;
     text-align: center;
     padding: 4px 12px;
     border-radius: 8px;
     background: rgba(0, 113, 227, 0.06);
     cursor: pointer;
     transition: background 0.2s ease;
+    white-space: nowrap;
 }
 
 .stories-date-label:hover {
@@ -2574,7 +2586,16 @@ body.stories-dark .stories-review-panel .review-empty {
     color: #005bb5;
 }
 
-/* 深色模式日期导航 */
+/* 深色模式底部工具栏 */
+.stories-panel.dark-bg .stories-bottom-bar {
+    background: rgba(30, 41, 59, 0.92);
+    border-top-color: rgba(71, 85, 105, 0.5);
+}
+
+.stories-panel.dark-bg .stories-bottom-nav {
+    background: rgba(71, 85, 105, 0.3);
+}
+
 .stories-panel.dark-bg .stories-date-btn {
     background: rgba(71, 85, 105, 0.6);
     border-color: rgba(100, 116, 139, 0.5);
@@ -3028,10 +3049,9 @@ body.stories-dark .stories-review-panel .review-empty {
 /* 横屏模式适配 */
 @media (max-height: 500px) and (orientation: landscape) {
     .stories-main-btn {
-        bottom: 15px;
-        right: 20px;
-        width: 46px;
-        height: 46px;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
     }
     
     .stories-main-icon {
@@ -3045,19 +3065,18 @@ body.stories-dark .stories-review-panel .review-empty {
 }
 
 /* ============================
-   状态筛选按钮（内嵌于 date-nav）
+   状态筛选按钮（底部工具栏内）
    ============================ */
 .stories-status-sep {
-    display: inline-block;
     width: 1px;
     height: 18px;
     background: rgba(0, 0, 0, 0.1);
     margin: 0 4px;
-    align-self: center;
+    flex-shrink: 0;
 }
 
 .stories-status-btn {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     height: 30px;
@@ -3071,7 +3090,8 @@ body.stories-dark .stories-review-panel .review-empty {
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    gap: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .stories-status-btn:hover {
@@ -3086,8 +3106,8 @@ body.stories-dark .stories-review-panel .review-empty {
     font-weight: 600;
 }
 
-/* 非今天视图：仅隐藏分隔线，日期导航按钮保持可见 */
-.stories-date-nav.in-global-view .stories-status-sep {
+/* 非今天视图：仅隐藏分隔线，底部导航按钮保持可见 */
+.stories-bottom-nav.in-global-view .stories-status-sep {
     display: none;
 }
 

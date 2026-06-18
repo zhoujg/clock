@@ -8,13 +8,13 @@
 
 ## 数据库表
 - `users` — 用户（email, bcrypt密码）
-- `user_data` — 键值对配置（settings, picsumFavorites, musicFavorites, forestData, studyAchievements, pomodoroData）
+- `user_data` — 键值对配置（settings, picsumFavorites, musicFavorites, pomodoroData）
 - `stories` — 每日故事（独立表，支持增量同步、按日期查询）
 
 ## 前端模块加载顺序
 1. flip.min.js → storage.js → particle/animation/background/quotes/tickSound
 2. jamendoAPI.js → bgmPlayer.js
-3. achievement → forest → pomodoro → weather → picsum → smartColor → dailyStories
+3. pomodoro → weather → picsum → smartColor → dailyStories
 4. cloudSync.js → syncAdapter.js → authUI.js → app.js
 
 ## 已修复的问题

@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conflicts = [];   // 冲突的数据 key
     $saved = [];       // 成功保存的 key
     $now = date('Y-m-d H:i:s');
-    $validKeys = ['settings', 'picsumFavorites', 'musicFavorites', 'forestData', 'achievements', 'pomodoroData'];
+    $validKeys = ['settings', 'picsumFavorites', 'musicFavorites', 'pomodoroData'];
 
     foreach ($inputData as $key => $value) {
         if (!in_array($key, $validKeys, true)) {

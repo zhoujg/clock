@@ -11,8 +11,6 @@ window.DailyStories = class DailyStories {
         this.focusValues = this.loadFocusValues(); // 焦点维度列表
         
         // 引用外部系统
-        this.achievementSystem = null;
-        this.forestSystem = null;
         this.pomodoroTimer = null;
         
         // 预设生活方向盘维度
@@ -31,9 +29,7 @@ window.DailyStories = class DailyStories {
     }
     
     // 设置外部系统引用（在 app.js 中初始化后调用）
-    setSystemReferences(achievement, forest, pomodoro) {
-        this.achievementSystem = achievement;
-        this.forestSystem = forest;
+    setSystemReferences(pomodoro) {
         this.pomodoroTimer = pomodoro;
     }
     
@@ -159,8 +155,8 @@ window.DailyStories = class DailyStories {
             document.querySelectorAll('.stories-status-btn').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.view === 'today');
             });
-            const dateNav = document.querySelector('.stories-date-nav');
-            if (dateNav) dateNav.classList.remove('in-global-view');
+            const bottomNav = document.querySelector('.stories-bottom-nav');
+            if (bottomNav) bottomNav.classList.remove('in-global-view');
             const focusDisplay = document.getElementById('storiesFocusDisplay');
             if (focusDisplay) focusDisplay.style.display = '';
         }
@@ -345,10 +341,15 @@ window.DailyStories = class DailyStories {
             <span class="stories-badge" id="storiesBadge">0/3</span>
         `;
         
-        // 直接添加到 body（先隐藏，等待 CSS 加载完成后显示）
+        // 添加到底部工具栏
         toggleBtn.style.opacity = '0';
         toggleBtn.style.visibility = 'hidden';
-        document.body.appendChild(toggleBtn);
+        const toolbar = document.querySelector('.bottom-toolbar');
+        if (toolbar) {
+            toolbar.appendChild(toggleBtn);
+        } else {
+            document.body.appendChild(toggleBtn);
+        }
         // 等待一帧，让 CSS 生效后再显示按钮（避免未样式化的闪烁）
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -365,42 +366,44 @@ window.DailyStories = class DailyStories {
         panel.style.visibility = 'hidden';
         panel.innerHTML = `
             <div class="stories-panel-header">
-                <div class="stories-header-left">
-                    <div class="stories-date-nav">
-                        <button class="stories-date-btn stories-date-prev" id="storiesDatePrev" title="前一天">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-                        </button>
-                        <span class="stories-date-label" id="storiesDateLabel">今天</span>
-                        <button class="stories-date-btn stories-date-next" id="storiesDateNext" title="后一天" disabled>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
-                        </button>
-                        <span class="stories-status-sep"></span>
-                        <button class="stories-status-btn" data-view="inProgress">进行中</button>
-                        <button class="stories-status-btn" data-view="pending">待开始</button>
-                        <span class="stories-header-sep"></span>
-                        <button class="stories-stats-btn" id="storiesStatsBtn" title="统计数据">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-                            </svg>
-                        </button>
-                        <button class="stories-review-btn" id="storiesReviewBtn" title="周回顾">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="stories-focus-display" id="storiesFocusDisplay" title="点击修改焦点维度">
-                    </div>
+                <div class="stories-focus-display" id="storiesFocusDisplay" title="点击修改焦点维度">
                 </div>
-                <button class="stories-close-btn" id="storiesClose">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                    </svg>
-                </button>
+                <div class="stories-header-actions">
+                    <button class="stories-stats-btn" id="storiesStatsBtn" title="统计数据">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                        </svg>
+                    </button>
+                    <button class="stories-review-btn" id="storiesReviewBtn" title="周回顾">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                    </button>
+                    <button class="stories-close-btn" id="storiesClose">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
             
             <div class="stories-list" id="storiesList">
                 <!-- 故事卡片列表 -->
+            </div>
+
+            <div class="stories-bottom-bar">
+                <div class="stories-bottom-nav">
+                    <button class="stories-date-btn" id="storiesDatePrev" title="前一天">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                    </button>
+                    <span class="stories-date-label" id="storiesDateLabel">今天</span>
+                    <button class="stories-date-btn" id="storiesDateNext" title="后一天" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+                    </button>
+                    <span class="stories-status-sep"></span>
+                    <button class="stories-status-btn" data-view="inProgress">进行中</button>
+                    <button class="stories-status-btn" data-view="pending">待开始</button>
+                </div>
             </div>
         `;
         
@@ -924,9 +927,9 @@ window.DailyStories = class DailyStories {
             this.showFocusEditor();
         });
         
-        // 视图状态筛选按钮（在 date-nav 内）
-        const dateNav = document.querySelector('.stories-date-nav');
-        dateNav?.addEventListener('click', (e) => {
+        // 视图状态筛选按钮（在 bottom-nav 内）
+        const bottomNav = document.querySelector('.stories-bottom-nav');
+        bottomNav?.addEventListener('click', (e) => {
             const btn = e.target.closest('.stories-status-btn');
             if (btn) {
                 this.switchView(btn.dataset.view);
@@ -945,12 +948,12 @@ window.DailyStories = class DailyStories {
         });
         
         const isTodayView = view === 'today';
-        const dateNav = document.querySelector('.stories-date-nav');
+        const bottomNav = document.querySelector('.stories-bottom-nav');
         const focusDisplay = document.getElementById('storiesFocusDisplay');
         
-        // 非今天视图隐藏焦点维度，日期导航按钮保持可见
-        if (dateNav) {
-            dateNav.classList.toggle('in-global-view', !isTodayView);
+        // 非今天视图隐藏焦点维度，底部导航按钮保持可见
+        if (bottomNav) {
+            bottomNav.classList.toggle('in-global-view', !isTodayView);
         }
         if (focusDisplay) focusDisplay.style.display = isTodayView ? '' : 'none';
         
@@ -1144,11 +1147,6 @@ window.DailyStories = class DailyStories {
         // 重新渲染当前视图
         this.updateUIForGlobalView(this.currentView);
         this.updateBadge();
-        
-        // 成就检查
-        if (stories[index].completed && this.achievementSystem) {
-            this.achievementSystem.addExp(10);
-        }
     }
     
     // 全局视图：番茄钟
@@ -1287,9 +1285,9 @@ window.DailyStories = class DailyStories {
                 tab.classList.toggle('active', tab.dataset.view === 'today');
             });
             // 恢复日期导航和焦点显示
-            const dateNav = document.querySelector('.stories-date-nav');
+            const bottomNav = document.querySelector('.stories-bottom-nav');
             const focusDisplay = document.getElementById('storiesFocusDisplay');
-            if (dateNav) dateNav.style.display = '';
+            if (bottomNav) bottomNav.style.display = '';
             if (focusDisplay) focusDisplay.style.display = '';
 
             // 首次打开且未设置焦点维度，弹出引导
@@ -1614,14 +1612,6 @@ window.DailyStories = class DailyStories {
         if (newCompleted) {
             this.playCompletionAnimation(index);
             
-            // 触发成就检查
-            this.checkStoryAchievements();
-            
-            // 种植特殊金色树木（如果有森林系统）
-            if (this.forestSystem && story.title) {
-                this.plantSpecialTree(story);
-            }
-            
             // 检查是否全部完成
             const allCompleted = this.stories.every(s => s.completed);
             if (allCompleted) {
@@ -1776,60 +1766,6 @@ window.DailyStories = class DailyStories {
         }, 3000);
     }
     
-    // 种植特殊树木
-    plantSpecialTree(story) {
-        // 创建一个特殊的"故事完成"事件，种植金色树
-        if (this.forestSystem) {
-            // 暂时使用模拟方式，未来可以扩展森林系统支持特殊树木类型
-            console.log(`🌟 完成故事"${story.title}"，获得特殊奖励！`);
-            
-            // 可以在这里添加额外的经验值
-            if (this.achievementSystem) {
-                this.achievementSystem.addExp(30); // 完成故事额外30经验
-            }
-        }
-    }
-    
-    // 检查故事相关成就
-    checkStoryAchievements() {
-        if (!this.achievementSystem) return;
-        
-        // 检查今日完成的故事数
-        const todayCompleted = this.stories.filter(s => s.completed).length;
-        const todayTotal = this.stories.length;
-        
-        // 统计历史数据
-        const allData = localStorage.getItem(this.storageKey);
-        if (allData) {
-            const data = JSON.parse(allData);
-            const dates = Object.keys(data);
-            
-            // 统计完成所有故事的天数
-            let perfectDays = 0;
-            let totalStories = 0;
-            
-            dates.forEach(date => {
-                const dayStories = data[date];
-                const completed = dayStories.filter(s => s.completed).length;
-                const total = dayStories.length;
-                totalStories += completed;
-                
-                if (total > 0 && completed === total) {
-                    perfectDays++;
-                }
-            });
-            
-            // 触发成就系统的故事相关成就检查
-            if (this.achievementSystem.checkStoriesAchievements) {
-                this.achievementSystem.checkStoriesAchievements({
-                    todayCompleted,
-                    todayTotal,
-                    perfectDays,
-                    totalStories
-                });
-            }
-        }
-    }
     
     // 更新故事字段
     updateStoryField(index, field, value) {
@@ -1883,11 +1819,6 @@ window.DailyStories = class DailyStories {
                 celebration.remove();
             }, 300);
         });
-        
-        // 可能触发成就系统（如果存在）
-        if (this.achievementSystem) {
-            this.achievementSystem.addExp(50);
-        }
     }
     
     // 显示欢迎提示

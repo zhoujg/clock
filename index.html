@@ -17,8 +17,6 @@
     <link rel="stylesheet" href="styles/main.css?v=20260617a" />
     <link rel="stylesheet" href="styles/controls.css?v=20260617a" />
     <link rel="stylesheet" href="styles/pomodoro.css?v=20260617a" />
-    <link rel="stylesheet" href="styles/achievement.css?v=20260617a" />
-    <link rel="stylesheet" href="styles/forest.css?v=20260617a" />
     <link rel="stylesheet" href="styles/weather.css?v=20260617a" />
     <link rel="stylesheet" href="styles/background-panel.css?v=20260617a" />
     <link rel="stylesheet" href="styles/pluginLibrary.css?v=20260617a" />
@@ -27,18 +25,6 @@
 <body>
     <!-- 控制面板 -->
     <div class="controls">
-        <!-- 成就按钮 -->
-        <button id="achievementToggle" class="control-btn achievement-toggle" title="学习成就">
-            🏆
-            <span class="achievement-badge" id="achievementBadge">0</span>
-        </button>
-        
-        <!-- 番茄钟按钮 -->
-        <button id="pomodoroToggle" class="control-btn" title="番茄钟">
-            🍅
-            <span class="pomodoro-status-indicator" id="statusIndicator"></span>
-        </button>
-        
         <!-- 设置按钮 -->
         <button id="settingsToggle" class="control-btn" title="设置">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -85,68 +71,6 @@
             </div>
         </div>
         
-        <!-- 番茄钟面板 -->
-        <div class="pomodoro-panel" id="pomodoroPanel">
-            <div class="panel-header">
-                <span>🍅 番茄钟</span>
-                <button class="panel-close-btn" id="pomodoroClose" title="关闭">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="panel-content">
-                <div class="pomodoro-modes">
-                    <button class="mode-btn active" data-mode="work">
-                        <span>工作</span>
-                        <small>25分钟</small>
-                    </button>
-                    <button class="mode-btn" data-mode="shortBreak">
-                        <span>短休息</span>
-                        <small>5分钟</small>
-                    </button>
-                    <button class="mode-btn" data-mode="longBreak">
-                        <span>长休息</span>
-                        <small>15分钟</small>
-                    </button>
-                </div>
-                <div class="pomodoro-custom">
-                    <label for="customMinutes">自定义时长（分钟）</label>
-                    <div class="custom-input-wrapper">
-                        <input type="number" id="customMinutes" min="1" max="180" placeholder="输入分钟数" />
-                        <button class="custom-start-btn" id="customStartBtn">开始</button>
-                    </div>
-                </div>
-                <div class="pomodoro-progress-bar">
-                    <div class="pomodoro-progress-fill" id="progressFill"></div>
-                </div>
-                <div class="pomodoro-controls">
-                    <button class="pomodoro-btn start" id="pomodoroStart">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                        </svg>
-                    </button>
-                    <button class="pomodoro-btn pause" id="pomodoroPause" style="display: none;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <rect x="6" y="4" width="4" height="16"></rect>
-                            <rect x="14" y="4" width="4" height="16"></rect>
-                        </svg>
-                    </button>
-                    <button class="pomodoro-btn reset" id="pomodoroReset">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="1 4 1 10 7 10"></polyline>
-                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="pomodoro-sessions">
-                    <span>已完成 </span>
-                    <span id="sessionCount">0</span>
-                    <span> 个番茄</span>
-                </div>
-            </div>
-        </div>
-        
     </div>
 
     <!-- 动画线条容器 -->
@@ -165,19 +89,6 @@
             <span data-key="hours" data-transform="pad(00)" data-view="flip"></span>
             <span data-key="minutes" data-transform="pad(00)" data-view="flip"></span>
             <span data-key="seconds" data-transform="pad(00)" data-view="flip"></span>
-        </div>
-    </div>
-    
-    <!-- 成长中的树苗显示 -->
-    <div class="growing-tree-display" id="growingTreeDisplay" style="display: none;">
-        <div class="tree-growing-animation">
-            <div class="tree-icon-large" id="treeIconLarge">🌱</div>
-            <div class="tree-growth-info">
-                <div class="tree-type-name" id="treeTypeName">小树苗</div>
-                <div class="tree-progress-mini">
-                    <div class="tree-progress-mini-fill" id="treeProgressMiniFill"></div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -339,8 +250,6 @@
     <script src="scripts/tickSound.js?v=20260620v"></script>
     <script src="scripts/jamendoAPI.js?v=20260620v"></script>
     <script src="scripts/bgmPlayer.js?v=20260620v"></script>
-    <script src="scripts/achievement.js?v=20260620v"></script>
-    <script src="scripts/forest.js?v=20260620v"></script>
     <script src="scripts/pomodoro.js?v=20260620v"></script>
     <script src="scripts/weather.js?v=20260620v"></script>
     <script src="scripts/picsum.js?v=20260620v"></script>
@@ -352,5 +261,14 @@
     <script src="scripts/authUI.js?v=20260617a"></script>
     <script src="scripts/app.js?v=20260617a"></script>
     <script src="scripts/pluginLibraryUI.js?v=20260620v"></script>
+    <!-- 底部工具栏 -->
+    <div class="bottom-toolbar">
+        <button id="pomodoroToggle" class="bottom-tool-btn" title="番茄钟">
+            <span class="tool-btn-icon">🍅</span>
+            <span class="tool-btn-label">番茄</span>
+            <span class="pomodoro-status-indicator" id="statusIndicator"></span>
+        </button>
+    </div>
+
 </body>
 </html>

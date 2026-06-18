@@ -126,31 +126,32 @@
 
     /* ────── DOM 创建 ────── */
 
-    function _createSettingItem() {
+    function _createToolButton() {
         if (_settingItemEl) return;
-        const panelContent = document.querySelector('.settings-panel .panel-content');
-        if (!panelContent) return;
+        const toolbar = document.querySelector('.bottom-toolbar');
+        if (!toolbar) return;
 
-        _settingItemEl = document.createElement('div');
-        _settingItemEl.className = 'setting-item';
-        _settingItemEl.setAttribute('data-plugin-setting', PLUGIN_ID);
+        _settingItemEl = document.createElement('button');
+        _settingItemEl.id = 'halftimeBtn';
+        _settingItemEl.className = 'bottom-tool-btn';
+        _settingItemEl.title = '此间半刻';
         _settingItemEl.innerHTML = `
-            <span class="setting-icon">
+            <span class="tool-btn-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
             </span>
-            <span class="setting-text">此间半刻</span>
+            <span class="tool-btn-label">半刻</span>
         `;
         _settingItemEl.addEventListener('click', (e) => {
             e.stopPropagation();
             _showModal();
         });
-        panelContent.appendChild(_settingItemEl);
+        toolbar.appendChild(_settingItemEl);
     }
 
-    function _removeSettingItem() {
+    function _removeToolButton() {
         if (_settingItemEl) {
             _settingItemEl.remove();
             _settingItemEl = null;
@@ -630,20 +631,20 @@
         onActivate: async function () {
             console.log('[此间半刻] 激活...');
             _loadSettings();
-            _createSettingItem();
+            _createToolButton();
             console.log('[此间半刻] 已激活');
         },
 
         onDeactivate: async function () {
             console.log('[此间半刻] 停用...');
             _hideModal();
-            _removeSettingItem();
+            _removeToolButton();
             console.log('[此间半刻] 已停用');
         },
 
         onUninstall: async function () {
             _hideModal();
-            _removeSettingItem();
+            _removeToolButton();
             if (_modalEl) { _modalEl.remove(); _modalEl = null; }
             if (_overlayEl) { _overlayEl.remove(); _overlayEl = null; }
             console.log('[此间半刻] 已卸载');

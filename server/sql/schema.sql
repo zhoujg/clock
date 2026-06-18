@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- ====================
 -- 用户配置表（轻量键值对）
--- data_key: settings / picsumFavorites / musicFavorites / forestData / achievements / pomodoroData
+-- data_key: settings / picsumFavorites / musicFavorites / pomodoroData
 -- ====================
 CREATE TABLE IF NOT EXISTS user_data (
     id          INT AUTO_INCREMENT PRIMARY KEY,

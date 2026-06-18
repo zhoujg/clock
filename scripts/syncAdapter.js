@@ -19,8 +19,6 @@ class SyncAdapter {
             settings:         'flipClockSettings',
             picsumFavorites:  'picsumFavorites',
             musicFavorites:   'musicFavorites',
-            forestData:       'forestData',
-            achievements:     'studyAchievements',
             pomodoroData:     'pomodoroData',
             installedPlugins: 'installedPlugins'
         };

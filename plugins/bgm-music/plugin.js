@@ -95,7 +95,7 @@
     </div>
 </div>`;
 
-    const MUSIC_BTN_HTML = '<button id="musicBtn" class="control-btn" title="音乐播放器">🎵</button>';
+    const MUSIC_BTN_HTML = '<button id="musicBtn" class="bottom-tool-btn" title="音乐播放器"><span class="tool-btn-icon">🎵</span><span class="tool-btn-label">音乐</span></button>';
 
     let _modalEl = null;
     let _btnEl = null;
@@ -156,17 +156,17 @@
     function _createUI() {
         // 创建按钮
         if (!document.getElementById('musicBtn')) {
-            const controlsBar = document.querySelector('.controls');
-            if (controlsBar) {
+            const toolbar = document.querySelector('.bottom-toolbar');
+            if (toolbar) {
                 const temp = document.createElement('div');
                 temp.innerHTML = MUSIC_BTN_HTML.trim();
                 _btnEl = temp.firstChild;
-                // 插入到设置按钮之前（靠左排放）
-                const settingsBtn = document.getElementById('settingsToggle');
-                if (settingsBtn) {
-                    controlsBar.insertBefore(_btnEl, settingsBtn);
+                // 插入到番茄钟之后
+                const pomodoroBtn = document.getElementById('pomodoroToggle');
+                if (pomodoroBtn && pomodoroBtn.nextSibling) {
+                    toolbar.insertBefore(_btnEl, pomodoroBtn.nextSibling);
                 } else {
-                    controlsBar.appendChild(_btnEl);
+                    toolbar.appendChild(_btnEl);
                 }
             }
         } else {

@@ -154,8 +154,6 @@ chmod 755 /www/wwwroot/neihou/public/clock
 - **设置**（flipClockSettings）→ 键值 `settings`
 - **背景收藏**（picsumFavorites）→ 键值 `picsumFavorites`
 - **音乐收藏**（musicFavorites）→ 键值 `musicFavorites`
-- **森林数据**（forestData）→ 键值 `forestData`
-- **成就**（studyAchievements）→ 键值 `achievements`
 - **番茄钟**（pomodoroData）→ 键值 `pomodoroData`
 
 ### 故事数据同步
