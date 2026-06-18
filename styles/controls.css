@@ -129,10 +129,9 @@
 .bottom-tool-btn {
     width: 56px;
     height: 56px;
-    border-radius: 16px;
     border: none;
     background: none;
-    color: #86868b;
+    color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -142,12 +141,10 @@
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     padding: 0;
-    position: relative;
 }
 
 .bottom-tool-btn:hover {
     transform: scale(1.08);
-    color: #1d1d1f;
 }
 
 .bottom-tool-btn:active {
@@ -826,7 +823,6 @@
     .bottom-tool-btn {
         width: 48px;
         height: 48px;
-        border-radius: 14px;
     }
 
     .tool-btn-icon {
@@ -849,7 +845,6 @@
     .bottom-tool-btn {
         width: 40px;
         height: 40px;
-        border-radius: 12px;
     }
 
     .tool-btn-icon {

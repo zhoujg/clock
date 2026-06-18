@@ -3,7 +3,7 @@ class QuoteManager {
     constructor() {
         this.quotes = [];
         this.currentQuoteIndex = 0;
-        this.displayDuration = 10000; // 10秒切换一次
+        this.displayDuration = 20000; // 10秒切换一次
         this.fadeDuration = 1000; // 1秒淡入淡出
         this.init();
     }

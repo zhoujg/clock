@@ -424,6 +424,20 @@ class WeatherModule {
                 weatherDisplay.style.opacity = '1';
             }, 100);
         }
+
+        // 触发 AI 天气解读（异步，不阻塞 UI）
+        if (window.AIContent && typeof window.AIContent.initWeatherInsight === 'function') {
+            // 延迟调用，让天气显示先完成
+            setTimeout(() => {
+                window.AIContent.initWeatherInsight({
+                    weather: data.type || data.description || '',
+                    temp: data.temperature || '',
+                    city: data.city || this.city || ''
+                }).catch(err => {
+                    console.warn('[Weather] AI 天气解读失败:', err);
+                });
+            }, 1200);
+        }
     }
     
     /**

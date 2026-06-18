@@ -355,6 +355,9 @@ class SmartColorManager {
         
         // 音乐播放器（如果存在）
         this.adjustMusicPlayerColors(textColor, shadowColor, borderColor);
+
+        // 底部工具栏按钮
+        this.adjustBottomToolbarColors(textColor, shadowColor);
     }
     
     // 调整时钟卡片颜色
@@ -571,6 +574,17 @@ class SmartColorManager {
         }        
     }
     
+    // 调整底部工具栏按钮颜色
+    adjustBottomToolbarColors(textColor, shadowColor) {
+        const btns = document.querySelectorAll('.bottom-tool-btn, .stories-main-btn');
+        if (!btns.length) return;
+
+        btns.forEach(btn => {
+            btn.style.color = textColor;
+            btn.style.textShadow = `0 1px 4px ${shadowColor}`;
+        });
+    }
+
     // 手动触发重新分析（供外部调用）
     refresh() {
         this.analyzeAndAdjust();

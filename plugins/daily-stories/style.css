@@ -6,10 +6,9 @@
 .stories-main-btn {
     width: 56px;
     height: 56px;
-    border-radius: 16px;
     border: none;
     background: none;
-    color: #86868b;
+    color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -24,7 +23,6 @@
 
 .stories-main-btn:hover {
     transform: scale(1.08);
-    color: #1d1d1f;
 }
 
 .stories-main-btn:active {
@@ -2386,18 +2384,17 @@ body.stories-dark .stories-review-panel .review-empty {
     .stories-main-btn {
         width: 48px;
         height: 48px;
-        border-radius: 14px;
     }
-    
+
     .stories-main-icon {
         width: 18px;
         height: 18px;
     }
-    
+
     .stories-main-text {
         font-size: 9px;
     }
-    
+
     .stories-panel-header {
         padding: 14px 16px 8px;
     }
@@ -2429,18 +2426,17 @@ body.stories-dark .stories-review-panel .review-empty {
     .stories-main-btn {
         width: 48px;
         height: 48px;
-        border-radius: 14px;
     }
-    
+
     .stories-main-icon {
         width: 18px;
         height: 18px;
     }
-    
+
     .stories-main-text {
         font-size: 8px;
     }
-    
+
     .stories-badge {
         font-size: 8px;
         padding: 1px 4px;

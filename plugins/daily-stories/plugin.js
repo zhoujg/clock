@@ -7,7 +7,7 @@
 
     const PLUGIN_ID = 'daily-stories';
     const CLASS_JS  = 'plugins/daily-stories/dailyStories-class.js';
-    const STYLE_CSS = 'plugins/daily-stories/style.css';
+    const STYLE_CSS = 'plugins/daily-stories/style.css?v=20260618f';
 
     let _classLoaded = false;
     let _loadPromise = null;

@@ -1,0 +1,70 @@
+/**
+ * AI 内容样式
+ * AI 语录徽章 + 天气解读
+ */
+
+/* ============================================
+   天气解读（绝对定位浮动卡片，不挤占日期行空间）
+   利用 .date-display 原有的 position: fixed 作为锚点
+   ============================================ */
+.weather-insight {
+    display: none; /* JS 控制显示 */
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    z-index: 10;
+    max-width: 90vw;
+    white-space: normal;
+    word-break: break-word;
+    text-align: left;
+    font-size: 1.15vw;
+    color: rgba(255, 255, 255, 0.88) !important;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    padding: 8px 16px;
+    border-radius: 12px;
+    line-height: 1.65;
+    transition: opacity 0.4s ease;
+    box-sizing: border-box;
+    letter-spacing: 0.5px;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* ============================================
+   响应式：手机竖屏（≤480px）
+   与 main.css 中 .date-display 的 flex-direction: column 左对齐一致
+   ============================================ */
+@media (max-width: 480px) {
+    .weather-insight {
+        font-size: 3vw;
+        max-width: 92vw;
+        padding: 7px 14px;
+        top: calc(100% + 8px);
+        left: 0;
+        border-radius: 10px;
+    }
+}
+
+/* ============================================
+   响应式：平板
+   ============================================ */
+@media (min-width: 481px) and (max-width: 768px) {
+    .weather-insight {
+        font-size: 1.6vw;
+        top: calc(100% + 8px);
+    }
+}
+
+/* ============================================
+   响应式：手机横屏
+   ============================================ */
+@media (max-width: 850px) and (orientation: landscape) {
+    .weather-insight {
+        font-size: 1.4vw;
+        max-width: 70vw;
+        padding: 6px 12px;
+    }
+}

@@ -174,8 +174,8 @@ body {
 @media (max-width: 768px) {
     .date-display {
         top: 6%;
-        gap: 12px;
-        max-width: calc(100% - 170px);
+        gap: 8px;
+        max-width: calc(100% - 130px);
         left: 40%;
         transform: translateX(-50%);
     }
@@ -217,19 +217,36 @@ body {
         top: 70px;
         left: 15px;
         transform: none;
-        max-width: calc(100% - 190px);
+        max-width: calc(100% - 30px);
+    }
+
+    /* 日期行内层 wrapper：竖排，防止年月日/星期/天气挤在同一行 */
+    .date-display > div:first-child {
+        flex-direction: column !important;
+        gap: 4px !important;
+        align-items: flex-start !important;
     }
     
     #dateText {
-        font-size: 4vw;
+        font-size: 5vw;
     }
     
     #weekText {
-        font-size: 3.2vw;
+        font-size: 4vw;
         padding-left: 0;
         border-left: none;
         padding-top: 4px;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .weather-display {
+        padding-top: 2px;
+    }
+    .weather-temp {
+        font-size: 4vw !important;
+    }
+    .weather-desc {
+        font-size: 3.5vw !important;
     }
     
     #quoteEnglish {
@@ -379,12 +396,12 @@ body {
     }
     
     #quoteEnglish {
-        font-size: 1.5vw;
+        font-size: 1.6vw;
         margin-bottom: 8px;
     }
     
     #quoteChinese {
-        font-size: 1.1vw;
+        font-size: 1.4vw;
     }
 }
 

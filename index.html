@@ -14,13 +14,14 @@
 
     <!-- 样式文件（?v= 用于突破 WebView 缓存） -->
     <link rel="stylesheet" href="styles/flip.min.css?v=20260617a" />
-    <link rel="stylesheet" href="styles/main.css?v=20260617a" />
-    <link rel="stylesheet" href="styles/controls.css?v=20260617a" />
+    <link rel="stylesheet" href="styles/main.css?v=20260618h" />
+    <link rel="stylesheet" href="styles/controls.css?v=20260618e" />
     <link rel="stylesheet" href="styles/pomodoro.css?v=20260617a" />
     <link rel="stylesheet" href="styles/weather.css?v=20260617a" />
     <link rel="stylesheet" href="styles/background-panel.css?v=20260617a" />
     <link rel="stylesheet" href="styles/pluginLibrary.css?v=20260617a" />
     <link rel="stylesheet" href="styles/learningHub.css?v=20260617a" />
+    <link rel="stylesheet" href="styles/ai-content.css?v=20260618h" />
 </head>
 <body>
     <!-- 控制面板 -->
@@ -85,9 +86,13 @@
 
     <!-- 日期显示 -->
     <div class="date-display" style="display: flex !important; visibility: visible !important; opacity: 1 !important;">
-        <div id="dateText" style="display: block !important; visibility: visible !important; opacity: 1 !important;"></div>
-        <!-- 天气显示将插入到这里 -->
-        <div id="weekText" style="display: block !important; visibility: visible !important; opacity: 1 !important;"></div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div id="dateText" style="display: block !important; visibility: visible !important; opacity: 1 !important;"></div>
+            <!-- 天气显示将插入到这里 -->
+            <div id="weekText" style="display: block !important; visibility: visible !important; opacity: 1 !important;"></div>
+        </div>
+        <!-- 天气解读（AI 生成，位于年月日下方） -->
+        <div id="weather-insight" class="weather-insight"></div>
     </div>
 
     <!-- 翻转时钟 -->
@@ -259,14 +264,15 @@
     <script src="scripts/bgmPlayer.js?v=20260620v"></script>
     <script src="scripts/pomodoro.js?v=20260620v"></script>
     <script src="scripts/weather.js?v=20260620v"></script>
+    <script src="scripts/aiContent.js?v=20260618f"></script>
     <script src="scripts/picsum.js?v=20260620v"></script>
-    <script src="scripts/smartColor.js?v=20260620v"></script>
+    <script src="scripts/smartColor.js?v=20260618f"></script>
     <script src="scripts/pluginManager.js?v=20260620v"></script>
     <script src="scripts/learningHub.js?v=20260620v"></script>
     <script src="scripts/cloudSync.js?v=20260620v"></script>
     <script src="scripts/syncAdapter.js?v=20260620v"></script>
     <script src="scripts/authUI.js?v=20260617a"></script>
-    <script src="scripts/app.js?v=20260617a"></script>
+    <script src="scripts/app.js?v=20260618a"></script>
     <script src="scripts/pluginLibraryUI.js?v=20260620v"></script>
     <!-- 底部工具栏 -->
     <div class="bottom-toolbar">
