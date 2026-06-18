@@ -184,6 +184,14 @@ const PluginLibraryUI = (() => {
     const _REGISTRY = {
         plugins: [
             {
+                id: 'particle-lines',
+                name: '粒子动画',
+                version: '2.0.0',
+                description: '极简数字流派艺术。内置秩序之息、虚空引力、生物脉冲、万向之门四套算法，搭载 HSL 全彩光谱和辉光拖尾特效。',
+                icon: '✨',
+                author: '时钟应用'
+            },
+            {
                 id: 'daily-stories',
                 name: '每日故事',
                 version: '1.0.0',

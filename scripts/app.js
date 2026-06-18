@@ -81,7 +81,6 @@ class App {
     constructor() {
         this.settingsStorage = new SettingsStorage();
         this.backgroundManager = new BackgroundManager();
-        this.animationManager = new AnimationManager('animationCanvas');
         this.quoteManager = new QuoteManager();
         this.tickSoundManager = new TickSoundManager();
         this.bgmPlayerManager = null; // 由音乐播放器插件管理生命周期
@@ -135,6 +134,14 @@ class App {
             const id = e.detail.id;
             if (id === 'daily-stories' && window.dailyStoriesManager) {
                 this._wireDailyStoriesRefs();
+            }
+            if (id === 'bgm-music') {
+                // 音乐插件激活后，尝试连接粒子动画
+                setTimeout(() => {
+                    if (window.ParticleLinesAPI && window.app && window.app.bgmPlayerManager) {
+                        window.ParticleLinesAPI.setBGMPlayer(window.app.bgmPlayerManager);
+                    }
+                }, 300);
             }
         });
 
@@ -230,7 +237,6 @@ class App {
         const settingsToggle = document.getElementById('settingsToggle');
         const settingsPanel = document.getElementById('settingsPanel');
         const backgroundBtn = document.getElementById('backgroundBtn');
-        const animationBtn = document.getElementById('animationBtn');
         const tickSoundBtn = document.getElementById('tickSoundBtn');
 
         // 设置按钮切换
@@ -271,14 +277,6 @@ class App {
             });
         }
 
-        // 动画线条按钮
-        animationBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.animationManager.toggle();
-            this.updateAnimationStatus();
-            this.saveCurrentSettings();
-        });
-
         // 滴答声音按钮
         tickSoundBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -301,19 +299,6 @@ class App {
                 }
             }
         });
-    }
-
-    updateAnimationStatus() {
-        const statusElement = document.getElementById('animationStatus');
-        if (statusElement) {
-            if (this.animationManager.enabled) {
-                statusElement.textContent = '开启';
-                statusElement.classList.add('active');
-            } else {
-                statusElement.textContent = '关闭';
-                statusElement.classList.remove('active');
-            }
-        }
     }
 
     updateTickSoundStatus() {
@@ -736,9 +721,6 @@ class App {
             }
         }
         
-        // 恢复动画状态（直接设置，不 toggle）
-        this.animationManager.setEnabled(!!settings.animationEnabled);
-
         // 恢复滴答声状态（直接设置，不 toggle）
         this.tickSoundManager.setEnabled(!!settings.tickSoundEnabled);
 
@@ -748,7 +730,6 @@ class App {
         }
 
         // 加载设置后更新状态显示
-        this.updateAnimationStatus();
         this.updateTickSoundStatus();
         
         // 触发智能颜色调整
@@ -772,7 +753,6 @@ class App {
         const settings = {
             backgroundColor: this.backgroundManager.currentBackground,
             backgroundImage: backgroundImage,
-            animationEnabled: this.animationManager.enabled,
             tickSoundEnabled: this.tickSoundManager.enabled,
             bgmPlayer: this.bgmPlayerManager ? this.bgmPlayerManager.getSettings() : null,
             picsumId: this.picsumManager.currentPicsumId,

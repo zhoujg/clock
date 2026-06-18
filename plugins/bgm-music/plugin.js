@@ -109,9 +109,11 @@
         return window.app;
     }
 
-    function _getAnimationManager() {
-        const app = _getApp();
-        return app ? app.animationManager : null;
+    function _getAnimationAPI() {
+        if (window.ParticleLinesAPI && typeof window.ParticleLinesAPI.setBGMPlayer === 'function') {
+            return window.ParticleLinesAPI;
+        }
+        return null;
     }
 
     function _saveSettings() {
@@ -397,10 +399,10 @@
                 app.bgmPlayerManager = _manager;
             }
 
-            // 5. 设置动画管理器引用
-            const animMgr = _getAnimationManager();
-            if (animMgr && typeof animMgr.setBGMPlayer === 'function') {
-                animMgr.setBGMPlayer(_manager);
+            // 5. 设置动画引用
+            const animAPI = _getAnimationAPI();
+            if (animAPI && typeof animAPI.setBGMPlayer === 'function') {
+                animAPI.setBGMPlayer(_manager);
             }
 
             // 6. 绑定事件
@@ -438,7 +440,7 @@
             if (app) app.bgmPlayerManager = null;
 
             // 清理动画引用
-            const animMgr = _getAnimationManager();
+            const animMgr = _getAnimationAPI();
             if (animMgr && typeof animMgr.setBGMPlayer === 'function') {
                 animMgr.setBGMPlayer(null);
             }
@@ -460,7 +462,7 @@
             const app = _getApp();
             if (app) app.bgmPlayerManager = null;
 
-            const animMgr = _getAnimationManager();
+            const animMgr = _getAnimationAPI();
             if (animMgr && typeof animMgr.setBGMPlayer === 'function') {
                 animMgr.setBGMPlayer(null);
             }

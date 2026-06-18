@@ -583,12 +583,7 @@ window.DailyStories = class DailyStories {
                     ${def.subtitle ? `<span class="story-dimension-subtitle">· ${def.subtitle}</span>` : ''}
                 </div>
             </div>
-            <button class="story-dimension-edit" title="添加${def.name}故事">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                </svg>
-                <span>编辑</span>
-            </button>
+
         `;
         card.appendChild(header);
 
@@ -652,9 +647,9 @@ window.DailyStories = class DailyStories {
             ? `<div class="story-task-desc">${story.story}</div>` 
             : '';
         
-        // 番茄钟按钮（仅今天且未完成时显示）
-        const isToday = this.isViewingToday();
-        const pomodoroBtn = (isToday && !story.completed)
+        // 番茄钟按钮（仅今天且未完成时显示，全局视图不显示）
+        const isTodayView = this.isViewingToday() && this.currentView === 'today';
+        const pomodoroBtn = (isTodayView && !story.completed)
             ? `<button class="story-task-pomodoro" data-index="${index}" title="开始专注" style="--value-color: ${color}">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/>
@@ -814,17 +809,9 @@ window.DailyStories = class DailyStories {
             const taskItem = e.target.closest('.story-task-item');
             
             if (pomodoroBtn) {
-                if (isGlobalView) {
-                    // 全局视图：通过sourceDate定位故事
-                    const sourceDate = pomodoroBtn.dataset.sourceDate || pomodoroBtn.closest('.story-dimension-card')?.dataset.sourceDate;
-                    const index = parseInt(pomodoroBtn.dataset.index);
-                    if (sourceDate) {
-                        this.linkToPomodoroGlobal(sourceDate, index);
-                    }
-                } else {
-                    const index = parseInt(pomodoroBtn.dataset.index);
-                    this.linkToPomodoro(index);
-                }
+                // 番茄钟仅在普通今天视图可用
+                const index = parseInt(pomodoroBtn.dataset.index);
+                this.linkToPomodoro(index);
             } else if (checkbox) {
                 if (isGlobalView) {
                     // 全局视图：可以标记完成

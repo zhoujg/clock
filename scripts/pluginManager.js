@@ -268,6 +268,13 @@ class PluginManager {
             console.log('[PluginManager] 核心插件：已自动安装「音乐播放器」');
         }
 
+        // 核心插件：粒子动画作为内置功能默认安装（仅首次，尊重用户卸载选择）
+        if (!this.installed['particle-lines'] && !this._wasUninstalled('particle-lines')) {
+            this.installed['particle-lines'] = { enabled: true, installDate: Date.now(), default: true };
+            this._saveState();
+            console.log('[PluginManager] 核心插件：已自动安装「粒子动画」');
+        }
+
         const ids = Object.keys(this.installed).filter(
             id => this.installed[id] && this.installed[id].enabled
         );

@@ -42,7 +42,6 @@ class SettingsStorage {
         return {
             backgroundColor: '#1a1a1a',
             backgroundImage: null,
-            animationEnabled: false,
             tickSoundEnabled: false,
             picsumId: null,  // 当前 Picsum 图片ID
             picsumUrl: null  // 当前 Picsum 图片URL

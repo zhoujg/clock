@@ -59,12 +59,10 @@ clock/
 │   └── slow-tick.mp3      # 滴答声音文件
 ├── scripts/               # JavaScript 文件
 │   ├── app.js            # 主应用逻辑
-│   ├── animation.js      # 动画效果
 │   ├── background.js     # 背景控制
 │   ├── bgmPlayer.js      # BGM 音乐播放器 🎵
 │   ├── dailyStories.js   # 每日三个故事 🎯
 │   ├── flip.min.js       # 翻转时钟库
-│   ├── particle.js       # 粒子效果
 │   ├── pomodoro.js       # 番茄钟功能
 │   ├── achievement.js    # 成就系统 ⭐
 │   ├── quotes-data.js    # 语录数据处理
@@ -76,7 +74,6 @@ clock/
 └── styles/               # CSS 样式文件
     ├── main.css          # 主样式
     ├── controls.css      # 控制面板样式
-    ├── animation.css     # 动画样式
     ├── bgmPlayer.css     # BGM 播放器样式 🎵
     ├── dailyStories.css  # 每日三个故事样式 🎯
     ├── pomodoro.css      # 番茄钟样式
