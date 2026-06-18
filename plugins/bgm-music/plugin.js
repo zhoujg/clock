@@ -95,7 +95,7 @@
     </div>
 </div>`;
 
-    const MUSIC_BTN_HTML = '<button id="musicBtn" class="bottom-tool-btn" title="音乐播放器"><span class="tool-btn-icon">🎵</span><span class="tool-btn-label">音乐</span></button>';
+    const MUSIC_BTN_HTML = '<button id="musicBtn" class="bottom-tool-btn" title="音乐播放器"><svg class="tool-btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-3v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></svg><span class="tool-btn-label">音乐</span></button>';
 
     let _modalEl = null;
     let _btnEl = null;
