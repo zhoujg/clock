@@ -11,26 +11,6 @@
       "css": "plugins/daily-stories/style.css"
     },
     {
-      "id": "english-daily",
-      "name": "英语每日单词",
-      "version": "1.0.0",
-      "description": "每天展示一个中考核心英语单词，包含音标、释义、例句，支持发音。",
-      "icon": "🔤",
-      "author": "滴答时钟",
-      "js": "plugins/english-daily/plugin.js",
-      "css": "plugins/english-daily/style.css"
-    },
-    {
-      "id": "cantonese-daily",
-      "name": "粤语每日一句",
-      "version": "1.0.0",
-      "description": "每天展示一句实用粤语，包含汉字、粤拼、普通话翻译，支持发音。",
-      "icon": "🗣️",
-      "author": "滴答时钟",
-      "js": "plugins/cantonese-daily/plugin.js",
-      "css": "plugins/cantonese-daily/style.css"
-    },
-    {
       "id": "halftime",
       "name": "此间半刻",
       "version": "1.0.0",

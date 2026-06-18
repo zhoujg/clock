@@ -101,17 +101,12 @@
         author: '滴答时钟',
 
         onInstall: async function () {
-            console.log('[每日故事] 首次安装');
         },
 
         onActivate: async function () {
-            console.log('[每日故事] 🔄 onActivate 开始...');
-            console.log('[每日故事] 等待 CSS 加载...');
             await _ensureCSS();
-            console.log('[每日故事] ✅ CSS 加载完成');
 
             await _ensureClassLoaded();
-            console.log('[每日故事] 类加载完成, DailyStories=', typeof window.DailyStories);
 
             if (!window.DailyStories) {
                 console.error('[每日故事] ❌ DailyStories 类未定义');
@@ -120,28 +115,23 @@
 
             // 如果已存在实例则先销毁
             if (window.dailyStoriesManager) {
-                console.log('[每日故事] 清理旧实例');
                 _removeUI();
             }
 
             // 创建实例（构造函数内部会调用 createUI 生成按钮和面板）
             try {
                 window.dailyStoriesManager = new DailyStories();
-                console.log('[每日故事] 实例创建完成');
             } catch (e) {
                 console.error('[每日故事] ❌ 创建实例失败:', e);
                 throw e;
             }
 
             const btn = document.getElementById('storiesToggle');
-            console.log('[每日故事] storiesToggle 按钮:', btn ? '✅ 已创建' : '❌ 未创建!');
-            console.log('[每日故事] ✅ 已激活');
         },
 
         onDeactivate: async function () {
             _removeUI();
             // CSS 保留（避免闪烁），下次激活时复用
-            console.log('[每日故事] ⏹ 已停用');
         },
 
         onUninstall: async function () {
@@ -149,7 +139,6 @@
             _removeCSS();
             // 清理 localStorage 中的故事数据（可选）
             // localStorage.removeItem('dailyStories');
-            console.log('[每日故事] 已卸载');
         }
     });
 })();

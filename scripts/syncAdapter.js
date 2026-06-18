@@ -60,7 +60,6 @@ class SyncAdapter {
             this._arrayKeys.add(cloudKey);
         }
         this._pluginSyncKeys.push({ cloudKey, storageKey, reloadFn, type });
-        console.log(`[Sync] 注册同步键: ${cloudKey} → ${storageKey} (${type})`);
     }
 
     /**
@@ -73,7 +72,6 @@ class SyncAdapter {
         delete this._pluginReloadFns[cloudKey];
         this._arrayKeys.delete(cloudKey);
         this._pluginSyncKeys = this._pluginSyncKeys.filter(k => k.cloudKey !== cloudKey);
-        console.log(`[Sync] 取消同步键: ${cloudKey}`);
     }
 
     /**
@@ -82,7 +80,6 @@ class SyncAdapter {
     _setupVisibilityListener() {
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible' && this.cloudSync.isLoggedIn) {
-                console.log('[Sync] 页面回到前台，立即拉取增量更新...');
                 this._pullIncremental();
             }
         });
@@ -99,7 +96,6 @@ class SyncAdapter {
                 this._pullIncremental();
             }
         }, this._pollIntervalMs);
-        console.log(`[Sync] 定期同步已启动，间隔 ${this._pollIntervalMs / 1000}s`);
     }
 
     /**
@@ -109,7 +105,6 @@ class SyncAdapter {
         if (this._pollTimer) {
             clearInterval(this._pollTimer);
             this._pollTimer = null;
-            console.log('[Sync] 定期同步已停止');
         }
     }
 
@@ -137,8 +132,6 @@ class SyncAdapter {
                 }
                 return;
             }
-
-            console.log('[Sync] 增量拉取到数据:', Object.keys(result.data).join(', '));
 
             // 合并云端数据到本地（数组用并集，对象直接覆盖）
             this._mergeCloudToLocal(result.data);
@@ -168,8 +161,6 @@ class SyncAdapter {
     async syncAfterLogin() {
         if (!this.cloudSync.isLoggedIn) return null;
 
-        console.log('[Sync] 开始全量同步...');
-
         // 1. 先把本地故事推送到云端（故事走独立 API，不走 user_data）
         await this._pushLocalStoriesToCloud();
 
@@ -197,7 +188,6 @@ class SyncAdapter {
 
             // 6. 刷新各模块的内存状态
             this._reloadModuleState();
-            console.log('[Sync] 全量同步完成');
         }
 
         return result;
@@ -222,7 +212,6 @@ class SyncAdapter {
             }
 
             if (Object.keys(data).length > 0) {
-                console.log('[Sync] 推送合并数据:', Object.keys(data).join(', '));
                 await this.cloudSync.push(data, {});
             }
         } catch (e) {
@@ -252,7 +241,6 @@ class SyncAdapter {
                     completed: story.completed ? 1 : 0,
                     _localUpdatedAt: new Date().toISOString()
                 }));
-                console.log(`[Sync] 推送本地故事: ${date}, ${cloudStories.length}条`);
                 await this.cloudSync.pushStories(date, cloudStories);
             }
         } catch (e) {
@@ -310,7 +298,6 @@ class SyncAdapter {
         }
 
         this.debounceTimers[timerKey] = setTimeout(async () => {
-            console.log('[Sync] 推送变更:', Object.keys(data));
             const result = await this.cloudSync.push(data, timestamps);
 
             if (result.success) {
@@ -349,7 +336,6 @@ class SyncAdapter {
 
                 const merged = this._mergeArraysById(localArr, value);
                 localStorage.setItem(localKey, JSON.stringify(merged));
-                console.log(`[Sync] 合并 ${cloudKey}: 本地${localArr.length} + 云端${value.length} → ${merged.length}`);
             } else {
                 // 对象/简单类型：直接覆盖
                 const jsonStr = JSON.stringify(value);
@@ -390,7 +376,6 @@ class SyncAdapter {
         for (const [cloudKey, reloadFn] of Object.entries(this._pluginReloadFns)) {
             try {
                 reloadFn();
-                console.log(`[Sync] ${cloudKey} 状态已刷新`);
             } catch (e) { console.warn(`[Sync] ${cloudKey} 刷新失败:`, e); }
         }
     }
@@ -412,7 +397,6 @@ class SyncAdapter {
                 })() : [];
                 const merged = this._mergeArraysById(localArr, value);
                 localStorage.setItem(localKey, JSON.stringify(merged));
-                console.log(`[Sync] 冲突合并 ${cloudKey}: 本地${localArr.length} + 云端${value.length} → ${merged.length}`);
             } else {
                 // 对象/简单类型：云端覆盖本地
                 localStorage.setItem(localKey, JSON.stringify(value));

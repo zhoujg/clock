@@ -655,5 +655,4 @@
         isOpen: function () { return _overlayEl && _overlayEl.style.display === 'flex'; }
     };
 
-    console.log('[创意万年历] 插件已注册');
 })();

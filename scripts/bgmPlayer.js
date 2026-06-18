@@ -125,7 +125,6 @@ class BGMPlayerManager {
                     this.sourceNode = null;
                     this.audioContext = null;
                     this.dataArray = null;
-                    console.log('🎵 音频分析器已禁用，音乐将正常播放');
                 }
             }
             
@@ -245,7 +244,7 @@ class BGMPlayerManager {
         await this.loadJamendoMusic();
         
         if (this.musicList.length === 0) {
-            console.log('未找到音乐，请检查网络连接');
+            console.warn('未找到音乐，请检查网络连接');
         }
         
         this.renderMusicList();
@@ -303,19 +302,13 @@ class BGMPlayerManager {
         
         // 🎯 优化：记录开始加载时间，用于性能监控
         const loadStartTime = Date.now();
-        console.log('🎵 开始加载音乐:', this.currentTrack.name, '| URL:', this.currentTrack.file);
         
         this.audio.src = this.currentTrack.file;
         
-        // 🎯 优化：监听 loadstart 事件
-        const onLoadStart = () => {
-            console.log('⏳ 音频开始加载...');
-        };
         
         // 🎯 优化：监听 canplay 事件（有足够数据可以播放）
         const onCanPlay = () => {
             const loadTime = Date.now() - loadStartTime;
-            console.log(`✅ 音频可以播放了！加载耗时: ${loadTime}ms`);
             this.hideLoadingState();
             // 移除一次性事件监听器
             this.audio.removeEventListener('loadstart', onLoadStart);
@@ -721,8 +714,6 @@ class BGMPlayerManager {
         const { autoPlay = false, ...apiOptions } = options;
         
         // 🔍 日志：记录加载操作
-        console.log('🎵 loadJamendoMusic 被调用，选项:', options);
-        
         try {
             // 每次加载时清除缓存，确保获取新的音乐
             this.jamendoAPI.clearCache();
@@ -776,8 +767,6 @@ class BGMPlayerManager {
         const { autoPlay = true, ...searchOptions } = options;
         
         try {
-            console.log('🔍 搜索 Jamendo 音乐:', query);
-            
             const tracks = await this.jamendoAPI.searchTracks({
                 query,
                 ...searchOptions
@@ -855,7 +844,7 @@ class BGMPlayerManager {
             localStorage.setItem('musicFavorites', JSON.stringify(this.favorites));
             // 同步到云端
             if (window.syncAdapter) window.syncAdapter.pushChanges('musicFavorites');
-            console.log('✅ 保存收藏音乐:', this.favorites.length, '首');
+            ('✅ 保存收藏音乐:', this.favorites.length, '首');
         } catch (error) {
             console.error('❌ 保存收藏音乐失败:', error);
         }
@@ -882,7 +871,6 @@ class BGMPlayerManager {
             this.favorites.splice(existingIndex, 1);
             this.saveFavorites();
             this.updateFavoriteButton();
-            console.log('💔 取消收藏:', this.currentTrack.name);
             
             // 如果正在显示收藏列表，刷新列表
             if (this.showingFavorites) {
@@ -907,7 +895,6 @@ class BGMPlayerManager {
             this.favorites.unshift(favoriteTrack); // 添加到开头
             this.saveFavorites();
             this.updateFavoriteButton();
-            console.log('❤️ 收藏音乐:', this.currentTrack.name);
             
             return true;
         }
@@ -1056,7 +1043,6 @@ class BGMPlayerManager {
         // 🎯 优化：监听加载事件
         const onCanPlay = () => {
             const loadTime = Date.now() - loadStartTime;
-            console.log(`✅ 收藏音乐可以播放了！加载耗时: ${loadTime}ms`);
             this.hideLoadingState();
         };
         
@@ -1104,9 +1090,7 @@ class BGMPlayerManager {
         const track = this.favorites[index];
         this.favorites.splice(index, 1);
         this.saveFavorites();
-        
-        console.log('💔 移除收藏:', track.name);
-        
+                
         // 刷新收藏列表显示
         if (this.showingFavorites) {
             this.showFavoritesList();

@@ -649,28 +649,23 @@
         css: 'plugins/halftime/style.css',
 
         onInstall: async function () {
-            console.log('[此间半刻] 首次安装');
         },
 
         onActivate: async function () {
-            console.log('[此间半刻] 激活...');
             _loadSettings();
             _createToolButton();
             // 注册同步键（自包含，无需修改 syncAdapter 主代码）
             if (window.syncAdapter) {
                 window.syncAdapter.registerSyncKey('halftimeSettings', 'halftime_settings', _loadSettings);
             }
-            console.log('[此间半刻] 已激活');
         },
 
         onDeactivate: async function () {
-            console.log('[此间半刻] 停用...');
             _hideModal();
             _removeToolButton();
             if (window.syncAdapter) {
                 window.syncAdapter.unregisterSyncKey('halftimeSettings');
             }
-            console.log('[此间半刻] 已停用');
         },
 
         onUninstall: async function () {
@@ -681,9 +676,7 @@
             if (window.syncAdapter) {
                 window.syncAdapter.unregisterSyncKey('halftimeSettings');
             }
-            console.log('[此间半刻] 已卸载');
         }
     });
 
-    console.log('[此间半刻] 插件已注册');
 })();

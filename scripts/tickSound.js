@@ -64,7 +64,6 @@ class TickSoundManager {
             // 解码音频
             this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
             this.isLoaded = true;
-            console.log('✅ 滴答声音频已预解码 (Web Audio API)');
         } catch (error) {
             console.error('❌ 滴答声音频加载/解码失败:', error);
         }

@@ -40,7 +40,6 @@ class PluginManager {
             return;
         }
         this.plugins[descriptor.id] = descriptor;
-        console.log(`[PluginManager] 插件已注册: ${descriptor.id} (${descriptor.name})`);
 
         // 如果已安装且启用，立即激活
         if (this.installed[descriptor.id] && this.installed[descriptor.id].enabled) {
@@ -177,7 +176,6 @@ class PluginManager {
         }
 
         window.dispatchEvent(new CustomEvent('plugin-activated', { detail: { id } }));
-        console.log(`[PluginManager] ✅ 插件已激活: ${id}`);
     }
 
     async _deactivate(id) {
@@ -193,7 +191,6 @@ class PluginManager {
         // 移除 CSS
         this._removeCSS(id);
         window.dispatchEvent(new CustomEvent('plugin-deactivated', { detail: { id } }));
-        console.log(`[PluginManager] ⏹ 插件已停用: ${id}`);
     }
 
     /* ============ 动态加载 JS ============ */
@@ -258,28 +255,30 @@ class PluginManager {
         if (!this.installed['daily-stories'] && !this._wasUninstalled('daily-stories')) {
             this.installed['daily-stories'] = { enabled: true, installDate: Date.now(), default: true };
             this._saveState();
-            console.log('[PluginManager] 核心插件：已自动安装「每日故事」');
         }
 
         // 核心插件：音乐播放器作为内置功能默认安装（仅首次，尊重用户卸载选择）
         if (!this.installed['bgm-music'] && !this._wasUninstalled('bgm-music')) {
             this.installed['bgm-music'] = { enabled: true, installDate: Date.now(), default: true };
             this._saveState();
-            console.log('[PluginManager] 核心插件：已自动安装「音乐播放器」');
         }
 
         // 核心插件：粒子动画作为内置功能默认安装（仅首次，尊重用户卸载选择）
         if (!this.installed['particle-lines'] && !this._wasUninstalled('particle-lines')) {
             this.installed['particle-lines'] = { enabled: true, installDate: Date.now(), default: true };
             this._saveState();
-            console.log('[PluginManager] 核心插件：已自动安装「粒子动画」');
         }
 
         // 核心插件：此间半刻作为内置功能默认安装（仅首次，尊重用户卸载选择）
         if (!this.installed['halftime'] && !this._wasUninstalled('halftime')) {
             this.installed['halftime'] = { enabled: true, installDate: Date.now(), default: true };
             this._saveState();
-            console.log('[PluginManager] 核心插件：已自动安装「此间半刻」');
+        }
+
+        // 核心插件：万年历作为内置功能默认安装（仅首次，尊重用户卸载选择）
+        if (!this.installed['creative-calendar'] && !this._wasUninstalled('creative-calendar')) {
+            this.installed['creative-calendar'] = { enabled: true, installDate: Date.now(), default: true };
+            this._saveState();
         }
 
         const ids = Object.keys(this.installed).filter(
@@ -292,7 +291,6 @@ class PluginManager {
                 await this._activate(id);
             } else {
                 // 未注册，动态加载脚本
-                console.log(`[PluginManager] 动态加载插件: ${id}`);
                 try {
                     await this._loadPluginScript(id);
                     // _loadPluginScript 完成后 register() 已调用，_activate 已在 register() 中触发
@@ -302,7 +300,6 @@ class PluginManager {
             }
         }
 
-        console.log(`[PluginManager] 初始化完成，已激活 ${ids.length} 个插件`);
         this._notifyChange();
     }
 

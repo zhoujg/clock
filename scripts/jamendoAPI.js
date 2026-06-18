@@ -30,7 +30,6 @@ class JamendoAPI {
         // 检查缓存
         const now = Date.now();
         if (this.cache.tracks.length > 0 && (now - this.cache.lastFetch) < this.cache.cacheDuration) {
-            console.log('🎵 使用缓存的 Jamendo 音乐');
             return this.cache.tracks;
         }
         
@@ -177,7 +176,6 @@ class JamendoAPI {
             params.append('order', 'relevance');
             
             const url = `${this.baseURL}/tracks/?${params.toString()}`;
-            console.log('🔍 搜索 Jamendo 音乐:', url);
             
             const response = await fetch(url);
             
@@ -202,13 +200,6 @@ class JamendoAPI {
                 // 优先使用 audiodownload，因为 audio 字段可能为空
                 const audioUrl = track.audiodownload || track.audio;
                 
-                console.log('🎵 处理搜索曲目:', {
-                    name: track.name,
-                    audio: track.audio,
-                    audiodownload: track.audiodownload,
-                    finalUrl: audioUrl
-                });
-                
                 return {
                     id: track.id,
                     name: track.name,
@@ -221,7 +212,6 @@ class JamendoAPI {
                 };
             });
             
-            console.log(`✅ 搜索到 ${tracks.length} 首音乐`);
             return tracks;
             
         } catch (error) {

@@ -64,8 +64,6 @@
 
         _tabBar = _hubEl.querySelector('#learningHubTabs');
         _contentArea = _hubEl.querySelector('#learningHubContent');
-
-        console.log('[LearningHub] 学习中心已创建');
     }
 
     function _addTab(config) {

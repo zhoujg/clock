@@ -366,19 +366,15 @@
         css: 'plugins/bgm-music/style.css',
 
         onInstall: async function () {
-            console.log('[音乐播放器] 首次安装');
+
         },
 
         onActivate: async function () {
-            console.log('[音乐播放器] 🔄 激活中...');
-
             // 1. 注入 CSS
             _injectCSS();
-            console.log('[音乐播放器] CSS 已注入');
 
             // 2. 创建 UI
             _createUI();
-            console.log('[音乐播放器] UI 已创建');
 
             // 3. 初始化 BGMPlayerManager（如果尚未创建）
             const app = _getApp();
@@ -387,7 +383,6 @@
                 const quoteMgr = app ? app.quoteManager : null;
                 if (typeof BGMPlayerManager !== 'undefined') {
                     _manager = new BGMPlayerManager(tickMgr, quoteMgr);
-                    console.log('[音乐播放器] BGMPlayerManager 已创建');
                 } else {
                     console.error('[音乐播放器] ❌ BGMPlayerManager 未定义，请确保 bgmPlayer.js 已加载');
                     return;
@@ -407,7 +402,6 @@
 
             // 6. 绑定事件
             _wireEvents();
-            console.log('[音乐播放器] 事件已绑定');
 
             // 7. 恢复设置
             _restoreSettings();
@@ -415,7 +409,6 @@
             // 8. 加载音乐列表
             try {
                 await _manager.loadJamendoMusic({ tags: 'ambient', limit: 20 });
-                console.log('[音乐播放器] 音乐列表已加载');
             } catch (e) {
                 console.warn('[音乐播放器] 加载音乐列表失败:', e);
             }
@@ -435,13 +428,9 @@
                     }
                 }, 'array');
             }
-
-            console.log('[音乐播放器] ✅ 已激活');
         },
 
         onDeactivate: async function () {
-            console.log('[音乐播放器] ⏹ 停用中...');
-
             // 取消同步注册
             if (window.syncAdapter) {
                 window.syncAdapter.unregisterSyncKey('musicFavorites');
@@ -466,12 +455,9 @@
             // 移除 UI
             _removeUI();
 
-            console.log('[音乐播放器] ⏹ 已停用');
         },
 
         onUninstall: async function () {
-            console.log('[音乐播放器] 卸载中...');
-
             // 取消同步注册
             if (window.syncAdapter) {
                 window.syncAdapter.unregisterSyncKey('musicFavorites');
@@ -492,8 +478,6 @@
 
             _removeUI();
             _removeCSS();
-
-            console.log('[音乐播放器] 已卸载');
         }
     });
 })();

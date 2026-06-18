@@ -203,25 +203,9 @@ const PluginLibraryUI = (() => {
                 id: 'bgm-music',
                 name: '音乐播放器',
                 version: '1.0.0',
-                description: 'Jamendo 在线音乐播放器，支持播放/暂停、收藏、音量调节、云端同步。',
+                description: '在线音乐播放器，支持播放/暂停、收藏、音量调节、云端同步。',
                 icon: '🎵',
                 author: '时钟应用'
-            },
-            {
-                id: 'english-daily',
-                name: '英语每日单词',
-                version: '1.0.0',
-                description: '每天展示一个中考核心英语单词，包含音标、释义、例句，支持发音。',
-                icon: '🔤',
-                author: '滴答时钟'
-            },
-            {
-                id: 'cantonese-daily',
-                name: '粤语每日一句',
-                version: '1.0.0',
-                description: '每天展示一句实用粤语，包含汉字、粤拼、普通话翻译，支持发音。',
-                icon: '🗣️',
-                author: '滴答时钟'
             },
             {
                 id: 'halftime',
@@ -233,7 +217,7 @@ const PluginLibraryUI = (() => {
             },
             {
                 id: 'creative-calendar',
-                name: '创意万年历',
+                name: '万年历',
                 version: '1.0.0',
                 description: '融合公历、农历、二十四节气的创意万年历，以中国风视觉语言呈现时间流转。',
                 icon: '📅',

@@ -688,11 +688,9 @@
         author: '时钟应用',
 
         onInstall: async function () {
-            console.log('[粒子动画] 首次安装');
         },
 
         onActivate: async function () {
-            console.log('[粒子动画] 🔄 激活...');
             _ensureCSS();
 
             _canvas = document.getElementById(CANVAS_ID);
@@ -711,14 +709,11 @@
                 _bgmPlayer = function () { return window.app.bgmPlayerManager; };
             }
 
-            console.log('[粒子动画] ✅ 已激活，自动启动中...');
-
             // 自动启动动画
             setTimeout(() => _start(), 100);
         },
 
         onDeactivate: async function () {
-            console.log('[粒子动画] ⏹ 停用...');
             _stop();
             _particles = [];
             _bgmPlayer = null;
@@ -726,8 +721,6 @@
 
             // 移除动态生成的设置面板按钮和弹窗
             _removeSettingsItem();
-
-            console.log('[粒子动画] ✅ 已停用');
         },
 
         onUninstall: async function () {
@@ -738,9 +731,6 @@
             _removeSettingsItem();
             window.removeEventListener('resize', _onResize);
             delete window.ParticleLinesAPI;
-            console.log('[粒子动画] 已卸载');
         }
     });
-
-    console.log('[粒子动画] 插件已注册（TIME-ART 数字流派艺术引擎）');
 })();

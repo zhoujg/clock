@@ -162,12 +162,10 @@ class App {
      */
     _wireDailyStoriesRefs() {
         if (!window.dailyStoriesManager) return;
-        console.log('✅ 设置故事系统引用...');
 
         // 设置番茄钟的 dailyStories 引用
         if (this.pomodoroTimer) {
             this.pomodoroTimer.dailyStories = window.dailyStoriesManager;
-            console.log('✅ 番茄钟→故事系统引用已设置');
         }
 
         // 设置 dailyStories 的系统引用
@@ -175,7 +173,6 @@ class App {
             window.dailyStoriesManager.setSystemReferences(
                 this.pomodoroTimer
             );
-            console.log('✅ 故事系统引用已设置');
         }
 
         // 如果已登录，触发一次故事云端同步
@@ -708,7 +705,6 @@ class App {
         window.cloudSync.onChange((isLoggedIn) => {
             if (isLoggedIn) {
                 // 登录后触发全量同步
-                console.log('[App] 检测到登录，开始同步...');
                 this._syncFromCloud();
                 // 启动定期轮询（每 30s 拉取其他设备的更新）
                 if (window.syncAdapter) {

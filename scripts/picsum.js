@@ -37,7 +37,6 @@ class PicsumManager {
             // 如果方向发生变化且当前显示的是Picsum图片
             if (newOrientation !== this.currentOrientation && this.currentPicsumUrl) {
                 this.currentOrientation = newOrientation;
-                console.log('屏幕方向已变化为:', newOrientation);
                 // 可选：自动重新加载适合新方向的图片
                 // this.loadRandomImage();
             }
