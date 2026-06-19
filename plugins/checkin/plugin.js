@@ -6,8 +6,8 @@
     'use strict';
 
     const PLUGIN_ID = 'checkin';
-    const CLASS_JS  = 'plugins/checkin/checkin-class.js?v=20260619j';
-    const STYLE_CSS = 'plugins/checkin/style.css?v=20260619j';
+    const CLASS_JS  = 'plugins/checkin/checkin-class.js?v=20260619n';
+    const STYLE_CSS = 'plugins/checkin/style.css?v=20260619n';
 
     let _classLoaded = false;
     let _loadPromise = null;
@@ -119,13 +119,42 @@
                     _instance = new window.CheckInTimer(window.clockManager);
                     window.checkInTimerInstance = _instance;
                 }
+
+                // 注册云端同步：将 checkin_habits 纳入多设备同步
+                if (window.syncAdapter) {
+                    window.syncAdapter.registerSyncKey(
+                        'checkin_habits',       // 云端 user_data 表的 data_key
+                        'checkin_habits',       // localStorage 的 key
+                        () => {
+                            // 云端数据合并到 localStorage 后，刷新 UI
+                            if (_instance) {
+                                _instance.loadHabits();
+                                _instance.renderHabits();
+                                _instance.updateToggleState();
+                            }
+                        },
+                        'object'                 // 合并策略：直接覆盖（打卡数据以最新为准）
+                    );
+
+                    // 已登录则立即从云端拉取一次
+                    if (window.cloudSync && window.cloudSync.isLoggedIn) {
+                        window.syncAdapter.syncAfterLogin && window.syncAdapter.syncAfterLogin();
+                    }
+                }
             },
 
             async onDeactivate() {
+                // 取消同步注册
+                if (window.syncAdapter) {
+                    window.syncAdapter.unregisterSyncKey('checkin_habits');
+                }
                 _removeUI();
             },
 
             async onUninstall() {
+                if (window.syncAdapter) {
+                    window.syncAdapter.unregisterSyncKey('checkin_habits');
+                }
                 _removeUI();
                 _classLoaded = false;
                 _loadPromise = null;

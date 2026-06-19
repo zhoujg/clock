@@ -29,6 +29,24 @@ const PRESET_HABITS = [
     { name: '写日记', icon: '📝', target: 1, unit: '篇' }
 ];
 
+    // 各习惯分类的分享图主题色
+const SHARE_THEMES = {
+    sport:   { bg: ['#ff6b35', '#f7931e'], accent: '#fff5ee', text: '#3d1c00' },
+    health:  { bg: ['#34c759', '#30b350'], accent: '#e8f8ed', text: '#0a2e12' },
+    study:   { bg: ['#5e5ce6', '#7b79f7'], accent: '#ecebff', text: '#0d0c3a' },
+    life:    { bg: ['#ff9500', '#ffb340'], accent: '#fff6eb', text: '#3d2000' },
+    default: { bg: ['#8e8e93', '#aeaeb2'], accent: '#f2f2f7', text: '#1c1c1e' }
+};
+
+// 习惯名称 → 分类映射
+const SHARE_CATEGORY_MAP = {
+    '跑步': 'sport', '俯卧撑': 'sport', '深蹲': 'sport', '瑜伽': 'sport',
+    '游泳': 'sport', '散步': 'sport',
+    '喝水': 'health', '早睡': 'health', '冥想': 'health', '维生素': 'health',
+    '阅读': 'study', '编程': 'study', '外语': 'study', '练字': 'study',
+    '记账': 'life', '整理': 'life', '拍照': 'life', '写日记': 'life'
+};
+
 class CheckInTimer {
     constructor(clockManager) {
         this.clockManager = clockManager;
@@ -66,6 +84,11 @@ class CheckInTimer {
 
     saveHabits() {
         localStorage.setItem('checkin_habits', JSON.stringify(this.habits));
+
+        // 同步到云端（多设备同步）
+        if (window.syncAdapter && window.cloudSync && window.cloudSync.isLoggedIn) {
+            window.syncAdapter.pushChanges('checkin_habits');
+        }
     }
 
     getDefaultHabits() {
@@ -176,6 +199,7 @@ class CheckInTimer {
                             title="${progress.completed ? '点击撤销最后一次打卡' : '点击打卡'}">
                         ${progress.completed ? '✓' : '打卡'}
                     </button>
+                    ${progress.completed ? `<button class="habit-share-btn" data-habit-id="${habit.id}" title="生成分享图">分享</button>` : ''}
                     <button class="habit-delete-btn" data-habit-id="${habit.id}" title="删除习惯">
                         🗑️
                     </button>
@@ -232,6 +256,14 @@ class CheckInTimer {
             if (e.target.classList.contains('habit-delete-btn')) {
                 const habitId = e.target.dataset.habitId;
                 this.showDeleteConfirmDialog(habitId);
+            }
+        });
+
+        // 分享按钮
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('habit-share-btn')) {
+                const habitId = e.target.dataset.habitId;
+                this.generateShareImage(habitId);
             }
         });
 
@@ -606,6 +638,267 @@ class CheckInTimer {
         if (this.toggle) {
             this.toggle.remove();
         }
+    }
+
+    /* ========== 分享图生成 ========== */
+
+    getShareTheme(habit) {
+        const cat = SHARE_CATEGORY_MAP[habit.name] || 'default';
+        return SHARE_THEMES[cat] || SHARE_THEMES['default'];
+    }
+
+    generateShareImage(habitId) {
+        const habit = this.habits.find(h => h.id === habitId);
+        if (!habit) return;
+
+        const theme = this.getShareTheme(habit);
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+        const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+        const weekDay = '周' + weekDays[today.getDay()];
+
+        // 计算连续打卡天数
+        const streak = this.calcStreak(habit);
+
+        // 画布尺寸（竖版 9:16）
+        const W = 750;
+        const H = 1334;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+
+        // ── 背景渐变 ──
+        const grad = ctx.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, theme.bg[0]);
+        grad.addColorStop(1, theme.bg[1]);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // ── 装饰圆 ──
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(W * 0.75, H * 0.18, 160, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(W * 0.2, H * 0.55, 200, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(W * 0.65, H * 0.72, 120, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // ── 顶部品牌 ──
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '400 26px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('滴答时钟 · 今日打卡', W / 2, 70);
+
+        // ── 习惯图标（大号居中） ──
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '120px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(habit.icon, W / 2, 250);
+
+        // ── 底部装饰线 ──
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(W / 2 - 60, 310);
+        ctx.lineTo(W / 2 + 60, 310);
+        ctx.stroke();
+
+        // ── 习惯名称 ──
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 52px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(habit.name, W / 2, 340);
+
+        // ── 打卡完成徽章 ──
+        const badgeY = 460;
+        const badgeW = 360;
+        const badgeH = 80;
+
+        // 徽章背景
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.beginPath();
+        this._roundRect(ctx, W / 2 - badgeW / 2, badgeY, badgeW, badgeH, 40);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 36px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`✅ 今日已完成 ${habit.target} ${habit.unit}`, W / 2, badgeY + badgeH / 2);
+
+        // ── 日期 ──
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.font = '400 30px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.fillText(dateStr + ' ' + weekDay, W / 2, 590);
+
+        // ── 连续打卡 ──
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.font = '600 28px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.fillText(`🔥 连续打卡 ${streak} 天`, W / 2, 650);
+
+        // ── 分隔线 ──
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(80, 720);
+        ctx.lineTo(W - 80, 720);
+        ctx.stroke();
+
+        // ── 一句话激励 ──
+        const quotes = [
+            '坚持就是胜利 ✨',
+            '每一个好习惯，都是未来的礼物 🎁',
+            '今天的努力，明天的底气 💪',
+            '日拱一卒，功不唐捐 🏃',
+            '自律给我自由 🕊️',
+            '优于别人并不高贵，真正的高贵是优于过去的自己 🌟'
+        ];
+        const quote = quotes[Math.floor(Math.random() * quotes.length)];
+
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = 'italic 400 26px "PingFang SC", "Noto Serif SC", serif';
+        ctx.fillText(quote, W / 2, 800);
+
+        // ── 底部品牌 ──
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.font = '400 22px "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.fillText('— 滴答时钟 · 记录每一刻 —', W / 2, H - 80);
+
+        // 底部装饰线
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(W / 2 - 80, H - 55);
+        ctx.lineTo(W / 2 + 80, H - 55);
+        ctx.stroke();
+
+        // 导出并预览
+        const dataUrl = canvas.toDataURL('image/png');
+        this.showSharePreview(habit, dataUrl);
+    }
+
+    _roundRect(ctx, x, y, w, h, r) {
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+
+    calcStreak(habit) {
+        let streak = 0;
+        const today = new Date();
+        // 检查今天是否完成
+        const todayStr = this.getTodayDateStr();
+        const todayRecords = habit.records[todayStr];
+        const progress = todayRecords ? todayRecords.length : 0;
+        if (progress < habit.target) {
+            // 今天未完成，检查昨天
+            const d = new Date(today);
+            d.setDate(d.getDate() - 1);
+            const yStr = d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+            const recs = habit.records[yStr];
+            if (!recs || recs.length < habit.target) return 0;
+            streak = 1;
+            d.setDate(d.getDate() - 1);
+            while (true) {
+                const s = d.getFullYear() + '-' +
+                    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(d.getDate()).padStart(2, '0');
+                const r = habit.records[s];
+                if (!r || r.length < habit.target) break;
+                streak++;
+                d.setDate(d.getDate() - 1);
+            }
+            return streak;
+        }
+        // 今天已完成
+        streak = 1;
+        const d = new Date(today);
+        d.setDate(d.getDate() - 1);
+        while (true) {
+            const s = d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+            const r = habit.records[s];
+            if (!r || r.length < habit.target) break;
+            streak++;
+            d.setDate(d.getDate() - 1);
+        }
+        return streak;
+    }
+
+    showSharePreview(habit, dataUrl) {
+        // 移除已有预览
+        const existing = document.querySelector('.checkin-share-overlay');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'checkin-share-overlay';
+
+        const dialog = document.createElement('div');
+        dialog.className = 'checkin-share-dialog';
+        dialog.innerHTML = `
+            <div class="share-dialog-header">
+                <span>${habit.icon} ${habit.name} · 打卡分享</span>
+                <button class="share-close-btn">&times;</button>
+            </div>
+            <div class="share-image-wrap">
+                <img src="${dataUrl}" alt="${habit.name}打卡分享图" />
+            </div>
+            <div class="share-actions">
+                <button class="share-save-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    保存图片
+                </button>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        // 关闭
+        overlay.querySelector('.share-close-btn').addEventListener('click', () => overlay.remove());
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.remove();
+        });
+
+        // 保存
+        overlay.querySelector('.share-save-btn').addEventListener('click', () => {
+            this.downloadShareImage(dataUrl, habit.name);
+        });
+    }
+
+    downloadShareImage(dataUrl, habitName) {
+        const link = document.createElement('a');
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+        link.download = `${habitName}_打卡_${dateStr}.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
 

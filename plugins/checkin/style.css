@@ -586,7 +586,149 @@
     transition: all 0.3s ease;
 }
 
-/* ========== 响应式 ========== */
+/* ========== 分享按钮 ========== */
+.habit-share-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: white;
+    border: none;
+    animation: shareBtnIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.habit-share-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.35);
+}
+
+@keyframes shareBtnIn {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ========== 分享预览弹窗 ========== */
+.checkin-share-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.checkin-share-dialog {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 20px;
+    padding: 20px;
+    width: min(92vw, 400px);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.share-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d1d1f;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.share-close-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 18px;
+    color: #86868b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.share-close-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1d1d1f;
+}
+
+.share-image-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    line-height: 0;
+}
+
+.share-image-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.share-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.share-save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0071e3;
+    color: white;
+    border: none;
+    width: 100%;
+    justify-content: center;
+}
+
+.share-save-btn:hover {
+    background: #0077ed;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.share-save-btn:active {
+    transform: scale(0.97);
+}
+
+/* ========== 分享预览弹窗响应式 ========== */
+@media (orientation: landscape) and (min-width: 600px) {
+    .checkin-share-dialog {
+        width: min(60vw, 420px);
+        max-height: 85vh;
+    }
+}
 
 /* 竖屏/小屏 */
 @media (max-width: 480px) {

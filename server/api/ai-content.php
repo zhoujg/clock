@@ -128,7 +128,7 @@ function buildWeatherInsightPrompt($weather, $temp, $city) {
     
     $timeOfDay = $hour < 6 ? '凌晨' : ($hour < 12 ? '上午' : ($hour < 18 ? '下午' : '晚上'));
     
-    return "你是一个贴心的天气助手。请根据以下天气信息，生成一段温暖自然的天气解读（不超过50字）。\n" .
+    return "你是一个贴心的天气助手。请根据以下天气信息，生成一段温暖自然的天气解读，以及当地今日的尾号限行（不超过50字）。\n" .
            "地点：{$cityDesc}\n" .
            "天气：{$weatherDesc}\n" .
            "温度：{$tempDesc}\n" .
