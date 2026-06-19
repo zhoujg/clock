@@ -69,32 +69,8 @@ class CheckInTimer {
     }
 
     getDefaultHabits() {
-        return [
-            {
-                id: 'habit_' + Date.now() + '_1',
-                name: '跑步',
-                icon: '🏃',
-                target: 1,
-                unit: '次',
-                records: {}
-            },
-            {
-                id: 'habit_' + Date.now() + '_2',
-                name: '俯卧撑',
-                icon: '💪',
-                target: 3,
-                unit: '组',
-                records: {}
-            },
-            {
-                id: 'habit_' + Date.now() + '_3',
-                name: '喝水',
-                icon: '💧',
-                target: 8,
-                unit: '杯',
-                records: {}
-            }
-        ];
+        // 默认无打卡任务，用户可自由添加
+        return [];
     }
 
     getTodayDateStr() {
