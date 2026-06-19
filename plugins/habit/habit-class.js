@@ -1,5 +1,5 @@
 /**
- * 今日打卡 - 核心类
+ * 习惯 - 核心类
  * 日常习惯管理，支持自定义习惯、打卡记录
  */
 
@@ -47,7 +47,7 @@ const SHARE_CATEGORY_MAP = {
     '记账': 'life', '整理': 'life', '拍照': 'life', '写日记': 'life'
 };
 
-class CheckInTimer {
+class HabitManager {
     constructor(clockManager) {
         this.clockManager = clockManager;
         this.habits = [];
@@ -69,7 +69,7 @@ class CheckInTimer {
     /* ========== 数据管理 ========== */
 
     loadHabits() {
-        const saved = localStorage.getItem('checkin_habits');
+        const saved = localStorage.getItem('habit_data');
         if (saved) {
             try {
                 this.habits = JSON.parse(saved);
@@ -83,11 +83,11 @@ class CheckInTimer {
     }
 
     saveHabits() {
-        localStorage.setItem('checkin_habits', JSON.stringify(this.habits));
+        localStorage.setItem('habit_data', JSON.stringify(this.habits));
 
         // 同步到云端（多设备同步）
         if (window.syncAdapter && window.cloudSync && window.cloudSync.isLoggedIn) {
-            window.syncAdapter.pushChanges('checkin_habits');
+            window.syncAdapter.pushChanges('habit_data');
         }
     }
 
@@ -125,22 +125,22 @@ class CheckInTimer {
     }
 
     createToggle() {
-        this.toggle = document.getElementById('checkinToggle');
+        this.toggle = document.getElementById('habitToggle');
         if (!this.toggle) {
             const toolbar = document.querySelector('.bottom-toolbar');
             if (toolbar) {
                 this.toggle = document.createElement('button');
-                this.toggle.id = 'checkinToggle';
+                this.toggle.id = 'habitToggle';
                 this.toggle.className = 'bottom-tool-btn';
-                this.toggle.title = '今日打卡';
+                this.toggle.title = '习惯';
                 this.toggle.innerHTML = `
                     <svg class="tool-btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 11l3 3L22 4"/>
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
                     </svg>
-                    <span class="tool-btn-label">打卡</span>
-                    <span class="checkin-badge" id="checkinBadge">0</span>
-                    <span class="checkin-status-indicator" id="checkinStatusIndicator"></span>
+                    <span class="tool-btn-label">习惯</span>
+                    <span class="habit-badge" id="habitBadge">0</span>
+                    <span class="habit-status-indicator" id="habitStatusIndicator"></span>
                 `;
                 toolbar.appendChild(this.toggle);
             }
@@ -150,22 +150,22 @@ class CheckInTimer {
     createPanel() {
         // 创建遮罩层
         this.overlay = document.createElement('div');
-        this.overlay.id = 'checkinOverlay';
-        this.overlay.className = 'checkin-overlay';
+        this.overlay.id = 'habitOverlay';
+        this.overlay.className = 'habit-overlay';
         this.overlay.style.display = 'none';
         document.body.appendChild(this.overlay);
 
         // 创建面板
         this.panel = document.createElement('div');
-        this.panel.id = 'checkinPanel';
-        this.panel.className = 'checkin-panel';
+        this.panel.id = 'habitPanel';
+        this.panel.className = 'habit-panel';
         this.panel.innerHTML = `
-            <div class="checkin-header">
-                <h3>今日打卡</h3>
-                <button class="checkin-close-btn" id="checkinCloseBtn">✕</button>
+            <div class="habit-header">
+                <h3>习惯</h3>
+                <button class="habit-close-btn" id="habitCloseBtn">✕</button>
             </div>
-            <div class="checkin-list" id="checkinList"></div>
-            <button class="checkin-add-btn" id="checkinAddBtn">+ 添加习惯</button>
+            <div class="habit-list" id="habitList"></div>
+            <button class="habit-add-btn" id="habitAddBtn">+ 添加习惯</button>
         `;
         document.body.appendChild(this.panel);
 
@@ -173,7 +173,7 @@ class CheckInTimer {
     }
 
     renderHabits() {
-        const list = document.getElementById('checkinList');
+        const list = document.getElementById('habitList');
         if (!list) return;
 
         list.innerHTML = '';
@@ -181,7 +181,7 @@ class CheckInTimer {
         this.habits.forEach(habit => {
             const progress = this.getHabitProgress(habit);
             const habitEl = document.createElement('div');
-            habitEl.className = 'checkin-habit-item';
+            habitEl.className = 'habit-item';
             habitEl.dataset.habitId = habit.id;
 
             habitEl.innerHTML = `
@@ -223,7 +223,7 @@ class CheckInTimer {
 
         // 关闭按钮
         document.addEventListener('click', (e) => {
-            if (e.target.id === 'checkinCloseBtn') {
+            if (e.target.id === 'habitCloseBtn') {
                 this.closePanel();
             }
         });
@@ -269,7 +269,7 @@ class CheckInTimer {
 
         // 添加习惯按钮
         document.addEventListener('click', (e) => {
-            if (e.target.id === 'checkinAddBtn') {
+            if (e.target.id === 'habitAddBtn') {
                 this.showAddHabitDialog();
             }
         });
@@ -365,11 +365,11 @@ class CheckInTimer {
 
     showUndoToast(habitName) {
         // 移除已有的提示
-        const existing = document.querySelector('.checkin-undo-toast');
+        const existing = document.querySelector('.habit-undo-toast');
         if (existing) existing.remove();
 
         const toast = document.createElement('div');
-        toast.className = 'checkin-undo-toast';
+        toast.className = 'habit-undo-toast';
         toast.textContent = `已撤销「${habitName}」`;
         document.body.appendChild(toast);
 
@@ -389,7 +389,7 @@ class CheckInTimer {
 
     showAddHabitDialog() {
         const overlay = document.createElement('div');
-        overlay.className = 'checkin-dialog-overlay';
+        overlay.className = 'habit-dialog-overlay';
         overlay.style.display = 'flex';
 
         // 生成预设习惯列表 HTML（标记已添加的习惯）
@@ -410,7 +410,7 @@ class CheckInTimer {
         }).join('');
 
         const dialog = document.createElement('div');
-        dialog.className = 'checkin-dialog';
+        dialog.className = 'habit-dialog';
         dialog.innerHTML = `
             <h3>添加习惯</h3>
             <div class="preset-habits-section">
@@ -532,11 +532,11 @@ class CheckInTimer {
         if (!habit) return;
 
         const overlay = document.createElement('div');
-        overlay.className = 'checkin-dialog-overlay';
+        overlay.className = 'habit-dialog-overlay';
         overlay.style.display = 'flex';
 
         const dialog = document.createElement('div');
-        dialog.className = 'checkin-dialog';
+        dialog.className = 'habit-dialog';
         dialog.innerHTML = `
             <h3>删除习惯</h3>
             <div class="dialog-form">
@@ -595,9 +595,9 @@ class CheckInTimer {
         const uncompletedHabits = totalHabits - completedHabits;
 
         // 更新徽章（显示待打卡数量）
-        const badge = document.getElementById('checkinBadge');
+        const badge = document.getElementById('habitBadge');
         if (badge) {
-            badge.className = 'checkin-badge';
+            badge.className = 'habit-badge';
 
             if (totalHabits === 0) {
                 badge.textContent = '0';
@@ -610,7 +610,7 @@ class CheckInTimer {
         }
 
         // 更新状态指示灯
-        const indicator = document.getElementById('checkinStatusIndicator');
+        const indicator = document.getElementById('habitStatusIndicator');
         if (indicator) {
             if (completedHabits === totalHabits && totalHabits > 0) {
                 indicator.style.background = '#34c759';
@@ -627,7 +627,7 @@ class CheckInTimer {
         // 更新按钮文本
         const label = this.toggle.querySelector('.tool-btn-label');
         if (label) {
-            label.textContent = '打卡';
+            label.textContent = '习惯';
         }
     }
 
@@ -695,7 +695,7 @@ class CheckInTimer {
         ctx.fillStyle = 'rgba(255,255,255,0.7)';
         ctx.font = '400 26px "PingFang SC", "Microsoft YaHei", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('滴答时钟 · 今日打卡', W / 2, 70);
+        ctx.fillText('滴答时钟 · 习惯', W / 2, 70);
 
         // ── 习惯图标（大号居中） ──
         ctx.fillStyle = '#ffffff';
@@ -847,14 +847,14 @@ class CheckInTimer {
 
     showSharePreview(habit, dataUrl) {
         // 移除已有预览
-        const existing = document.querySelector('.checkin-share-overlay');
+        const existing = document.querySelector('.habit-share-overlay');
         if (existing) existing.remove();
 
         const overlay = document.createElement('div');
-        overlay.className = 'checkin-share-overlay';
+        overlay.className = 'habit-share-overlay';
 
         const dialog = document.createElement('div');
-        dialog.className = 'checkin-share-dialog';
+        dialog.className = 'habit-share-dialog';
         dialog.innerHTML = `
             <div class="share-dialog-header">
                 <span>${habit.icon} ${habit.name} · 打卡分享</span>
@@ -903,4 +903,4 @@ class CheckInTimer {
 }
 
 // 导出到全局
-window.CheckInTimer = CheckInTimer;
+window.HabitManager = HabitManager;

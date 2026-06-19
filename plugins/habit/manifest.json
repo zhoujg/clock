@@ -1,0 +1,12 @@
+{
+  "id": "habit",
+  "name": "习惯",
+  "version": "1.0.0",
+  "description": "日常习惯管理，支持自定义习惯、目标设置和完成统计",
+  "icon": "✅",
+  "author": "系统内置",
+  "main": "plugin.js",
+  "class": "habit-class.js",
+  "css": "style.css",
+  "default": true
+}

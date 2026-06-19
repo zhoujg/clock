@@ -1,8 +1,8 @@
-/* 今日打卡 - 样式 */
+/* 习惯 - 样式 */
 /* Apple 浅色风格设计 */
 
 /* ========== 遮罩层 ========== */
-.checkin-overlay {
+.habit-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -19,7 +19,7 @@
 }
 
 /* ========== 打卡面板 ========== */
-.checkin-panel {
+.habit-panel {
     position: fixed;
     bottom: -100%;
     left: 0;
@@ -41,12 +41,12 @@
     overflow-y: auto;
 }
 
-.checkin-panel.open {
+.habit-panel.open {
     bottom: calc(var(--toolbar-h) + env(safe-area-inset-bottom, 8px));
 }
 
 /* ========== 面板头部 ========== */
-.checkin-header {
+.habit-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -55,7 +55,7 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.checkin-header h3 {
+.habit-header h3 {
     margin: 0;
     font-size: 20px;
     font-weight: 600;
@@ -63,7 +63,7 @@
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
-.checkin-close-btn {
+.habit-close-btn {
     background: rgba(0, 0, 0, 0.05);
     border: none;
     width: 32px;
@@ -78,20 +78,20 @@
     transition: all 0.2s;
 }
 
-.checkin-close-btn:hover {
+.habit-close-btn:hover {
     background: rgba(0, 0, 0, 0.08);
     color: #1d1d1f;
 }
 
 /* ========== 习惯列表 ========== */
-.checkin-list {
+.habit-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
     margin-bottom: 20px;
 }
 
-.checkin-habit-item {
+.habit-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -102,7 +102,7 @@
     transition: all 0.2s;
 }
 
-.checkin-habit-item:hover {
+.habit-habit-item:hover {
     background: rgba(0, 0, 0, 0.04);
 }
 
@@ -224,7 +224,7 @@
 }
 
 /* ========== 添加习惯按钮 ========== */
-.checkin-add-btn {
+.habit-add-btn {
     width: 100%;
     padding: 14px;
     background: rgba(0, 113, 227, 0.08);
@@ -238,13 +238,13 @@
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
-.checkin-add-btn:hover {
+.habit-add-btn:hover {
     background: rgba(0, 113, 227, 0.12);
     border-color: rgba(0, 113, 227, 0.5);
 }
 
 /* ========== 添加习惯对话框 ========== */
-.checkin-dialog-overlay {
+.habit-dialog-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -258,7 +258,7 @@
     animation: fadeIn 0.2s ease;
 }
 
-.checkin-dialog {
+.habit-dialog {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -282,7 +282,7 @@
     }
 }
 
-.checkin-dialog h3 {
+.habit-dialog h3 {
     margin: 0 0 20px 0;
     font-size: 17px;
     font-weight: 600;
@@ -505,7 +505,7 @@
 
 /* ========== 撤销提示 ========== */
 
-.checkin-undo-toast {
+.habit-undo-toast {
     position: fixed;
     bottom: 90px;
     left: 50%;
@@ -527,19 +527,19 @@
     white-space: nowrap;
 }
 
-.checkin-undo-toast.show {
+.habit-undo-toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
 
 /* ========== 底部工具栏按钮状态 ========== */
-#checkinToggle {
+#habitToggle {
     position: relative;
     transition: all 0.3s ease;
 }
 
 /* ========== 打卡徽章 ========== */
-.checkin-badge {
+.habit-badge {
     position: absolute;
     top: -6px;
     right: -6px;
@@ -560,7 +560,7 @@
     animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.checkin-badge.completed {
+.habit-badge.completed {
     background: #34c759;
     box-shadow: 0 2px 6px rgba(52, 195, 89, 0.3);
     font-size: 12px;
@@ -575,7 +575,7 @@
     }
 }
 
-.checkin-status-indicator {
+.habit-status-indicator {
     position: absolute;
     top: 4px;
     right: 4px;
@@ -612,7 +612,7 @@
 }
 
 /* ========== 分享预览弹窗 ========== */
-.checkin-share-overlay {
+.habit-share-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -628,7 +628,7 @@
     animation: fadeIn 0.2s ease;
 }
 
-.checkin-share-dialog {
+.habit-share-dialog {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -724,7 +724,7 @@
 
 /* ========== 分享预览弹窗响应式 ========== */
 @media (orientation: landscape) and (min-width: 600px) {
-    .checkin-share-dialog {
+    .habit-share-dialog {
         width: min(60vw, 420px);
         max-height: 85vh;
     }
@@ -732,12 +732,12 @@
 
 /* 竖屏/小屏 */
 @media (max-width: 480px) {
-    .checkin-panel {
+    .habit-panel {
         padding: 20px 16px;
         --toolbar-h: 60px;
     }
 
-    .checkin-dialog {
+    .habit-dialog {
         padding: 24px 24px;
         min-width: 280px;
         max-width: 92vw;
@@ -767,7 +767,7 @@
 /* 横屏适配 */
 @media (orientation: landscape) and (min-width: 600px) {
     /* ===== 打卡面板 ===== */
-    .checkin-panel {
+    .habit-panel {
         left: 50%;
         right: auto;
         transform: translateX(-50%);
@@ -781,12 +781,12 @@
         max-height: calc(80vh - var(--toolbar-h));
     }
 
-    .checkin-panel.open {
+    .habit-panel.open {
         bottom: calc(var(--toolbar-h) + env(safe-area-inset-bottom, 8px));
     }
 
     /* ===== 添加习惯对话框 ===== */
-    .checkin-dialog {
+    .habit-dialog {
         max-width: 420px;
         padding: 24px 28px;
     }
@@ -848,7 +848,7 @@
     }
 
     /* 习惯列表更紧凑 */
-    .checkin-habit-item {
+    .habit-item {
         padding: 12px 14px;
     }
 
@@ -870,11 +870,11 @@
 
 /* 大横屏（iPad 横屏等） */
 @media (orientation: landscape) and (min-width: 1024px) {
-    .checkin-panel {
+    .habit-panel {
         max-width: 520px;
     }
 
-    .checkin-dialog {
+    .habit-dialog {
         max-width: 440px;
     }
 

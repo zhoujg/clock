@@ -1,27 +1,27 @@
 /**
- * 今日打卡插件
+ * 习惯插件
  * 日常习惯管理，支持自定义习惯、打卡记录
  */
 (function () {
     'use strict';
 
-    const PLUGIN_ID = 'checkin';
-    const CLASS_JS  = 'plugins/checkin/checkin-class.js?v=20260619n';
-    const STYLE_CSS = 'plugins/checkin/style.css?v=20260619n';
+    const PLUGIN_ID = 'habit';
+    const CLASS_JS  = 'plugins/habit/habit-class.js?v=20260619r';
+    const STYLE_CSS = 'plugins/habit/style.css?v=20260619r';
 
     let _classLoaded = false;
     let _loadPromise = null;
     let _instance = null;
     let _cssInjected = false;
 
-    /* 加载 CheckInTimer 类定义 */
+    /* 加载 HabitManager 类定义 */
     function _ensureClassLoaded() {
         if (_classLoaded) return Promise.resolve();
         if (_loadPromise)  return _loadPromise;
 
         _loadPromise = new Promise((resolve, reject) => {
             // 如果已在其他地方加载过
-            if (window.CheckInTimer) {
+            if (window.HabitManager) {
                 _classLoaded = true;
                 resolve();
                 return;
@@ -30,17 +30,17 @@
             const script = document.createElement('script');
             script.src = CLASS_JS + '?v=' + Date.now();
             script.onload = () => {
-                if (window.CheckInTimer) {
+                if (window.HabitManager) {
                     _classLoaded = true;
                     resolve();
                 } else {
                     _loadPromise = null;
-                    reject(new Error('今日打卡：类定义脚本已加载但 CheckInTimer 未定义'));
+                    reject(new Error('习惯：类定义脚本已加载但 HabitManager 未定义'));
                 }
             };
             script.onerror = () => {
                 _loadPromise = null;
-                reject(new Error('今日打卡：类定义脚本加载失败'));
+                reject(new Error('习惯：类定义脚本加载失败'));
             };
             document.body.appendChild(script);
         });
@@ -84,9 +84,9 @@
         }
         // 移除动态创建的元素
         const ids = [
-            'checkinToggle',
-            'checkinPanel',
-            'checkinOverlay'
+            'habitToggle',
+            'habitPanel',
+            'habitOverlay'
         ];
         ids.forEach(id => {
             const el = document.getElementById(id);
@@ -99,9 +99,9 @@
     if (window.PluginManager) {
         window.PluginManager.register({
             id: PLUGIN_ID,
-            name: '今日打卡',
+            name: '习惯',
             version: '1.0.0',
-            description: '日常习惯打卡，支持自定义习惯、目标设置和完成统计',
+            description: '日常习惯管理，支持自定义习惯、目标设置和完成统计',
             icon: '✅',
             author: '系统内置',
             css: STYLE_CSS,
@@ -115,16 +115,16 @@
                 await _ensureClassLoaded();
 
                 // 创建实例
-                if (!_instance && window.CheckInTimer && window.clockManager) {
-                    _instance = new window.CheckInTimer(window.clockManager);
-                    window.checkInTimerInstance = _instance;
+                if (!_instance && window.HabitManager && window.clockManager) {
+                    _instance = new window.HabitManager(window.clockManager);
+                    window.habitInstance = _instance;
                 }
 
-                // 注册云端同步：将 checkin_habits 纳入多设备同步
+                // 注册云端同步：将 habit_data 纳入多设备同步
                 if (window.syncAdapter) {
                     window.syncAdapter.registerSyncKey(
-                        'checkin_habits',       // 云端 user_data 表的 data_key
-                        'checkin_habits',       // localStorage 的 key
+                        'habit_data',           // 云端 user_data 表的 data_key
+                        'habit_data',           // localStorage 的 key
                         () => {
                             // 云端数据合并到 localStorage 后，刷新 UI
                             if (_instance) {
@@ -146,14 +146,14 @@
             async onDeactivate() {
                 // 取消同步注册
                 if (window.syncAdapter) {
-                    window.syncAdapter.unregisterSyncKey('checkin_habits');
+                    window.syncAdapter.unregisterSyncKey('habit_data');
                 }
                 _removeUI();
             },
 
             async onUninstall() {
                 if (window.syncAdapter) {
-                    window.syncAdapter.unregisterSyncKey('checkin_habits');
+                    window.syncAdapter.unregisterSyncKey('habit_data');
                 }
                 _removeUI();
                 _classLoaded = false;

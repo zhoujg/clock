@@ -274,7 +274,7 @@ class PluginManager {
         // 通过扫描已知插件目录下的 manifest.json 来发现
         // 由于浏览器无法直接列出目录，我们尝试加载所有可能的插件路径
         // 这里用一个内置的"种子列表"来定位目录，然后加载每个目录的 manifest
-        const seedIds = ['pomodoro', 'daily-stories', 'bgm-music', 'particle-lines', 'halftime', 'creative-calendar', 'checkin'];
+        const seedIds = ['pomodoro', 'daily-stories', 'bgm-music', 'particle-lines', 'halftime', 'creative-calendar', 'habit'];
 
         const results = await Promise.allSettled(
             seedIds.map(id => this._loadManifest(id))
