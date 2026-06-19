@@ -1,5 +1,5 @@
 /**
- * Halftime · 此间半刻
+ * Halftime · 此生
  * 极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。
  */
 (function () {
@@ -13,7 +13,7 @@
         if (document.querySelector(`link[data-plugin-css="${PLUGIN_ID}"]`)) return;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `plugins/${PLUGIN_ID}/style.css?v=${Date.now()}`;
+        link.href = `plugins/${PLUGIN_ID}/style.css?v=20260619a`;
         link.dataset.pluginCss = PLUGIN_ID;
         document.head.appendChild(link);
     }
@@ -138,15 +138,15 @@
         _settingItemEl = document.createElement('button');
         _settingItemEl.id = 'halftimeBtn';
         _settingItemEl.className = 'bottom-tool-btn';
-        _settingItemEl.title = '此间半刻';
+        _settingItemEl.title = '此生';
         _settingItemEl.innerHTML = `
             <span class="tool-btn-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
             </span>
-            <span class="tool-btn-label">半刻</span>
+            <span class="tool-btn-label">此生</span>
         `;
         _settingItemEl.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -179,7 +179,7 @@
         const header = document.createElement('div');
         header.className = 'halftime-header';
         header.innerHTML = `
-            <div class="halftime-header-title">此间半刻</div>
+            <div class="halftime-header-title">此生</div>
             <div class="halftime-header-sub" id="halftimeSubtitle"></div>
             <button class="halftime-close" title="关闭">&times;</button>
         `;
@@ -626,7 +626,7 @@
             const quotes = [
                 { max: 0.15, text: '人生刚刚开始，未来一切皆有可能。' },
                 { max: 0.3, text: '最好的时光，或许就在此刻。' },
-                { max: 0.5, text: '一半已过，一半犹存。半刻之间，亦有永恒。' },
+                { max: 0.5, text: '一半已过，一半犹存。此生之间，亦有永恒。' },
                 { max: 0.7, text: '每一个当下，都是余生最年轻的一天。' },
                 { max: 0.85, text: '岁月从不败美人，亦不欺智者。' },
                 { max: 1.0, text: '生命的长度有界，深度无边。' }
@@ -644,7 +644,7 @@
 
     window.PluginManager.register({
         id: PLUGIN_ID,
-        name: '此间半刻',
+        name: '此生',
         version: '1.0.0',
         description: '极简点阵视觉语言，把一天、一周、一月、一年、一生重新呈现在眼前。',
         icon: '⏳',

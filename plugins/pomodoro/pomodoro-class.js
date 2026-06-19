@@ -1,7 +1,7 @@
 // 番茄钟 — 聚焦之环 (Focus Ring)
-// 颠覆性设计：无面板，光环进度，粒子环绕，背景呼吸
+// 交互：单击 开始/暂停，长按 自定义时长，双击 重启
 
-class PomodoroTimer {
+window.PomodoroTimer = class PomodoroTimer {
     constructor(clockManager, dailyStories = null) {
         // 时间设置（分钟）
         this.workDuration = 25;
@@ -26,21 +26,16 @@ class PomodoroTimer {
         this.ctx = null;
         this.particles = [];
         this.animationId = null;
-        this.ringGlow = 0;       // 光环发光强度 (0-1)
-        this.completionFlash = 0; // 完成时闪光 (0-1)
+        this.ringGlow = 0;
+        this.completionFlash = 0;
 
         // DOM 元素
         this.toggle = null;
         this.statusIndicator = null;
-        this.sessionCount = null;
         this.sessionDots = null;
 
         // 音效
         this.audioContext = null;
-
-        // 径向菜单
-        this._radialOpen = false;
-        this._radialEl = null;
 
         // 完成过渡动画
         this._celebrationTimer = null;
@@ -48,7 +43,7 @@ class PomodoroTimer {
         // 背景呼吸层
         this._breathOverlay = null;
 
-        // 完成声音播放标记（防止重复播放）
+        // 完成声音播放标记
         this._soundPlayed = false;
 
         this.init();
@@ -62,15 +57,38 @@ class PomodoroTimer {
         this.initBreathOverlay();
         this.bindEvents();
         this.updateDisplay();
-        this.createRadialMenu();
         this.startRenderLoop();
     }
 
     createUI() {
         this.toggle = document.getElementById('pomodoroToggle');
+        if (!this.toggle) {
+            const toolbar = document.querySelector('.bottom-toolbar');
+            if (toolbar) {
+                this.toggle = document.createElement('button');
+                this.toggle.id = 'pomodoroToggle';
+                this.toggle.className = 'bottom-tool-btn';
+                this.toggle.title = '番茄钟（单击开始/暂停，长按自定义，双击重启）';
+                this.toggle.innerHTML = `
+                    <svg class="tool-btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 5c-4.4 0-8 3.6-8 8s3.6 7 8 7 8-2.6 8-7-3.6-8-8-8z"/>
+                        <path d="M12 5c0-2 1.5-3.5 3-4 .5-.1 1 .2 1 .7 0 1-1 2-2 3"/>
+                        <path d="M11 5c0-2-1.5-3.5-3-4-.5-.1-1 .2-1 .7 0 1 1 2 2 3"/>
+                        <ellipse cx="9" cy="10" rx="1.5" ry="1" opacity="0.25" fill="currentColor"/>
+                    </svg>
+                    <span class="tool-btn-label">番茄</span>
+                    <span class="pomodoro-status-indicator" id="statusIndicator"></span>
+                `;
+                if (toolbar.firstChild) {
+                    toolbar.insertBefore(this.toggle, toolbar.firstChild);
+                } else {
+                    toolbar.appendChild(this.toggle);
+                }
+            }
+        }
+
         this.statusIndicator = document.getElementById('statusIndicator');
-        
-        // 会话计数点容器
+
         this.sessionDots = document.getElementById('pomodoroSessionDots');
         if (!this.sessionDots) {
             this.sessionDots = document.createElement('div');
@@ -122,8 +140,9 @@ class PomodoroTimer {
 
         let pressTimer = null;
         let isLongPress = false;
+        let lastTapTime = 0;
 
-        // 指针按下 — 启动长按计时
+        // 指针按下 — 长按打开自定义时长
         this.toggle.addEventListener('pointerdown', (e) => {
             isLongPress = false;
             pressTimer = setTimeout(() => {
@@ -132,13 +151,24 @@ class PomodoroTimer {
             }, 500);
         });
 
-        // 指针释放 — 短按逻辑
+        // 指针释放 — 短按/双击
         this.toggle.addEventListener('pointerup', (e) => {
             clearTimeout(pressTimer);
             if (isLongPress) return;
-            if (this._radialOpen) return;
 
             e.stopPropagation();
+
+            // 双击检测（300ms 内两次点击 → 重启）
+            const now = Date.now();
+            if (now - lastTapTime < 300) {
+                this.reset();
+                this.setMode(this.currentMode);
+                lastTapTime = 0;
+                return;
+            }
+            lastTapTime = now;
+
+            // 短按 → 开始/暂停
             this.handleTap();
         });
 
@@ -146,137 +176,26 @@ class PomodoroTimer {
         this.toggle.addEventListener('pointerleave', () => {
             clearTimeout(pressTimer);
         });
-
-        // 全局点击 — 关闭径向菜单
-        document.addEventListener('click', (e) => {
-            if (this._radialOpen && !e.target.closest('.pomodoro-radial-menu') && !e.target.closest('#pomodoroToggle')) {
-                this.hideRadialMenu();
-            }
-        });
     }
 
-    // 短按处理
+    // 短按：开始 ↔ 暂停
     handleTap() {
         if (this.isRunning) {
-            // 运行中 → 暂停
             this.pause();
-        } else if (this.timeRemaining <= 0 || (this.timeRemaining === this.getTotalTime() && !this.isCustomMode)) {
-            // 未开始或已完成 → 开始工作模式
-            this.setMode('work');
-            this.start();
         } else {
-            // 暂停中 → 继续
             this.start();
         }
     }
 
-    // ========== 径向模式菜单 ==========
-
-    createRadialMenu() {
-        const menu = document.createElement('div');
-        menu.id = 'pomodoroRadial';
-        menu.className = 'pomodoro-radial-menu';
-        menu.innerHTML = `
-            <button class="radial-item" data-mode="work">
-                <span class="radial-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                    </svg>
-                </span>
-                <span class="radial-label">工作</span>
-                <span class="radial-time">25min</span>
-            </button>
-            <button class="radial-item" data-mode="shortBreak">
-                <span class="radial-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-                    </svg>
-                </span>
-                <span class="radial-label">短休</span>
-                <span class="radial-time">5min</span>
-            </button>
-            <button class="radial-item" data-mode="longBreak">
-                <span class="radial-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                    </svg>
-                </span>
-                <span class="radial-label">长休</span>
-                <span class="radial-time">15min</span>
-            </button>
-            <button class="radial-item" data-mode="custom" id="radialCustomBtn">
-                <span class="radial-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2"/>
-                    </svg>
-                </span>
-                <span class="radial-label">自定义</span>
-                <span class="radial-time" id="radialCustomTime">${parseInt(localStorage.getItem('pomodoroCustomDuration')) || 25}min</span>
-            </button>
-        `;
-        document.body.appendChild(menu);
-        this._radialEl = menu;
-
-        // 绑定菜单项点击
-        menu.querySelectorAll('.radial-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const mode = item.dataset.mode;
-                if (mode === 'custom') {
-                    this.promptCustomDuration();
-                } else {
-                    this.setMode(mode);
-                    this.start();
-                }
-                this.hideRadialMenu();
-            });
-        });
-    }
-
-    showRadialMenu(e) {
-        if (this._radialOpen) return;
-        
-        const btnRect = this.toggle.getBoundingClientRect();
-        const cx = btnRect.left + btnRect.width / 2;
-        const cy = btnRect.bottom + 8;     // 按钮下方 8px 为弧心
-        
-        // 四个按钮位置：在按钮下方呈弧形展开（左侧→右侧）
-        const items = this._radialEl.querySelectorAll('.radial-item');
-        const radius = 100;
-        const startAngle = Math.PI * 0.75;  // 135° 左侧偏下
-        const endAngle = Math.PI * 0.25;    // 45° 右侧偏下
-        
-        items.forEach((item, i) => {
-            const angle = startAngle + ((endAngle - startAngle) / (items.length - 1)) * i;
-            const ix = cx + radius * Math.cos(angle) - 32;
-            const iy = cy + radius * Math.sin(angle) - 32;
-            item.style.left = ix + 'px';
-            item.style.top = iy + 'px';
-        });
-        
-        this._radialEl.style.setProperty('--origin-x', cx + 'px');
-        this._radialEl.style.setProperty('--origin-y', cy + 'px');
-        this._radialEl.classList.add('active');
-        this._radialOpen = true;
-        this.toggle.classList.add('radial-open');
-    }
-
-    hideRadialMenu() {
-        this._radialEl.classList.remove('active');
-        this._radialOpen = false;
-        this.toggle.classList.remove('radial-open');
-    }
+    // ========== 自定义时长弹窗 ==========
 
     promptCustomDuration() {
-        // 读取上次保存的自定义时长
         const saved = parseInt(localStorage.getItem('pomodoroCustomDuration')) || 25;
         const defaultVal = Math.min(Math.max(saved, 1), 180);
 
-        const input = document.createElement('div');
-        input.className = 'pomodoro-custom-overlay';
-        input.innerHTML = `
+        const overlay = document.createElement('div');
+        overlay.className = 'pomodoro-custom-overlay';
+        overlay.innerHTML = `
             <div class="custom-dialog">
                 <h3>自定义时长</h3>
                 <div class="custom-input-row">
@@ -289,23 +208,23 @@ class PomodoroTimer {
                 </div>
             </div>
         `;
-        document.body.appendChild(input);
-        
-        const numInput = input.querySelector('#customMinutesInput');
+        document.body.appendChild(overlay);
+
+        const numInput = overlay.querySelector('#customMinutesInput');
         numInput.focus();
         numInput.select();
 
         const cleanup = () => {
             document.removeEventListener('click', outsideClick);
-            input.remove();
+            overlay.remove();
         };
 
         const outsideClick = (ev) => {
-            if (!input.contains(ev.target)) cleanup();
+            if (!overlay.contains(ev.target)) cleanup();
         };
         setTimeout(() => document.addEventListener('click', outsideClick), 100);
 
-        input.querySelector('.custom-dialog-confirm').addEventListener('click', () => {
+        overlay.querySelector('.custom-dialog-confirm').addEventListener('click', () => {
             const minutes = parseInt(numInput.value);
             if (minutes && minutes > 0 && minutes <= 180) {
                 this.startCustomTimer(minutes);
@@ -313,11 +232,11 @@ class PomodoroTimer {
             }
         });
 
-        input.querySelector('.custom-dialog-cancel').addEventListener('click', cleanup);
+        overlay.querySelector('.custom-dialog-cancel').addEventListener('click', cleanup);
 
         numInput.addEventListener('keydown', (ev) => {
             if (ev.key === 'Enter') {
-                input.querySelector('.custom-dialog-confirm').click();
+                overlay.querySelector('.custom-dialog-confirm').click();
             } else if (ev.key === 'Escape') {
                 cleanup();
             }
@@ -346,7 +265,7 @@ class PomodoroTimer {
 
         this._soundPlayed = false;
         this.completionFlash = 0;
-        this.toggle.classList.remove('running-work', 'running-break');
+        this.toggle.classList.remove('running-work', 'running-break', 'paused');
         this.statusIndicator.className = 'pomodoro-status-indicator';
         this.clockManager.switchToNormalMode();
         this.updateBreathOverlay();
@@ -359,11 +278,7 @@ class PomodoroTimer {
         this.currentMode = 'custom';
         this.timeRemaining = minutes * 60;
         this._soundPlayed = false;
-        // 记住本次自定义时长
         localStorage.setItem('pomodoroCustomDuration', minutes);
-        // 更新菜单中的自定义时长显示
-        const radialTime = document.getElementById('radialCustomTime');
-        if (radialTime) radialTime.textContent = minutes + 'min';
         this.updateDisplay();
         this.start();
     }
@@ -372,23 +287,20 @@ class PomodoroTimer {
         if (this.isRunning) return;
         this.isRunning = true;
 
-        // 按钮状态
+        this.toggle.classList.remove('paused');
         this.toggle.classList.add(
             this.currentMode === 'work' || this.isCustomMode ? 'running-work' : 'running-break'
         );
         this.statusIndicator.className = 'pomodoro-status-indicator ' +
-            (this.currentMode === 'work' || this.isCustomMode ? 'working' : 'breaking');
+            (this.currentMode === 'work' || this.isCustomMode ? 'status-work' : 'status-break');
         this.toggle.classList.add('is-running');
 
-        // 呼吸层
         this.updateBreathOverlay();
 
-        // 倒计时
         this.intervalId = setInterval(() => {
             this.timeRemaining--;
-            this.updateDisplay();
             this.ringGlow = Math.min(1, this.ringGlow + 0.03);
-
+            this.updateDisplay();
             if (this.timeRemaining <= 0) {
                 this.complete();
             }
@@ -401,6 +313,7 @@ class PomodoroTimer {
         clearInterval(this.intervalId);
         this.toggle.classList.remove('is-running');
         this.toggle.classList.remove('running-work', 'running-break');
+        this.toggle.classList.add('paused');
         this.statusIndicator.className = 'pomodoro-status-indicator';
         this.ringGlow = Math.max(0, this.ringGlow - 0.05);
         this.clockManager.switchToNormalMode();
@@ -412,32 +325,26 @@ class PomodoroTimer {
         this.setMode(this.currentMode);
         this.ringGlow = 0;
         this.completionFlash = 0;
+        this.toggle.classList.remove('paused');
     }
 
     complete() {
         this.pause();
 
-        // 防止重复触发
         if (this._soundPlayed) return;
         this._soundPlayed = true;
 
         this.playSound();
-
-        // 完成闪光
         this.completionFlash = 1;
         this.ringGlow = 1;
-
-        // 粒子爆发
         this.spawnBurstParticles();
 
-        // 自定义模式
         if (this.isCustomMode) {
             this.showNotification();
             this.scheduleCelebrationEnd();
             return;
         }
 
-        // 工作完成
         if (this.currentMode === 'work') {
             this.completedSessions++;
             this.updateSessionDots();
@@ -448,7 +355,6 @@ class PomodoroTimer {
 
             this.showNotification();
 
-            // 自动切换
             const nextMode = this.completedSessions % 4 === 0 ? 'longBreak' : 'shortBreak';
             setTimeout(() => {
                 this.setMode(nextMode);
@@ -457,7 +363,6 @@ class PomodoroTimer {
                 this.start();
             }, 2000);
         } else {
-            // 休息完成
             this.showNotification();
             setTimeout(() => {
                 this.setMode('work');
@@ -482,8 +387,6 @@ class PomodoroTimer {
             const minutes = Math.floor(this.timeRemaining / 60);
             const seconds = this.timeRemaining % 60;
             this.clockManager.updatePomodoroDisplay(minutes, seconds);
-        } else if (this.timeRemaining <= 0) {
-            // 显示完成状态
         }
     }
 
@@ -513,7 +416,7 @@ class PomodoroTimer {
     updateBreathOverlay() {
         if (!this._breathOverlay) return;
         this._breathOverlay.classList.remove('breath-work', 'breath-break', 'breath-active');
-        
+
         if (this.isRunning) {
             this._breathOverlay.classList.add('breath-active');
             if (this.currentMode === 'work' || this.isCustomMode) {
@@ -524,7 +427,7 @@ class PomodoroTimer {
         }
     }
 
-    // ========== Canvas 渲染（聚焦之环 + 粒子） ==========
+    // ========== Canvas 渲染 ==========
 
     startRenderLoop() {
         const loop = () => {
@@ -542,7 +445,6 @@ class PomodoroTimer {
 
         ctx.clearRect(0, 0, w, h);
 
-        // 找到时钟中心
         const tickEl = document.querySelector('.tick');
         if (!tickEl) return;
         const rect = tickEl.getBoundingClientRect();
@@ -550,7 +452,6 @@ class PomodoroTimer {
         const cy = rect.top + rect.height / 2;
         const clockRadius = Math.max(rect.width, rect.height) / 1.2;
 
-        // 光环衰减
         if (!this.isRunning) {
             this.ringGlow = Math.max(0, this.ringGlow - 0.02);
         }
@@ -560,11 +461,9 @@ class PomodoroTimer {
             this.drawFocusRing(ctx, cx, cy, clockRadius);
         }
 
-        // 粒子
         this.updateParticles(cx, cy, clockRadius);
         this.drawParticles(ctx);
 
-        // 完成闪光
         if (this.completionFlash > 0.01) {
             this.drawCompletionFlash(ctx, cx, cy, clockRadius);
         }
@@ -573,12 +472,11 @@ class PomodoroTimer {
     drawFocusRing(ctx, cx, cy, radius) {
         const progress = 1 - (this.getTotalTime() > 0 ? this.timeRemaining / this.getTotalTime() : 0);
         const ringRadius = radius * 0.85;
-        const startAngle = -Math.PI / 2; // 12点钟方向
+        const startAngle = -Math.PI / 2;
         const endAngle = startAngle + (Math.PI * 2 * progress);
 
         const isWork = this.currentMode === 'work' || this.isCustomMode;
 
-        // 外发光（多层光晕）
         for (let i = 3; i >= 0; i--) {
             const blur = 4 + i * 6;
             const alpha = (0.06 + i * 0.03) * this.ringGlow;
@@ -597,35 +495,15 @@ class PomodoroTimer {
         }
         ctx.shadowBlur = 0;
 
-        // 主环
         ctx.beginPath();
         ctx.arc(cx, cy, ringRadius, startAngle, endAngle);
-        const gradient = ctx.createConicalGradient
-            ? ctx.createConicalGradient(startAngle, cx, cy)
-            : null;
-
-        if (gradient) {
-            // Conic gradient if supported
-            if (isWork) {
-                gradient.addColorStop(0, 'rgba(255, 159, 67, 0.9)');
-                gradient.addColorStop(0.5, 'rgba(255, 107, 107, 0.9)');
-                gradient.addColorStop(1, 'rgba(255, 159, 67, 0.9)');
-            } else {
-                gradient.addColorStop(0, 'rgba(78, 205, 196, 0.9)');
-                gradient.addColorStop(0.5, 'rgba(0, 184, 212, 0.9)');
-                gradient.addColorStop(1, 'rgba(78, 205, 196, 0.9)');
-            }
-            ctx.strokeStyle = gradient;
-        } else {
-            ctx.strokeStyle = isWork
-                ? `rgba(255, 159, 67, ${0.7 * this.ringGlow})`
-                : `rgba(78, 205, 196, ${0.7 * this.ringGlow})`;
-        }
+        ctx.strokeStyle = isWork
+            ? `rgba(255, 159, 67, ${0.7 * this.ringGlow})`
+            : `rgba(78, 205, 196, ${0.7 * this.ringGlow})`;
         ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
         ctx.stroke();
 
-        // 环端发光点
         if (progress > 0) {
             const ex = cx + ringRadius * Math.cos(endAngle);
             const ey = cy + ringRadius * Math.sin(endAngle);
@@ -646,17 +524,14 @@ class PomodoroTimer {
         }
     }
 
-    // 粒子系统
     updateParticles(cx, cy, radius) {
         const isWork = this.currentMode === 'work' || this.isCustomMode;
         const ringRadius = radius * 0.85;
         const targetCount = this.isRunning ? 25 : 5;
 
-        // 生成粒子
         while (this.particles.length < targetCount) {
-            const angle = Math.random() * Math.PI * 2;
             this.particles.push({
-                angle: angle,
+                angle: Math.random() * Math.PI * 2,
                 distance: ringRadius + (Math.random() - 0.5) * 30,
                 speed: (Math.random() * 0.005 + 0.003) * (isWork ? 1.5 : 0.6),
                 radius: Math.random() * 2 + 1,
@@ -666,12 +541,10 @@ class PomodoroTimer {
             });
         }
 
-        // 超出则移除
         while (this.particles.length > targetCount) {
             this.particles.shift();
         }
 
-        // 更新位置
         const progress = this.getTotalTime() > 0 ? 1 - this.timeRemaining / this.getTotalTime() : 0;
         const maxAngle = -Math.PI / 2 + Math.PI * 2 * progress;
 
@@ -679,7 +552,6 @@ class PomodoroTimer {
             p.angle += p.speed;
             p.pulse += p.pulseSpeed;
 
-            // 粒子跟随光环进度
             if (this.isRunning) {
                 while (p.angle > maxAngle + Math.PI * 2) p.angle -= Math.PI * 2;
                 if (p.angle > maxAngle && p.angle < maxAngle + Math.PI * 0.5) {
@@ -695,7 +567,6 @@ class PomodoroTimer {
             const alpha = p.opacity * (0.5 + 0.5 * Math.sin(p.pulse)) * this.ringGlow;
             if (alpha < 0.03) continue;
 
-            // 相对于时钟中心的位置
             const px = this._clockCx + p.distance * Math.cos(p.angle);
             const py = this._clockCy + p.distance * Math.sin(p.angle);
 
@@ -714,16 +585,13 @@ class PomodoroTimer {
         }
     }
 
-    // 粒子爆发（完成时）
     spawnBurstParticles() {
         const burstCount = 40;
-        const isWork = this.currentMode === 'work' || this.isCustomMode;
         for (let i = 0; i < burstCount; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const dist = 0;
             this.particles.push({
                 angle: angle,
-                distance: dist,
+                distance: 0,
                 speed: (Math.random() * 0.03 + 0.01) * (Math.random() > 0.5 ? 1 : -1),
                 radius: Math.random() * 3 + 2,
                 opacity: 1,
@@ -733,7 +601,6 @@ class PomodoroTimer {
             });
         }
 
-        // 爆发粒子渐隐
         setTimeout(() => {
             this.particles = this.particles.filter(p => !p.burst);
         }, 2000);
@@ -759,7 +626,6 @@ class PomodoroTimer {
         ctx.fill();
     }
 
-    // 时钟中心缓存
     get _clockCx() {
         const tickEl = document.querySelector('.tick');
         if (!tickEl) return window.innerWidth / 2;
@@ -782,8 +648,7 @@ class PomodoroTimer {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
 
-            // 完成音效：三音符上行和弦
-            const notes = this.currentMode === 'work' ? [523, 659, 784] : [784, 659, 523]; // C5-E5-G5 上行
+            const notes = this.currentMode === 'work' ? [523, 659, 784] : [784, 659, 523];
             notes.forEach((freq, i) => {
                 const osc = this.audioContext.createOscillator();
                 const gain = this.audioContext.createGain();
@@ -797,9 +662,7 @@ class PomodoroTimer {
                 osc.start(startTime);
                 osc.stop(startTime + 0.3);
             });
-        } catch (e) {
-            // 静默处理
-        }
+        } catch (e) {}
     }
 
     showNotification() {
@@ -840,4 +703,4 @@ class PomodoroTimer {
             this.setMode(this.currentMode);
         }
     }
-}
+};

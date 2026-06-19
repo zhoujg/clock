@@ -134,12 +134,23 @@ class PluginManager {
 
     /**
      * 检查用户是否主动卸载过某个插件
+     * 增加控制台警告，帮助调试
      */
     _wasUninstalled(id) {
         try {
-            const set = new Set(JSON.parse(localStorage.getItem('userUninstalledPlugins') || '[]'));
-            return set.has(id);
-        } catch (e) { return false; }
+            const raw = localStorage.getItem('userUninstalledPlugins');
+            if (raw) {
+                const set = new Set(JSON.parse(raw));
+                if (set.has(id)) {
+                    console.warn(`[PluginManager] 插件 ${id} 曾被用户卸载，跳过自动安装。如需恢复，请在插件库中重新安装。`);
+                    return true;
+                }
+            }
+            return false;
+        } catch (e) { 
+            console.warn('[PluginManager] _wasUninstalled 解析失败:', e);
+            return false; 
+        }
     }
 
     /* ============ 启用 / 停用 ============ */
@@ -263,7 +274,7 @@ class PluginManager {
         // 通过扫描已知插件目录下的 manifest.json 来发现
         // 由于浏览器无法直接列出目录，我们尝试加载所有可能的插件路径
         // 这里用一个内置的"种子列表"来定位目录，然后加载每个目录的 manifest
-        const seedIds = ['daily-stories', 'bgm-music', 'particle-lines', 'halftime', 'creative-calendar'];
+        const seedIds = ['pomodoro', 'daily-stories', 'bgm-music', 'particle-lines', 'halftime', 'creative-calendar'];
 
         const results = await Promise.allSettled(
             seedIds.map(id => this._loadManifest(id))
@@ -336,12 +347,23 @@ class PluginManager {
      * 3. 激活所有已安装且启用的插件
      */
     async init() {
+        // 调试：允许通过 URL 参数重置插件状态
+        if (new URLSearchParams(window.location.search).get('resetPlugins') === 'true') {
+            console.warn('[PluginManager] 检测到 resetPlugins=true，正在清除插件数据...');
+            localStorage.removeItem('installedPlugins');
+            localStorage.removeItem('userUninstalledPlugins');
+            console.warn('[PluginManager] 插件数据已清除，即将刷新页面...');
+            setTimeout(() => window.location.href = window.location.pathname, 1000);
+            return;
+        }
+
         // 第一步：自动发现所有插件
         await this.discoverPlugins();
 
         // 第二步：自动安装标记为 default 的插件（仅首次，尊重用户卸载选择）
         for (const manifest of Object.values(this.manifests)) {
             if (manifest.default && !this.installed[manifest.id] && !this._wasUninstalled(manifest.id)) {
+                console.log(`[PluginManager] 自动安装默认插件: ${manifest.id}`);
                 this.installed[manifest.id] = { enabled: true, installDate: Date.now(), default: true };
             }
         }

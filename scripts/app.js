@@ -69,11 +69,11 @@ class ClockManager {
 }
 
 // 全局时钟管理器实例
-const clockManager = new ClockManager();
+window.clockManager = new ClockManager();
 
 // 时钟初始化函数
 function handleTickInit(tick) {
-    clockManager.initNormalClock(tick);
+    window.clockManager.initNormalClock(tick);
 }
 
 // 应用主控制器
@@ -85,12 +85,12 @@ class App {
         this.tickSoundManager = new TickSoundManager();
         this.bgmPlayerManager = null; // 由音乐播放器插件管理生命周期
         
-        this.pomodoroTimer = new PomodoroTimer(clockManager, null);
+        // 番茄钟实例由 pomodoro 插件在激活时创建并挂载到 window
         
         this.picsumManager = new PicsumManager(this.backgroundManager, this.settingsStorage);
         
         // 设置时钟管理器的滴答声引用
-        clockManager.setTickSoundManager(this.tickSoundManager);
+        window.clockManager.setTickSoundManager(this.tickSoundManager);
         
         this.initializeControls();
         this.initializeColorPanel();
@@ -164,14 +164,14 @@ class App {
         if (!window.dailyStoriesManager) return;
 
         // 设置番茄钟的 dailyStories 引用
-        if (this.pomodoroTimer) {
-            this.pomodoroTimer.dailyStories = window.dailyStoriesManager;
+        if (window.pomodoroTimerInstance) {
+            window.pomodoroTimerInstance.dailyStories = window.dailyStoriesManager;
         }
 
         // 设置 dailyStories 的系统引用
         if (window.dailyStoriesManager.setSystemReferences) {
             window.dailyStoriesManager.setSystemReferences(
-                this.pomodoroTimer
+                window.pomodoroTimerInstance || null
             );
         }
 

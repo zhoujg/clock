@@ -161,10 +161,9 @@
                 const temp = document.createElement('div');
                 temp.innerHTML = MUSIC_BTN_HTML.trim();
                 _btnEl = temp.firstChild;
-                // 插入到番茄钟之后
-                const pomodoroBtn = document.getElementById('pomodoroToggle');
-                if (pomodoroBtn && pomodoroBtn.nextSibling) {
-                    toolbar.insertBefore(_btnEl, pomodoroBtn.nextSibling);
+                // 插入到工具栏开头（作为第一个按钮）
+                if (toolbar.firstChild) {
+                    toolbar.insertBefore(_btnEl, toolbar.firstChild);
                 } else {
                     toolbar.appendChild(_btnEl);
                 }

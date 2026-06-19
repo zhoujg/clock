@@ -1167,7 +1167,7 @@ window.DailyStories = class DailyStories {
             return;
         }
         
-        const pomodoroTimer = this.pomodoroTimer || window.app?.pomodoroTimer;
+        const pomodoroTimer = this.pomodoroTimer || window.pomodoroTimerInstance || window.app?.pomodoroTimer;
         if (!pomodoroTimer) {
             console.error('❌ 番茄钟系统不可用');
             alert('番茄钟功能暂不可用，请刷新页面重试');
@@ -1654,7 +1654,7 @@ window.DailyStories = class DailyStories {
         }
         
         // 获取番茄钟系统实例
-        const pomodoroTimer = this.pomodoroTimer || window.app?.pomodoroTimer;
+        const pomodoroTimer = this.pomodoroTimer || window.pomodoroTimerInstance || window.app?.pomodoroTimer;
         
         if (!pomodoroTimer) {
             console.error('❌ 番茄钟系统不可用');
