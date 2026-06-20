@@ -114,7 +114,7 @@
     </div>
 </div>`;
 
-    const MUSIC_BTN_HTML = '<button id="musicBtn" class="bottom-tool-btn" title="音乐播放器"><svg class="tool-btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-3v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></svg><span class="tool-btn-label">音乐</span></button>';
+    const MUSIC_BTN_HTML = '<button id="musicBtn" class="bottom-tool-btn" title="音乐播放器"><svg class="tool-btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-3v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></svg><span class="tool-btn-label">音乐</span><span class="music-playing-indicator"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span></button>';
 
     let _modalEl = null;
     let _btnEl = null;
@@ -158,7 +158,7 @@
         }
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = 'plugins/bgm-music/style.css?v=20260620l';
+        link.href = 'plugins/bgm-music/style.css?v=20260621a';
         link.dataset.pluginCss = PLUGIN_ID;
         document.head.appendChild(link);
         _cssInjected = true;
@@ -340,10 +340,14 @@
             });
         }
 
-        // 音乐播放状态变化 → 唱片旋转
+        // 音乐播放状态变化 → 唱片旋转 + 底栏按钮指示器
         const onPlayState = () => {
+            const playing = !!(mgr && mgr.isPlaying);
             if (_modalEl) {
-                _modalEl.classList.toggle('playing', !!(mgr && mgr.isPlaying));
+                _modalEl.classList.toggle('playing', playing);
+            }
+            if (_btnEl) {
+                _btnEl.classList.toggle('playing', playing);
             }
         };
         window.addEventListener('musicPlayStateChanged', onPlayState);

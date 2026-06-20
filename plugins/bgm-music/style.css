@@ -1,5 +1,58 @@
 /* ===== 音乐播放器全屏模态框 — Apple 浅色主题 ===== */
 
+/* ===== 底栏音乐按钮「正在播放」指示器 ===== */
+#musicBtn {
+    position: relative;
+}
+
+/* 播放中：图标变为强调蓝 */
+#musicBtn.playing .tool-btn-icon {
+    color: #0071e3;
+    filter: drop-shadow(0 0 4px rgba(0, 113, 227, 0.4));
+}
+
+/* 播放中：文字也变为强调蓝 */
+#musicBtn.playing .tool-btn-label {
+    color: #0071e3;
+}
+
+/* 均衡器条容器 — 默认隐藏 */
+.music-playing-indicator {
+    display: none;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    gap: 2px;
+    align-items: flex-end;
+    height: 12px;
+    pointer-events: none;
+}
+
+/* 播放中：显示均衡器 */
+#musicBtn.playing .music-playing-indicator {
+    display: flex;
+}
+
+/* 均衡器条 */
+.eq-bar {
+    width: 2.5px;
+    height: 4px;
+    background: #0071e3;
+    border-radius: 1.5px;
+    animation: eq-bounce 0.7s ease-in-out infinite alternate;
+}
+
+.eq-bar:nth-child(1) { animation-delay: 0s; }
+.eq-bar:nth-child(2) { animation-delay: 0.12s; }
+.eq-bar:nth-child(3) { animation-delay: 0.24s; }
+.eq-bar:nth-child(4) { animation-delay: 0.36s; }
+
+@keyframes eq-bounce {
+    0%   { height: 3px; }
+    50%  { height: 10px; }
+    100% { height: 5px; }
+}
+
 .music-modal {
     display: none;
     position: fixed;
