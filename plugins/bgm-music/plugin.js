@@ -21,76 +21,95 @@
                 </svg>
             </button>
         </div>
-        <div class="music-modal-current">
-            <div class="current-track-cover">
-                <div class="vinyl-record" id="vinylRecord">
-                    <div class="vinyl-center"></div>
+        <div class="music-modal-right">
+            <div class="music-modal-current">
+                <div class="current-track-cover">
+                    <div class="vinyl-record" id="vinylRecord">
+                        <div class="vinyl-center"></div>
+                    </div>
+                </div>
+                <div class="current-track-info">
+                    <div class="current-track-name" id="currentTrackName">未播放</div>
+                    <div class="current-artist" id="currentArtist" style="display: none;"></div>
                 </div>
             </div>
-            <div class="current-track-info">
-                <div class="current-track-name" id="currentTrackName">未播放</div>
-                <div class="current-artist" id="currentArtist" style="display: none;"></div>
+            <div class="music-modal-progress">
+                <span class="time-current" id="currentTime">0:00</span>
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <span class="time-duration" id="duration">0:00</span>
+            </div>
+            <div class="music-modal-controls">
+                <button class="control-btn-large" id="musicFavoriteBtn" title="收藏">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </button>
+                <button class="control-btn-large" id="prevBtn" title="上一曲">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                    </svg>
+                </button>
+                <button class="control-btn-xlarge play-pause" id="playPauseBtn" title="播放/暂停">
+                    <svg class="play-icon" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg class="pause-icon" width="40" height="40" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                    </svg>
+                </button>
+                <button class="control-btn-large" id="nextBtn" title="下一曲">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                    </svg>
+                </button>
+                <button class="control-btn-large" id="loopBtn" title="循环">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="music-modal-volume">
+                <span class="volume-icon">🔊</span>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" />
+                <span class="volume-value" id="volumeValue">50%</span>
             </div>
         </div>
-        <div class="music-modal-progress">
-            <span class="time-current" id="currentTime">0:00</span>
-            <div class="progress-container" id="progressContainer">
-                <div class="progress-bar" id="progressBar"></div>
+        <div class="music-modal-left">
+            <div class="music-modal-genre">
+                <span class="genre-label">风格</span>
+                <select class="genre-select" id="genreSelect">
+                    <option value="ambient">🌿 环境音乐</option>
+                    <option value="classical">🎻 古典</option>
+                    <option value="jazz">🎷 爵士</option>
+                    <option value="electronic">🎹 电子</option>
+                    <option value="rock">🎸 摇滚</option>
+                    <option value="pop">🎤 流行</option>
+                    <option value="world">🌍 世界音乐</option>
+                    <option value="folk">🪕 民谣</option>
+                    <option value="lounge">🍸 Lounge</option>
+                    <option value="instrumental">🎼 纯器乐</option>
+                </select>
             </div>
-            <span class="time-duration" id="duration">0:00</span>
-        </div>
-        <div class="music-modal-controls">
-            <button class="control-btn-large" id="musicFavoriteBtn" title="收藏">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-            </button>
-            <button class="control-btn-large" id="prevBtn" title="上一曲">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-                </svg>
-            </button>
-            <button class="control-btn-xlarge play-pause" id="playPauseBtn" title="播放/暂停">
-                <svg class="play-icon" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
-                </svg>
-                <svg class="pause-icon" width="40" height="40" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
-                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                </svg>
-            </button>
-            <button class="control-btn-large" id="nextBtn" title="下一曲">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                </svg>
-            </button>
-            <button class="control-btn-large" id="loopBtn" title="循环">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
-                </svg>
-            </button>
-        </div>
-        <div class="music-modal-volume">
-            <span class="volume-icon">🔊</span>
-            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" />
-            <span class="volume-value" id="volumeValue">50%</span>
-        </div>
-        <div class="music-modal-tabs">
-            <button class="music-tab active" data-tab="playlist">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/>
-                </svg>
-                播放列表
-            </button>
-            <button class="music-tab" data-tab="favorites">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-                我的收藏
-                <span class="favorites-count-badge" id="favoritesCountBadge">0</span>
-            </button>
-        </div>
-        <div class="music-modal-list" id="musicListContainer">
-            <div class="no-music">加载中...</div>
+            <div class="music-modal-tabs">
+                <button class="music-tab active" data-tab="playlist">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/>
+                    </svg>
+                    播放列表
+                </button>
+                <button class="music-tab" data-tab="favorites">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    我的收藏
+                    <span class="favorites-count-badge" id="favoritesCountBadge">0</span>
+                </button>
+            </div>
+            <div class="music-modal-list" id="musicListContainer">
+                <div class="no-music">加载中...</div>
+            </div>
         </div>
     </div>
 </div>`;
@@ -139,7 +158,7 @@
         }
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = 'plugins/bgm-music/style.css?v=20260620c';
+        link.href = 'plugins/bgm-music/style.css?v=20260620l';
         link.dataset.pluginCss = PLUGIN_ID;
         document.head.appendChild(link);
         _cssInjected = true;
@@ -284,6 +303,29 @@
                 const rect = progressContainer.getBoundingClientRect();
                 const percent = ((e.clientX - rect.left) / rect.width) * 100;
                 mgr.setProgress(percent);
+            });
+        }
+
+        // 风格选择
+        const genreSelect = document.getElementById('genreSelect');
+        if (genreSelect && mgr) {
+            genreSelect.addEventListener('change', async (e) => {
+                e.stopPropagation();
+                const tag = e.target.value;
+                // 切换回播放列表模式
+                if (mgr.showingFavorites) {
+                    mgr.showingFavorites = false;
+                    document.querySelectorAll('.music-tab').forEach(t => t.classList.remove('active'));
+                    const playlistTab = document.querySelector('.music-tab[data-tab="playlist"]');
+                    if (playlistTab) playlistTab.classList.add('active');
+                }
+                _showNotification(`正在加载 ${e.target.options[e.target.selectedIndex].text}...`, 'info');
+                try {
+                    await mgr.loadJamendoByTag(tag, 20, true);
+                } catch (err) {
+                    console.error('[音乐播放器] 切换风格失败:', err);
+                }
+                _saveSettings();
             });
         }
 

@@ -389,6 +389,50 @@
     text-align: right;
 }
 
+/* 风格选择器 */
+.music-modal-genre {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 0 12px;
+}
+
+.genre-label {
+    font-size: 14px;
+    color: #86868b;
+    flex-shrink: 0;
+    font-weight: 500;
+}
+
+.genre-select {
+    flex: 1;
+    padding: 10px 28px 10px 14px;
+    font-size: 14px;
+    color: #1d1d1f;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2386868b' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: all 0.2s ease;
+}
+
+.genre-select:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.genre-select:focus {
+    border-color: #0071e3;
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
+
 /* 标签页切换 */
 .music-modal-tabs {
     display: flex;
@@ -623,146 +667,152 @@
     }
 }
 
-/* 横屏/高度受限：压缩上方区域，让列表获得更多空间 */
-@media (max-height: 700px) and (min-width: 500px) {
+/* ===== 横屏双栏布局：左栏 flex 弹性 + 右栏固定宽，各自独立 flex 列 ===== */
+@media (min-width: 680px) and (max-height: 900px) {
     .music-modal-content {
-        padding: 16px 24px;
-    }
-    
-    .music-modal-title {
-        font-size: 18px;
-        margin-bottom: 10px;
-    }
-    
-    .music-modal-close {
-        width: 28px;
-        height: 28px;
-        top: 12px;
-        right: 12px;
-    }
-    
-    .music-modal-current {
-        padding: 12px 16px;
-        gap: 16px;
-        margin-bottom: 12px;
-        border-radius: 14px;
+        display: flex;
         flex-direction: row;
-        text-align: left;
+        gap: 20px;
+        padding: 12px 16px;
+        max-height: 76vh;
+        max-width: 96vw;
+        width: auto;
+        overflow: hidden;
+        position: relative;
     }
-    
-    .vinyl-record {
-        width: 70px;
-        height: 70px;
+
+    /* 标题栏：隐藏文字，关闭按钮悬浮右上角 */
+    .music-modal-header {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        margin: 0;
+        padding: 0;
+        z-index: 10;
     }
-    
-    .vinyl-record.has-cover .vinyl-center {
-        width: 14px;
-        height: 14px;
+    .music-modal-title { display: none; }
+    .music-modal-close {
+        width: 22px; height: 22px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.08);
+        border-color: rgba(0,0,0,0.12);
     }
-    
-    .current-track-name {
-        font-size: 18px;
-        margin-bottom: 2px;
+    .music-modal-close svg { width: 13px; height: 13px; }
+
+    /* ═══ 左栏：弹性宽，垂直 flex 列 ═══ */
+    .music-modal-left {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
-    
-    .current-artist {
-        font-size: 14px;
+
+    /* 风格选择（紧凑顶行） */
+    .music-modal-genre {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 2px 6px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
     }
-    
-    .music-modal-progress {
-        gap: 10px;
-        margin-bottom: 12px;
-    }
-    
-    .time-current,
-    .time-duration {
-        font-size: 12px;
-        min-width: 36px;
-    }
-    
-    .progress-container {
-        height: 4px;
-        border-radius: 2px;
-    }
-    
-    .progress-bar {
-        border-radius: 2px;
-    }
-    
-    .music-modal-controls {
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-    
-    .control-btn-large {
-        width: 38px;
-        height: 38px;
-    }
-    
-    .control-btn-large svg {
-        width: 18px;
-        height: 18px;
-    }
-    
-    .control-btn-xlarge {
-        width: 48px;
-        height: 48px;
-    }
-    
-    .control-btn-xlarge svg {
-        width: 24px;
-        height: 24px;
-    }
-    
-    .music-modal-volume {
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .volume-icon {
-        font-size: 16px;
-    }
-    
-    .volume-slider {
-        width: 120px;
-    }
-    
+    .genre-label { font-size: 12px; white-space: nowrap; }
+    .genre-select { flex: 1; padding: 4px 20px 4px 6px; font-size: 12px; border-radius: 6px; background-position: right 4px center; }
+
+    /* 标签切换（紧贴风格，零间距） */
     .music-modal-tabs {
-        margin-bottom: 10px;
-        gap: 8px;
+        flex-shrink: 0;
+        display: flex;
+        gap: 6px;
+        padding: 5px 2px 4px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
     }
-    
-    .music-tab {
-        padding: 6px 14px;
-        font-size: 13px;
-    }
-    
-    .music-tab svg {
-        width: 16px;
-        height: 16px;
-    }
-    
+    .music-tab { padding: 5px 12px; font-size: 12px; border-radius: 7px; }
+    .music-tab svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .favorites-count-badge { font-size: 10px; min-width: 18px; height: 18px; padding: 0 6px; border-radius: 9px; }
+
+    /* 播放列表（flex:1 吃满左栏剩余空间） */
     .music-modal-list {
-        max-height: 200px;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-top: 4px;
+        padding-right: 4px;
     }
-    
-    .music-track {
-        padding: 10px 14px;
-        margin-bottom: 6px;
+    .no-music { padding: 20px 8px; font-size: 13px; }
+    .music-track { padding: 9px 10px; margin-bottom: 3px; gap: 8px; border-radius: 8px; }
+    .track-thumb { width: 32px; height: 32px; border-radius: 4px; }
+    .track-icon { font-size: 16px; }
+    .track-name { font-size: 13px; margin-bottom: 1px; }
+    .music-artist { font-size: 11px; }
+    .track-remove-btn { width: 20px; height: 20px; font-size: 14px; }
+
+    /* ═══ 右栏：固定宽 230px，垂直 flex 列 ═══ */
+    .music-modal-right {
+        width: 430px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
-    
-    .track-thumb {
-        width: 32px;
-        height: 32px;
+
+    /* 封面 + 曲目信息 */
+    .music-modal-current {
+        flex-shrink: 0;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,0.07);
     }
-    
-    .track-name {
-        font-size: 13px;
+    .vinyl-record { width: 230px; height: 230px; margin: 0 auto; }
+    .vinyl-center { width: 18px; height: 18px; }
+    .vinyl-record.has-cover .vinyl-center { width: 14px; height: 14px; }
+    .vinyl-record::before { width: 72%; height: 72%; }
+    .current-track-name { font-size: 14px; font-weight: 600; margin-bottom: 0; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .current-artist { font-size: 11px; opacity: 0.5; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* 进度条 */
+    .music-modal-progress {
+        flex-shrink: 0;
+        padding: 6px 6px;
+        gap: 6px;
+        align-items: center;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-    
-    .music-artist {
-        font-size: 12px;
+    .time-current, .time-duration { font-size: 10px; min-width: 28px; }
+    .progress-container { height: 4px; border-radius: 2px; }
+    .progress-bar { border-radius: 2px; }
+
+    /* 播放控制按钮 */
+    .music-modal-controls {
+        flex-shrink: 0;
+        padding: 6px 2px;
+        gap: 6px;
+        justify-content: center;
+        align-items: center;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
+    .control-btn-large { width: 32px; height: 32px; }
+    .control-btn-large svg { width: 15px; height: 15px; }
+    .control-btn-xlarge { width: 42px; height: 42px; box-shadow: 0 3px 12px rgba(0,113,227,0.22); }
+    .control-btn-xlarge svg { width: 20px; height: 20px; }
+
+    /* 音量滑块 */
+    .music-modal-volume {
+        flex-shrink: 0;
+        padding: 6px 6px;
+        gap: 6px;
+        align-items: center;
+    }
+    .volume-icon { font-size: 13px; }
+    .volume-slider { height: 3px; width: auto; flex: 1; }
+    .volume-slider::-webkit-slider-thumb { width: 13px; height: 13px; }
+    .volume-value { font-size: 10px; min-width: 28px; }
 }
 
 @media (max-width: 480px) {
