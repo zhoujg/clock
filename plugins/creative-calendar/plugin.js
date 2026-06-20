@@ -244,13 +244,35 @@
     function _getMonthHolidays(year, month, daysInMonth, getLunar) {
         const holidays = [];
 
-        // 公历节日
+        // 公历固定节日
         const solarHolidays = {
             '1-1': '元旦', '2-14': '情人节', '3-8': '妇女节', '3-12': '植树节',
             '4-1': '愚人节', '5-1': '劳动节', '5-4': '青年节', '6-1': '儿童节',
             '7-1': '建党节', '8-1': '建军节', '9-10': '教师节', '10-1': '国庆节',
             '12-25': '圣诞节', '10-31': '万圣节'
         };
+
+        // 公历动态节日（第N个周几）
+        const dynamicHolidays = [
+            { month: 5, nth: 2, weekday: 0, name: '母亲节' },  // 5月第二个周日
+            { month: 6, nth: 3, weekday: 0, name: '父亲节' },  // 6月第三个周日
+        ];
+        for (const dh of dynamicHolidays) {
+            if (month === dh.month) {
+                // 计算该月第 nth 个 weekday 的日期
+                let count = 0;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dow = new Date(year, month - 1, d).getDay();
+                    if (dow === dh.weekday) {
+                        count++;
+                        if (count === dh.nth) {
+                            solarHolidays[month + '-' + d] = dh.name;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
         for (let d = 1; d <= daysInMonth; d++) {
             const key = month + '-' + d;
@@ -547,8 +569,11 @@
                 } else {
                     lunarSpan.textContent = lunar.dayName;
                 }
-                // 农历节日
+                // 农历节日或公历节日替换农历文本
                 if (holidayMap[dayNum] && holidayMap[dayNum].type === 'lunar') {
+                    lunarSpan.textContent = holidayMap[dayNum].name;
+                    lunarSpan.classList.add('cc-lunar-holiday-text');
+                } else if (holidayMap[dayNum] && holidayMap[dayNum].type === 'solar') {
                     lunarSpan.textContent = holidayMap[dayNum].name;
                     lunarSpan.classList.add('cc-lunar-holiday-text');
                 }
