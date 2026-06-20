@@ -35,3 +35,10 @@
 - 参见 `DEPLOYMENT.md`
 - API 路径：`/api/*.php`
 - CORS 配置在 `server/config.php` 的 `ALLOWED_ORIGINS`
+
+## 环境音插件（ambient-sound, v3.0.0）
+- 音源来自 Moodist（https://github.com/remvze/moodist, MIT 许可）
+- CDN：`https://moodist.mvze.net/sounds/{category}/{name}.mp3`，CORS `*`
+- 双模式引擎：真实音频（fetch+decodeAudioData+缓存）+ 噪音合成（white/pink/brown）
+- 6 个分类 28 个音源：自然/雨声/动物/场所/器物/噪音
+- 同步键 `ambient_settings`，复用 syncAdapter.registerSyncKey 机制

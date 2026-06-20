@@ -1,5 +1,5 @@
-/* 白噪音·环境音 - 样式 */
-/* Apple 浅色玻璃态风格，复刻 bgm-music 模态框 */
+/* 环境音 - 样式 v3.5.0 */
+/* Apple 浅色玻璃态风格，基于 Moodist 真实环境音 */
 
 /* ========== 模态框 ========== */
 .ambient-modal {
@@ -113,6 +113,331 @@
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
+/* ========== 混音预设区域 ========== */
+.ambient-preset-section {
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.ambient-preset-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* 预设操作按钮组 */
+.ambient-preset-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* 全部停止按钮（头部小按钮） */
+.ambient-stop-all-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255, 59, 48, 0.08);
+    color: #FF3B30;
+    border: 1px solid rgba(255, 59, 48, 0.15);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.ambient-stop-all-btn:hover {
+    background: rgba(255, 59, 48, 0.12);
+}
+
+.preset-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d1d1f;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.ambient-preset-save {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(0, 113, 227, 0.08);
+    color: #0071e3;
+    border: 1px solid rgba(0, 113, 227, 0.15);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.ambient-preset-save:hover {
+    background: rgba(0, 113, 227, 0.12);
+}
+
+/* 预设列表 */
+.ambient-preset-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* 预设子标签 */
+.ambient-preset-sublabel {
+    font-size: 11px;
+    font-weight: 600;
+    color: #86868b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 12px 0 8px;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.ambient-preset-sublabel:first-of-type {
+    margin-top: 0;
+}
+
+/* 预设卡片 */
+.ambient-preset-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1.5px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    max-width: 100%;
+    position: relative;
+}
+
+.ambient-preset-card:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 113, 227, 0.2);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* 预设卡片 - 正在播放状态（高亮标识） */
+.ambient-preset-card.active {
+    background: linear-gradient(135deg, rgba(52, 199, 89, 0.08), rgba(90, 200, 250, 0.06));
+    border-color: #34C759;
+    box-shadow: 0 0 16px rgba(52, 199, 89, 0.15), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.ambient-preset-card.active .preset-card-name {
+    color: #34C759;
+    font-weight: 600;
+}
+
+.ambient-preset-card.builtin.active {
+    background: linear-gradient(135deg, rgba(0, 113, 227, 0.1), rgba(52, 199, 89, 0.06));
+    border-color: #0071e3;
+    box-shadow: 0 0 16px rgba(0, 113, 227, 0.15), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.ambient-preset-card.builtin.active .preset-card-name {
+    color: #0071e3;
+}
+
+/* 内置预设卡片样式 */
+.ambient-preset-card.builtin {
+    background: linear-gradient(135deg, rgba(0, 113, 227, 0.04), rgba(90, 200, 250, 0.06));
+    border-color: rgba(0, 113, 227, 0.12);
+}
+
+.ambient-preset-card.builtin:hover {
+    background: linear-gradient(135deg, rgba(0, 113, 227, 0.08), rgba(90, 200, 250, 0.1));
+    border-color: rgba(0, 113, 227, 0.25);
+}
+
+/* 内置预设图标徽章 */
+.preset-card-badge {
+    font-size: 16px;
+    line-height: 1;
+    margin-right: 2px;
+}
+
+/* 预设描述文字 */
+.preset-card-desc {
+    font-size: 10px;
+    color: #86868b;
+    line-height: 1.3;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.preset-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.preset-card-icons {
+    font-size: 14px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.preset-more {
+    font-size: 11px;
+    color: #86868b;
+    margin-left: 2px;
+}
+
+/* 正在播放指示器 */
+.preset-playing-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #34C759;
+    font-weight: 600;
+    margin-left: 6px;
+    padding: 1px 6px;
+    background: rgba(52, 199, 89, 0.12);
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.preset-playing-indicator svg {
+    animation: preset-playing-dots 1.4s ease-in-out infinite;
+}
+
+.preset-playing-indicator svg circle:first-child {
+    animation: preset-dot-pulse 1.4s ease-in-out infinite;
+}
+
+.preset-playing-indicator svg circle:last-child {
+    animation: preset-dot-pulse 1.4s ease-in-out 0.3s infinite;
+}
+
+@keyframes preset-playing-dots {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes preset-dot-pulse {
+    0%, 100% { r: 4; }
+    50% { r: 2.5; }
+}
+
+.preset-card-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1d1d1f;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.preset-card-delete {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.04);
+    border: none;
+    border-radius: 50%;
+    color: #86868b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.preset-card-delete:hover {
+    background: rgba(255, 59, 48, 0.12);
+    color: #ff3b30;
+}
+
+/* 预设空状态 */
+.ambient-preset-empty {
+    font-size: 12px;
+    color: #86868b;
+    padding: 8px 0;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* 预设保存输入框 */
+.ambient-preset-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(0, 113, 227, 0.08);
+    border: 1px solid rgba(0, 113, 227, 0.2);
+    border-radius: 10px;
+}
+
+.ambient-preset-input {
+    flex: 1;
+    min-width: 80px;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: #1d1d1f;
+    outline: none;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.ambient-preset-input::placeholder {
+    color: #c7c7cc;
+}
+
+.preset-input-confirm {
+    padding: 4px 10px;
+    background: #0071e3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    flex-shrink: 0;
+}
+
+.preset-input-confirm:hover {
+    opacity: 0.85;
+}
+
+.preset-input-cancel {
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.05);
+    color: #86868b;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    flex-shrink: 0;
+}
+
+.preset-input-cancel:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1d1d1f;
+}
+
 /* ========== 总音量控制 ========== */
 .ambient-master {
     display: flex;
@@ -160,12 +485,40 @@
     font-family: -apple-system, sans-serif;
 }
 
+/* ========== 分类区块 ========== */
+.ambient-category {
+    margin-bottom: 20px;
+}
+
+.ambient-category:last-of-type {
+    margin-bottom: 12px;
+}
+
+.ambient-category-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-left: 4px;
+}
+
+.ambient-category-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.ambient-category-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d1d1f;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
 /* ========== 音源卡片网格 ========== */
 .ambient-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
-    margin-bottom: 20px;
 }
 
 .ambient-card {
@@ -190,6 +543,33 @@
     background: color-mix(in srgb, var(--sound-color) 12%, transparent);
     border-color: var(--sound-color);
     box-shadow: 0 0 20px color-mix(in srgb, var(--sound-color) 20%, transparent);
+}
+
+/* card 加载状态 */
+.ambient-card.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.ambient-card.loading .ambient-card-icon {
+    animation: ambient-spin 0.8s linear infinite;
+}
+
+@keyframes ambient-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* card 错误状态 */
+.ambient-card.error {
+    border-color: #FF3B30;
+    animation: ambient-shake 0.4s ease;
+}
+
+@keyframes ambient-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
 }
 
 /* card 图标 */
@@ -233,23 +613,22 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* ========== 全部停止按钮 ========== */
-.ambient-stop-all {
-    width: 100%;
-    padding: 14px;
-    background: rgba(255, 59, 48, 0.08);
-    color: #FF3B30;
-    border: 1px solid rgba(255, 59, 48, 0.15);
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
+/* ========== 信用文本 ========== */
+.ambient-credit {
+    text-align: center;
+    font-size: 11px;
+    color: #86868b;
+    margin-top: 14px;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
-.ambient-stop-all:hover {
-    background: rgba(255, 59, 48, 0.12);
+.ambient-credit a {
+    color: #0071e3;
+    text-decoration: none;
+}
+
+.ambient-credit a:hover {
+    text-decoration: underline;
 }
 
 /* ========== 按钮徽章 ========== */
@@ -268,6 +647,16 @@
     align-items: center;
     justify-content: center;
     padding: 0 4px;
+}
+
+/* 徽章脉冲：提示用户点击任意位置恢复音频 */
+.bottom-tool-btn.resume-pending .ambient-badge {
+    animation: ambient-resume-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes ambient-resume-pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(90, 200, 250, 0.5); }
+    50% { transform: scale(1.3); box-shadow: 0 0 0 6px rgba(90, 200, 250, 0); }
 }
 
 /* ========== 底栏按钮播放状态 ========== */

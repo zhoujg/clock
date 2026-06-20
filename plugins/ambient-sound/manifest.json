@@ -1,8 +1,8 @@
 {
   "id": "ambient-sound",
-  "name": "白噪音·环境音",
-  "version": "1.0.0",
-  "description": "雨声、风声、海浪、白噪音等环境音，可叠加混音，助眠专注。",
+  "name": "环境音",
+  "version": "3.5.0",
+  "description": "基于 Moodist 的真实环境音：75+ 音源，内置学习专注预设，可叠加混音、保存预设、多设备同步。预设播放状态可视化标识。",
   "icon": "🌧️",
   "author": "时钟应用",
   "main": "plugin.js",
