@@ -303,36 +303,27 @@ class BGMPlayerManager {
         // 🎯 优化：记录开始加载时间，用于性能监控
         const loadStartTime = Date.now();
         
-        this.audio.src = this.currentTrack.file;
-        
-        
-        // 🎯 优化：监听 canplay 事件（有足够数据可以播放）
+        // 🎯 优化：先在设置 src 之前注册事件监听器，避免 canplay 在注册前就触发
         const onCanPlay = () => {
             const loadTime = Date.now() - loadStartTime;
             this.hideLoadingState();
-            // 移除一次性事件监听器
-            this.audio.removeEventListener('loadstart', onLoadStart);
             this.audio.removeEventListener('canplay', onCanPlay);
             this.audio.removeEventListener('error', onLoadError);
         };
         
-        // 🎯 优化：监听加载错误
         const onLoadError = () => {
             const loadTime = Date.now() - loadStartTime;
             console.error(`❌ 音频加载失败！耗时: ${loadTime}ms`);
             this.hideLoadingState();
-            // 移除一次性事件监听器
-            this.audio.removeEventListener('loadstart', onLoadStart);
             this.audio.removeEventListener('canplay', onCanPlay);
             this.audio.removeEventListener('error', onLoadError);
         };
         
-        // 添加一次性事件监听器
-        this.audio.addEventListener('loadstart', onLoadStart, { once: true });
         this.audio.addEventListener('canplay', onCanPlay, { once: true });
         this.audio.addEventListener('error', onLoadError, { once: true });
         
-        this.audio.load();
+        // 设置 src 触发加载（监听器已在上面注册）
+        this.audio.src = this.currentTrack.file;
         
         // 在开始播放前立即暂停滴答声
         this.pauseTickSound();
@@ -493,6 +484,7 @@ class BGMPlayerManager {
     updateCurrentTrackDisplay() {
         const currentTrackName = document.getElementById('currentTrackName');
         const currentArtist = document.getElementById('currentArtist');
+        const vinylRecord = document.getElementById('vinylRecord');
         
         if (currentTrackName && this.currentTrack) {
             currentTrackName.textContent = this.currentTrack.name;
@@ -503,6 +495,17 @@ class BGMPlayerManager {
                 currentArtist.style.display = 'block';
             } else if (currentArtist) {
                 currentArtist.style.display = 'none';
+            }
+            
+            // 显示专辑封面
+            if (vinylRecord) {
+                if (this.currentTrack.image) {
+                    vinylRecord.style.backgroundImage = `url(${this.currentTrack.image})`;
+                    vinylRecord.classList.add('has-cover');
+                } else {
+                    vinylRecord.style.backgroundImage = '';
+                    vinylRecord.classList.remove('has-cover');
+                }
             }
         }
     }
@@ -579,9 +582,13 @@ class BGMPlayerManager {
                 trackElement.classList.add('active');
             }
             
+            const thumbHTML = track.image 
+                ? `<img class="track-thumb" src="${track.image}" alt="" onerror="this.style.display='none'">`
+                : `<span class="track-icon">♪</span>`;
+            
             trackElement.innerHTML = `
                 <div class="track-info">
-                    <span class="track-icon">♪</span>
+                    ${thumbHTML}
                     <div style="flex: 1; min-width: 0;">
                         <div class="track-name">${track.name}</div>
                         ${track.artist ? `<div class="music-artist">${track.artist}</div>` : ''}
@@ -627,6 +634,12 @@ class BGMPlayerManager {
         const currentTrackName = document.getElementById('currentTrackName');
         if (currentTrackName) {
             currentTrackName.innerHTML = '<span style="opacity: 0.6;">⏳ 加载中...</span>';
+        }
+        // 清除上一首曲目的封面，避免残留
+        const vinylRecord = document.getElementById('vinylRecord');
+        if (vinylRecord) {
+            vinylRecord.style.backgroundImage = '';
+            vinylRecord.classList.remove('has-cover');
         }
     }
     
@@ -871,6 +884,7 @@ class BGMPlayerManager {
             this.favorites.splice(existingIndex, 1);
             this.saveFavorites();
             this.updateFavoriteButton();
+            this.updateShowFavoritesButton();
             
             // 如果正在显示收藏列表，刷新列表
             if (this.showingFavorites) {
@@ -895,6 +909,7 @@ class BGMPlayerManager {
             this.favorites.unshift(favoriteTrack); // 添加到开头
             this.saveFavorites();
             this.updateFavoriteButton();
+            this.updateShowFavoritesButton();
             
             return true;
         }
@@ -971,9 +986,13 @@ class BGMPlayerManager {
                 trackElement.classList.add('active');
             }
             
+            const thumbHTML = track.image 
+                ? `<img class="track-thumb" src="${track.image}" alt="" onerror="this.style.display='none'">`
+                : `<span class="track-icon">❤️</span>`;
+            
             trackElement.innerHTML = `
                 <div class="track-info">
-                    <span class="track-icon">❤️</span>
+                    ${thumbHTML}
                     <div style="flex: 1; min-width: 0;">
                         <div class="track-name">${track.name}</div>
                         ${track.artist ? `<div class="music-artist">${track.artist}</div>` : ''}
@@ -1098,6 +1117,7 @@ class BGMPlayerManager {
         
         // 更新收藏按钮状态
         this.updateFavoriteButton();
+        this.updateShowFavoritesButton();
     }
     
     /**
@@ -1113,6 +1133,12 @@ class BGMPlayerManager {
         } else {
             showFavoritesBtn.classList.remove('active');
             showFavoritesBtn.title = `我的收藏 (${this.favorites.length})`;
+        }
+        
+        // 同步更新收藏数量徽章
+        const badge = document.getElementById('favoritesCountBadge');
+        if (badge) {
+            badge.textContent = this.favorites.length;
         }
     }
     

@@ -129,9 +129,40 @@
     height: 120px;
     border-radius: 50%;
     background: linear-gradient(135deg, #0071e3, #005bb5);
+    background-size: cover;
+    background-position: center;
     position: relative;
     animation: spin 3s linear infinite paused;
     box-shadow: 0 8px 32px rgba(0, 113, 227, 0.25);
+}
+
+/* 有封面图时：用图片替代纯色背景，保留唱片纹理叠加层 */
+.vinyl-record.has-cover {
+    background: #1d1d1f url('') center/cover no-repeat;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* 有封面图时：弱化唱片纹理叠加层，让封面更清晰可见 */
+.vinyl-record.has-cover::before {
+    width: 88%;
+    height: 88%;
+    background: radial-gradient(circle, 
+        transparent 58%, 
+        rgba(0, 0, 0, 0.15) 60%, 
+        rgba(0, 0, 0, 0.08) 65%, 
+        transparent 70%,
+        rgba(0, 0, 0, 0.12) 75%, 
+        transparent 80%,
+        rgba(0, 0, 0, 0.1) 85%,
+        transparent 90%
+    );
+}
+
+/* 有封面图时：缩小并半透明化中心圆点 */
+.vinyl-record.has-cover .vinyl-center {
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.75);
 }
 
 .vinyl-record::before {
@@ -469,6 +500,16 @@
     flex-shrink: 0;
 }
 
+/* 列表缩略图 */
+.track-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
 .track-info {
     flex: 1;
     min-width: 0;
@@ -579,6 +620,148 @@
     
     .music-modal-list {
         max-height: 300px;
+    }
+}
+
+/* 横屏/高度受限：压缩上方区域，让列表获得更多空间 */
+@media (max-height: 700px) and (min-width: 500px) {
+    .music-modal-content {
+        padding: 16px 24px;
+    }
+    
+    .music-modal-title {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    
+    .music-modal-close {
+        width: 28px;
+        height: 28px;
+        top: 12px;
+        right: 12px;
+    }
+    
+    .music-modal-current {
+        padding: 12px 16px;
+        gap: 16px;
+        margin-bottom: 12px;
+        border-radius: 14px;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .vinyl-record {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .vinyl-record.has-cover .vinyl-center {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .current-track-name {
+        font-size: 18px;
+        margin-bottom: 2px;
+    }
+    
+    .current-artist {
+        font-size: 14px;
+    }
+    
+    .music-modal-progress {
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .time-current,
+    .time-duration {
+        font-size: 12px;
+        min-width: 36px;
+    }
+    
+    .progress-container {
+        height: 4px;
+        border-radius: 2px;
+    }
+    
+    .progress-bar {
+        border-radius: 2px;
+    }
+    
+    .music-modal-controls {
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .control-btn-large {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .control-btn-large svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .control-btn-xlarge {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .control-btn-xlarge svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .music-modal-volume {
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .volume-icon {
+        font-size: 16px;
+    }
+    
+    .volume-slider {
+        width: 120px;
+    }
+    
+    .music-modal-tabs {
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+    
+    .music-tab {
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+    
+    .music-tab svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .music-modal-list {
+        max-height: 200px;
+    }
+    
+    .music-track {
+        padding: 10px 14px;
+        margin-bottom: 6px;
+    }
+    
+    .track-thumb {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .track-name {
+        font-size: 13px;
+    }
+    
+    .music-artist {
+        font-size: 12px;
     }
 }
 

@@ -139,7 +139,7 @@
         }
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = 'plugins/bgm-music/style.css?v=20260618a';
+        link.href = 'plugins/bgm-music/style.css?v=20260620c';
         link.dataset.pluginCss = PLUGIN_ID;
         document.head.appendChild(link);
         _cssInjected = true;
@@ -293,6 +293,7 @@
             favBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const isFav = mgr.favoriteCurrentTrack();
+                _updateFavCount();
                 _showNotification(isFav ? '❤️ 已收藏' : '💔 已取消收藏', isFav ? 'success' : 'info');
             });
         }
