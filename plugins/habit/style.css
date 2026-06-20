@@ -102,7 +102,7 @@
     transition: all 0.2s;
 }
 
-.habit-habit-item:hover {
+.habit-item:hover {
     background: rgba(0, 0, 0, 0.04);
 }
 

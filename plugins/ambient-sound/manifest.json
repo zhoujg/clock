@@ -1,0 +1,11 @@
+{
+  "id": "ambient-sound",
+  "name": "白噪音·环境音",
+  "version": "1.0.0",
+  "description": "雨声、风声、海浪、白噪音等环境音，可叠加混音，助眠专注。",
+  "icon": "🌧️",
+  "author": "时钟应用",
+  "main": "plugin.js",
+  "css": "style.css",
+  "default": true
+}

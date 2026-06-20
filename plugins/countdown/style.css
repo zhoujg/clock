@@ -1,0 +1,503 @@
+/* 倒计时·纪念日 - 样式 */
+/* Apple 浅色玻璃态风格 */
+
+/* ========== 遮罩层 ========== */
+.countdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    animation: cd-fadeIn 0.2s ease;
+}
+
+@keyframes cd-fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ========== 面板 ========== */
+.countdown-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 24px 20px;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    transition: bottom 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --toolbar-h: 68px;
+    bottom: calc(-100% + var(--toolbar-h) + env(safe-area-inset-bottom, 8px));
+    max-height: calc(70vh - var(--toolbar-h));
+    overflow-y: auto;
+}
+
+.countdown-panel.open {
+    bottom: calc(var(--toolbar-h) + env(safe-area-inset-bottom, 8px));
+}
+
+/* ========== 面板头部 ========== */
+.countdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.countdown-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1d1d1f;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.countdown-close-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 14px;
+    color: #86868b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.countdown-close-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1d1d1f;
+}
+
+/* ========== 倒计时列表 ========== */
+.countdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* 空状态 */
+.countdown-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #86868b;
+}
+
+.countdown-empty .empty-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.countdown-empty p {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    color: #1d1d1f;
+    font-weight: 500;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.countdown-empty .empty-hint {
+    font-size: 13px;
+    color: #86868b;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* 单条卡片 */
+.countdown-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.2s;
+}
+
+.countdown-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.countdown-item.past {
+    opacity: 0.6;
+}
+
+.countdown-item-icon {
+    font-size: 22px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.countdown-item-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.countdown-item-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 3px;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.countdown-item-meta {
+    font-size: 12px;
+    color: #86868b;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.countdown-item-meta .dot {
+    opacity: 0.5;
+}
+
+.countdown-item-days {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 56px;
+}
+
+.countdown-day-number {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    font-family: -apple-system, 'SF Pro Display', sans-serif;
+}
+
+.countdown-day-unit {
+    font-size: 11px;
+    color: #86868b;
+    margin-top: 2px;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.countdown-delete-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+}
+
+.countdown-delete-btn:hover {
+    opacity: 1;
+}
+
+/* ========== 添加按钮 ========== */
+.countdown-add-btn {
+    width: 100%;
+    padding: 14px;
+    background: rgba(0, 113, 227, 0.08);
+    color: #0071e3;
+    border: 1px dashed rgba(0, 113, 227, 0.3);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.countdown-add-btn:hover {
+    background: rgba(0, 113, 227, 0.12);
+    border-color: rgba(0, 113, 227, 0.5);
+}
+
+/* ========== 按钮徽章 ========== */
+.countdown-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #FF3B30;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+/* ========== 常驻横幅 ========== */
+/* 定位由 JS positionBanner() 动态计算，适配横竖屏 */
+.countdown-banner {
+    position: fixed;
+    z-index: 15;
+    text-align: center;
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    cursor: pointer;
+    transition: opacity 0.2s, background 0.2s, left 0.3s ease, top 0.3s ease;
+    animation: cd-bannerIn 0.4s ease;
+    white-space: nowrap;
+    /* left / top 由 JS 动态设置 */
+}
+
+@keyframes cd-bannerIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.countdown-banner:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.countdown-banner .banner-icon {
+    font-size: 16px;
+}
+
+.countdown-banner .banner-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: inherit;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    letter-spacing: 0.3px;
+}
+
+/* ========== 对话框 ========== */
+.countdown-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: cd-fadeIn 0.2s ease;
+}
+
+.countdown-dialog {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 420px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.countdown-dialog h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d1d1f;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.countdown-confirm-text p {
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    color: #1d1d1f;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    line-height: 1.5;
+}
+
+/* 表单 */
+.countdown-form .form-row {
+    margin-bottom: 16px;
+}
+
+.countdown-form .form-row label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #86868b;
+    margin-bottom: 8px;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.countdown-form input[type="text"],
+.countdown-form input[type="date"],
+.countdown-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    font-size: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    color: #1d1d1f;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.countdown-form input:focus,
+.countdown-form select:focus {
+    outline: none;
+    border-color: #0071e3;
+}
+
+/* 图标选择网格 */
+.countdown-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+}
+
+.countdown-icon-pick {
+    font-size: 20px;
+    text-align: center;
+    padding: 6px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.countdown-icon-pick:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.countdown-icon-pick.selected {
+    background: rgba(0, 113, 227, 0.12);
+    border-color: #0071e3;
+}
+
+/* 颜色选择网格 */
+.countdown-color-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 6px;
+}
+
+.countdown-color-pick {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 3px solid transparent;
+}
+
+.countdown-color-pick.selected {
+    border-color: rgba(0, 0, 0, 0.3);
+    transform: scale(1.15);
+}
+
+/* 对话框按钮 */
+.dialog-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.dialog-cancel-btn,
+.dialog-confirm-btn,
+.dialog-delete-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.dialog-cancel-btn {
+    background: rgba(0, 0, 0, 0.05);
+    color: #1d1d1f;
+}
+
+.dialog-cancel-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.dialog-confirm-btn {
+    background: #0071e3;
+    color: white;
+}
+
+.dialog-confirm-btn:hover {
+    background: #005bb5;
+}
+
+.dialog-delete-btn {
+    background: #FF3B30;
+    color: white;
+}
+
+.dialog-delete-btn:hover {
+    background: #d70015;
+}
+
+/* ========== Toast 提示 ========== */
+.countdown-toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 3000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    backdrop-filter: blur(20px);
+}
+
+.countdown-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 380px) {
+    .countdown-icon-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+    .countdown-color-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+    .countdown-day-number {
+        font-size: 24px;
+    }
+}

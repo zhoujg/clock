@@ -1,0 +1,12 @@
+{
+  "id": "countdown",
+  "name": "倒计时·纪念日",
+  "version": "1.0.0",
+  "description": "记录重要日子，距离生日/考试/纪念日还有多少天，时钟下方常驻显示。",
+  "icon": "⏰",
+  "author": "时钟应用",
+  "main": "plugin.js",
+  "class": "countdown-class.js",
+  "css": "style.css",
+  "default": true
+}
