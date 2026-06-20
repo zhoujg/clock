@@ -1,0 +1,398 @@
+/* PDF阅读器样式 */
+
+/* ========== 底部工具栏按钮 ========== */
+#pdfReaderBtn {
+    position: relative;
+}
+
+/* ========== 全屏阅读器 ========== */
+.pdf-reader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9000;
+    display: flex;
+    flex-direction: column;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.pdf-reader-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 顶部工具栏 */
+.pdf-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: rgba(30, 30, 50, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 12px;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.pdf-toolbar-left,
+.pdf-toolbar-center,
+.pdf-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pdf-toolbar-center {
+    flex: 1;
+    justify-content: center;
+}
+
+.pdf-toolbar-right {
+    justify-content: flex-end;
+}
+
+/* 工具栏按钮 */
+.pdf-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ccc;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.pdf-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.pdf-btn:active {
+    transform: scale(0.95);
+}
+
+.pdf-btn.active {
+    background: rgba(78, 205, 196, 0.2);
+    color: #4ecdc4;
+}
+
+.pdf-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+/* 页码显示 */
+.pdf-page-info {
+    font-size: 13px;
+    color: #aaa;
+    min-width: 80px;
+    text-align: center;
+}
+
+.pdf-page-info input {
+    width: 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-size: 13px;
+    padding: 2px 4px;
+    outline: none;
+}
+
+.pdf-page-info input:focus {
+    border-color: #4ecdc4;
+}
+
+/* 缩放显示 */
+.pdf-zoom-info {
+    font-size: 12px;
+    color: #888;
+    min-width: 45px;
+    text-align: center;
+}
+
+/* 文件名 */
+.pdf-filename {
+    font-size: 13px;
+    color: #bbb;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ========== 主内容区 ========== */
+.pdf-main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 侧边目录 */
+.pdf-sidebar {
+    width: 240px;
+    background: rgba(25, 25, 45, 0.95);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    overflow-y: auto;
+    flex-shrink: 0;
+    display: none;
+    padding: 8px 0;
+}
+
+.pdf-sidebar.open {
+    display: block;
+}
+
+.pdf-sidebar-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    padding: 8px 16px 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pdf-outline-item {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: #bbb;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1.4;
+}
+
+.pdf-outline-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.pdf-outline-item.level-1 {
+    padding-left: 24px;
+    font-size: 12px;
+}
+
+.pdf-outline-item.level-2 {
+    padding-left: 36px;
+    font-size: 12px;
+    color: #999;
+}
+
+/* 页面列表缩略图 */
+.pdf-thumb-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.pdf-thumb-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.pdf-thumb-item.active {
+    background: rgba(78, 205, 196, 0.1);
+}
+
+.pdf-thumb-item canvas {
+    max-width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pdf-thumb-label {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* 阅读区域 */
+.pdf-viewer {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 16px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pdf-viewer canvas {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+    max-width: 100%;
+}
+
+/* ========== 欢迎页 ========== */
+.pdf-welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    color: #888;
+}
+
+.pdf-welcome-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: rgba(78, 205, 196, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdf-welcome-icon svg {
+    width: 40px;
+    height: 40px;
+    color: #4ecdc4;
+}
+
+.pdf-welcome h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ccc;
+    margin: 0;
+}
+
+.pdf-welcome p {
+    font-size: 14px;
+    color: #777;
+    margin: 0;
+}
+
+.pdf-open-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(78, 205, 196, 0.3);
+}
+
+.pdf-open-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(78, 205, 196, 0.4);
+}
+
+.pdf-open-btn:active {
+    transform: translateY(0);
+}
+
+/* 拖拽区域 */
+.pdf-drop-zone {
+    width: 300px;
+    height: 120px;
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #666;
+    transition: all 0.2s ease;
+}
+
+.pdf-drop-zone.drag-over {
+    border-color: #4ecdc4;
+    background: rgba(78, 205, 196, 0.05);
+    color: #4ecdc4;
+}
+
+/* ========== 加载动画 ========== */
+.pdf-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #888;
+    font-size: 14px;
+}
+
+.pdf-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #4ecdc4;
+    border-radius: 50%;
+    animation: pdf-spin 0.8s linear infinite;
+}
+
+@keyframes pdf-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========== 深色模式 ========== */
+body.stories-dark .pdf-reader-overlay {
+    background: #0d0d1a;
+}
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 768px) {
+    .pdf-sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        z-index: 5;
+        width: 220px;
+    }
+    
+    .pdf-toolbar {
+        padding: 6px 10px;
+    }
+    
+    .pdf-btn {
+        min-width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .pdf-filename {
+        max-width: 100px;
+    }
+    
+    .pdf-viewer {
+        padding: 10px;
+    }
+}

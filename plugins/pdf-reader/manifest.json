@@ -1,0 +1,11 @@
+{
+  "id": "pdf-reader",
+  "name": "PDF阅读器",
+  "version": "1.0.0",
+  "description": "在线PDF阅读器，支持翻页、缩放、目录导航，基于pdf.js",
+  "icon": "📄",
+  "author": "系统内置",
+  "main": "plugin.js",
+  "css": "style.css",
+  "default": false
+}
