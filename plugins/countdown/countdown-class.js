@@ -168,7 +168,6 @@ class CountdownManager {
                         <path d="M22 6l-3-3"/>
                     </svg>
                     <span class="tool-btn-label">倒数</span>
-                    <span class="countdown-badge" id="countdownBadge" style="display:none;">0</span>
                 `;
                 toolbar.appendChild(this.toggle);
             }
@@ -596,13 +595,7 @@ class CountdownManager {
     /* ========== 状态更新 ========== */
 
     updateToggleState() {
-        if (!this.toggle) return;
-        const badge = document.getElementById('countdownBadge');
-        if (badge) {
-            const count = this.countdowns.length;
-            badge.textContent = count;
-            badge.style.display = count > 0 ? 'inline-flex' : 'none';
-        }
+        // 不再需要徽章数字
     }
 
     /* ========== 工具方法 ========== */

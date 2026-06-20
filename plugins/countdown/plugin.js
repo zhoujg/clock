@@ -6,8 +6,8 @@
     'use strict';
 
     const PLUGIN_ID = 'countdown';
-    const CLASS_JS  = 'plugins/countdown/countdown-class.js?v=20260620g';
-    const STYLE_CSS = 'plugins/countdown/style.css?v=20260620g';
+    const CLASS_JS  = 'plugins/countdown/countdown-class.js?v=20260620h';
+    const STYLE_CSS = 'plugins/countdown/style.css?v=20260620h';
 
     let _instance = null;
     let _classLoaded = false;
