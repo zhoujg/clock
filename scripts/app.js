@@ -842,4 +842,74 @@ document.addEventListener('DOMContentLoaded', () => {
             window.app.updateDate();
         }
     }, 500);
+
+    // ── 底部工具栏滑动边缘提示 ──
+    (function initToolbarScrollIndicators() {
+        const toolbar = document.querySelector('.bottom-toolbar');
+        if (!toolbar) return;
+
+        // 创建左右边缘渐变指示器
+        const leftEdge = document.createElement('div');
+        leftEdge.className = 'toolbar-edge left';
+        const rightEdge = document.createElement('div');
+        rightEdge.className = 'toolbar-edge right';
+        document.body.appendChild(leftEdge);
+        document.body.appendChild(rightEdge);
+
+        function updateEdges() {
+            const hasOverflow = toolbar.scrollWidth > toolbar.clientWidth + 2;
+            if (!hasOverflow) {
+                leftEdge.classList.remove('visible');
+                rightEdge.classList.remove('visible');
+                return;
+            }
+            // 左侧：未滚到最左时显示
+            if (toolbar.scrollLeft > 4) {
+                leftEdge.classList.add('visible');
+            } else {
+                leftEdge.classList.remove('visible');
+            }
+            // 右侧：未滚到最右时显示
+            const maxScroll = toolbar.scrollWidth - toolbar.clientWidth;
+            if (toolbar.scrollLeft < maxScroll - 4) {
+                rightEdge.classList.add('visible');
+            } else {
+                rightEdge.classList.remove('visible');
+            }
+        }
+
+        // 同步边缘指示器位置：浮动在工具栏上方角落
+        function syncEdgePosition() {
+            const rect = toolbar.getBoundingClientRect();
+            // 指示器圆点在工具栏上方，用 bottom 定位
+            const bottomPx = window.innerHeight - rect.top + 4;
+            leftEdge.style.bottom = bottomPx + 'px';
+            rightEdge.style.bottom = bottomPx + 'px';
+        }
+
+        toolbar.addEventListener('scroll', updateEdges, { passive: true });
+        window.addEventListener('resize', () => { syncEdgePosition(); updateEdges(); });
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => { syncEdgePosition(); updateEdges(); }, 300);
+        });
+
+        // 监听工具栏子元素变化（插件按钮增减）
+        const observer = new MutationObserver(() => {
+            syncEdgePosition();
+            updateEdges();
+        });
+        observer.observe(toolbar, { childList: true, subtree: true });
+
+        // 点击边缘指示器 → 平滑滚动一屏
+        leftEdge.addEventListener('click', () => {
+            toolbar.scrollBy({ left: -toolbar.clientWidth * 0.7, behavior: 'smooth' });
+        });
+        rightEdge.addEventListener('click', () => {
+            toolbar.scrollBy({ left: toolbar.clientWidth * 0.7, behavior: 'smooth' });
+        });
+
+        // 初始检测（延迟等插件按钮渲染）
+        setTimeout(() => { syncEdgePosition(); updateEdges(); }, 1000);
+        setTimeout(() => { syncEdgePosition(); updateEdges(); }, 3000);
+    })();
 });

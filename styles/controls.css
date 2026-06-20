@@ -138,6 +138,74 @@
     flex: 0 0 4px; /* right padding for scroll end */
 }
 
+/* ========== 滑动边缘提示 ========== */
+.toolbar-edge {
+    position: fixed;
+    z-index: 1501;
+    pointer-events: auto;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.25s ease;
+}
+/* 默认微微上浮，出现时滑入 */
+.toolbar-edge.left {
+    left: 8px;
+    transform: translateX(-6px) translateY(2px);
+}
+.toolbar-edge.left.visible {
+    transform: translateX(0) translateY(0);
+}
+.toolbar-edge.right {
+    right: 8px;
+    transform: translateX(6px) translateY(2px);
+}
+.toolbar-edge.right.visible {
+    transform: translateX(0) translateY(0);
+}
+
+/* 小型半透明确认圆 + 箭头 */
+.toolbar-edge::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: -4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(29, 29, 31, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+.toolbar-edge::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% - 4px);
+    width: 7px;
+    height: 7px;
+    border-color: rgba(255, 255, 255, 0.85);
+    border-style: solid;
+    border-width: 0;
+}
+.toolbar-edge.left::after {
+    left: 50%;
+    margin-left: -5px;
+    border-left-width: 2px;
+    border-bottom-width: 2px;
+    transform: rotate(45deg) translateY(-1px);
+}
+.toolbar-edge.right::after {
+    right: 50%;
+    margin-right: -5px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    transform: rotate(45deg) translateY(-1px);
+}
+.toolbar-edge.visible {
+    opacity: 1;
+}
+
 .bottom-tool-btn {
     width: 56px;
     min-width: 56px;
