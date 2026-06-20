@@ -334,6 +334,10 @@ class SmartColorManager {
     
     // 应用颜色到所有元素
     applyColors(textColor, shadowColor, borderColor) {
+        // 缓存最近的颜色值，供后续动态元素（如倒计时横幅）使用
+        this._lastTextColor = textColor;
+        this._lastShadowColor = shadowColor;
+        this._lastBorderColor = borderColor;
         // 日期文字
         if (this.elements.dateText) {
             this.elements.dateText.style.color = textColor;
@@ -358,6 +362,9 @@ class SmartColorManager {
 
         // 底部工具栏按钮
         this.adjustBottomToolbarColors(textColor, shadowColor);
+        
+        // 倒计时横幅（如果存在）
+        this.adjustCountdownBannerColors(textColor, shadowColor);
     }
     
     // 调整时钟卡片颜色
@@ -583,6 +590,37 @@ class SmartColorManager {
             btn.style.color = textColor;
             btn.style.textShadow = `0 1px 4px ${shadowColor}`;
         });
+    }
+
+    // 调整倒计时横幅文字颜色（无参时用缓存值，适合外部动态元素创建后调用）
+    adjustCountdownBannerColors(textColor, shadowColor) {
+        const banner = document.getElementById('countdownBanner');
+        if (!banner) return;
+
+        // 支持无参调用（横幅创建时）→ 使用缓存的颜色值
+        if (!textColor) textColor = this._lastTextColor || 'rgba(255, 255, 255, 0.95)';
+        if (!shadowColor) shadowColor = this._lastShadowColor || 'rgba(0, 0, 0, 0.5)';
+
+        const iconEl = banner.querySelector('.banner-icon');
+        const textEl = banner.querySelector('.banner-text');
+
+        if (iconEl) {
+            iconEl.style.color = textColor;
+            iconEl.style.textShadow = `0 1px 6px ${shadowColor}`;
+        }
+        if (textEl) {
+            textEl.style.color = textColor;
+            textEl.style.textShadow = `0 1px 6px ${shadowColor}`;
+        }
+
+        // 横幅背景随背景色智能调整
+        if (this.currentMode === 'dark') {
+            banner.style.background = 'rgba(255, 255, 255, 0.18)';
+            banner.style.border = '1px solid rgba(255, 255, 255, 0.25)';
+        } else {
+            banner.style.background = 'rgba(0, 0, 0, 0.12)';
+            banner.style.border = '1px solid rgba(0, 0, 0, 0.15)';
+        }
     }
 
     // 手动触发重新分析（供外部调用）

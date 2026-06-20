@@ -219,6 +219,11 @@ class CountdownManager {
         // 追加到 body，用 fixed 定位不参与 flex 布局
         document.body.appendChild(this.banner);
 
+        // 横幅创建后立即应用智能颜色（smartColor 初始化时横幅还不存在）
+        if (window.smartColorManager) {
+            window.smartColorManager.adjustCountdownBannerColors();
+        }
+
         // 绑定 resize / orientationchange 动态重算位置
         this._boundPositionBanner = () => this.positionBanner();
         window.addEventListener('resize', this._boundPositionBanner);
@@ -395,8 +400,9 @@ class CountdownManager {
         const rect = targetEl.getBoundingClientRect();
 
         const isLandscape = window.innerWidth > window.innerHeight;
-        const GAP = isLandscape ? 6 : 8;
-        const LEFT_OFFSET = isLandscape ? 0 : 2;
+        // 横屏时钟卡片更大，需要更多间距避免重叠；竖屏相对紧凑
+        const GAP = isLandscape ? 130 : 60;
+        const LEFT_OFFSET = isLandscape ? 4 : 4;
 
         let left = rect.left + LEFT_OFFSET;
         let top = rect.bottom + GAP;
@@ -408,7 +414,7 @@ class CountdownManager {
         }
         if (left < 5) left = 5;
         if (top < 5) top = 5;
-        const maxTop = window.innerHeight - (isLandscape ? 45 : 65);
+        const maxTop = window.innerHeight - (isLandscape ? 55 : 65);
         if (top > maxTop) top = maxTop;
 
         this.banner.style.left = left + 'px';
