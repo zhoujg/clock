@@ -245,9 +245,12 @@
 }
 
 .pdf-viewer canvas {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    border-radius: 2px;
+    display: block;
     max-width: 100%;
+}
+
+.pdf-page-container canvas {
+    display: block;
 }
 
 /* ========== 欢迎页 ========== */
@@ -395,4 +398,249 @@ body.stories-dark .pdf-reader-overlay {
     .pdf-viewer {
         padding: 10px;
     }
+}
+
+/* ========== 笔记工具栏 ========== */
+.pdf-annot-tools {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pdf-toolbar-sep {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0 4px;
+}
+
+.pdf-annot-btn {
+    position: relative;
+}
+
+.pdf-annot-btn.active {
+    background: rgba(78, 205, 196, 0.2);
+    color: #4ecdc4;
+}
+
+.pdf-color-picker {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    margin-left: 4px;
+}
+
+.pdf-color-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.pdf-color-dot:hover {
+    transform: scale(1.2);
+}
+
+.pdf-color-dot.active {
+    border-color: #fff;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.3);
+}
+
+/* ========== 笔记图层 ========== */
+.pdf-page-container {
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.pdf-highlight-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.pdf-highlight-rect {
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.pdf-highlight-rect:hover {
+    opacity: 0.5 !important;
+}
+
+.pdf-draw-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.pdf-text-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.pdf-interaction-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+}
+
+/* 笔记模式下的光标 */
+.pdf-viewer.annot-highlight .pdf-interaction-layer {
+    cursor: crosshair;
+}
+
+.pdf-viewer.annot-text .pdf-interaction-layer {
+    cursor: text;
+}
+
+.pdf-viewer.annot-draw .pdf-interaction-layer {
+    cursor: crosshair;
+}
+
+.pdf-viewer.annot-eraser .pdf-interaction-layer {
+    cursor: pointer;
+}
+
+/* ========== 文本批注标记 ========== */
+.pdf-text-marker {
+    position: absolute;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.pdf-text-marker-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s ease;
+}
+
+.pdf-text-marker-icon:hover {
+    transform: scale(1.15);
+}
+
+.pdf-text-marker-tooltip {
+    position: absolute;
+    left: 26px;
+    top: -8px;
+    min-width: 120px;
+    max-width: 240px;
+    padding: 8px 12px;
+    background: rgba(30, 30, 50, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    font-size: 12px;
+    line-height: 1.5;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+    z-index: 20;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.pdf-text-marker-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.pdf-text-marker-tooltip::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 10px;
+    border: 6px solid transparent;
+    border-right-color: rgba(30, 30, 50, 0.95);
+    border-left: 0;
+}
+
+/* ========== 文本输入弹窗 ========== */
+.pdf-text-input-popup {
+    position: absolute;
+    z-index: 30;
+    min-width: 200px;
+    padding: 10px;
+    background: rgba(30, 30, 50, 0.98);
+    backdrop-filter: blur(16px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.pdf-text-input-field {
+    width: 100%;
+    min-height: 60px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.pdf-text-input-field:focus {
+    border-color: #4ecdc4;
+}
+
+.pdf-text-input-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.pdf-text-input-confirm,
+.pdf-text-input-cancel {
+    padding: 5px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pdf-text-input-confirm {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: #fff;
+}
+
+.pdf-text-input-confirm:hover {
+    opacity: 0.9;
+}
+
+.pdf-text-input-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #aaa;
+}
+
+.pdf-text-input-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ddd;
 }

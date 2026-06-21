@@ -24,6 +24,15 @@
     let _lastFileName = '';
 
     const STORAGE_KEY = 'pdfReaderState';
+    const ANNOTATIONS_KEY = 'pdfReaderAnnotations';
+
+    // 笔记状态
+    let _annotMode = null;       // null | 'highlight' | 'text' | 'draw' | 'eraser'
+    let _annotColor = '#FFEB3B'; // 高亮颜色
+    let _drawing = false;        // 画笔是否按下
+    let _drawCtx = null;         // 画笔 canvas 上下文
+    let _highlightStart = null;  // 高亮起始点
+    let _currentPath = [];       // 当前画笔路径
 
     // ============ 持久化（IndexedDB 存文件，localStorage 存状态） ============
 
@@ -108,6 +117,45 @@
             state.scale = _scale;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } catch (e) {}
+    }
+
+    // ============ 笔记持久化 ============
+
+    function _getAnnotKey() {
+        if (!_lastFileName) return null;
+        return ANNOTATIONS_KEY + ':' + _lastFileName;
+    }
+
+    function _loadAnnotations() {
+        try {
+            const key = _getAnnotKey();
+            if (!key) return {};
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function _saveAnnotations(annotations) {
+        try {
+            const key = _getAnnotKey();
+            if (!key) return;
+            localStorage.setItem(key, JSON.stringify(annotations));
+        } catch (e) {
+            console.warn('[PDF阅读器] 保存笔记失败:', e);
+        }
+    }
+
+    function _getPageAnnotations(pageNum) {
+        const all = _loadAnnotations();
+        return all[pageNum] || { highlights: [], texts: [], drawings: [] };
+    }
+
+    function _setPageAnnotations(pageNum, data) {
+        const all = _loadAnnotations();
+        all[pageNum] = data;
+        _saveAnnotations(all);
     }
 
     // ============ 加载 pdf.js ============
@@ -217,6 +265,38 @@
                     </button>
                 </div>
                 <div class="pdf-toolbar-right">
+                    <div class="pdf-annot-tools">
+                        <button class="pdf-btn pdf-annot-btn" id="pdfHighlightBtn" title="高亮" data-mode="highlight">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" opacity="0.3"/>
+                                <rect x="4" y="4" width="16" height="16" rx="2"/>
+                            </svg>
+                        </button>
+                        <button class="pdf-btn pdf-annot-btn" id="pdfTextBtn" title="文本批注" data-mode="text">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                            </svg>
+                        </button>
+                        <button class="pdf-btn pdf-annot-btn" id="pdfDrawBtn" title="画笔" data-mode="draw">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                            </svg>
+                        </button>
+                        <button class="pdf-btn pdf-annot-btn" id="pdfEraserBtn" title="橡皮擦" data-mode="eraser">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.8 1.4c.8-.8 2-.8 2.8 0l5 5c.8.8.8 2 0 2.8L11 20"/>
+                                <line x1="18" y1="13" x2="11" y2="20"/>
+                            </svg>
+                        </button>
+                        <div class="pdf-color-picker" id="pdfColorPicker">
+                            <span class="pdf-color-dot active" data-color="#FFEB3B" style="background:#FFEB3B"></span>
+                            <span class="pdf-color-dot" data-color="#4FC3F7" style="background:#4FC3F7"></span>
+                            <span class="pdf-color-dot" data-color="#81C784" style="background:#81C784"></span>
+                            <span class="pdf-color-dot" data-color="#FF8A65" style="background:#FF8A65"></span>
+                            <span class="pdf-color-dot" data-color="#CE93D8" style="background:#CE93D8"></span>
+                        </div>
+                    </div>
+                    <div class="pdf-toolbar-sep"></div>
                     <button class="pdf-btn" id="pdfZoomOutBtn" title="缩小">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -301,6 +381,29 @@
         // 侧边栏
         document.getElementById('pdfSidebarBtn').addEventListener('click', _toggleSidebar);
 
+        // 笔记工具栏
+        const annotBtns = _overlayEl.querySelectorAll('.pdf-annot-btn');
+        annotBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.mode;
+                if (_annotMode === mode) {
+                    _setAnnotMode(null);
+                } else {
+                    _setAnnotMode(mode);
+                }
+            });
+        });
+
+        // 颜色选择
+        const colorDots = _overlayEl.querySelectorAll('.pdf-color-dot');
+        colorDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                _annotColor = dot.dataset.color;
+                colorDots.forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+            });
+        });
+
         // 拖拽
         const dropZone = document.getElementById('pdfDropZone');
         const viewer = document.getElementById('pdfViewer');
@@ -327,17 +430,23 @@
 
         // 键盘
         _overlayEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') _closeReader();
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); _goToPage(_currentPage - 1); }
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); _goToPage(_currentPage + 1); }
-            if (e.key === '+' || e.key === '=') { e.preventDefault(); _setZoom(_scale + 0.1); }
-            if (e.key === '-') { e.preventDefault(); _setZoom(_scale - 0.1); }
+            if (e.key === 'Escape') {
+                if (_annotMode) { _setAnnotMode(null); return; }
+                _closeReader();
+            }
+            if (!_annotMode) {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); _goToPage(_currentPage - 1); }
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); _goToPage(_currentPage + 1); }
+                if (e.key === '+' || e.key === '=') { e.preventDefault(); _setZoom(_scale + 0.1); }
+                if (e.key === '-') { e.preventDefault(); _setZoom(_scale - 0.1); }
+            }
         });
 
         // 滚轮翻页（防抖模式：滚动停止后只翻一页）
         let _wheelTimer = null;
         let _wheelDir = 0;
         viewer.addEventListener('wheel', (e) => {
+            if (_annotMode) return; // 笔记模式下不翻页
             e.preventDefault();
             _wheelDir = e.deltaY > 0 ? 1 : -1;
             clearTimeout(_wheelTimer);
@@ -347,6 +456,33 @@
                 _wheelDir = 0;
             }, 50);
         }, { passive: false });
+    }
+
+    // ============ 笔记模式 ============
+
+    function _setAnnotMode(mode) {
+        _annotMode = mode;
+        const btns = _overlayEl.querySelectorAll('.pdf-annot-btn');
+        btns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+        const viewer = document.getElementById('pdfViewer');
+        if (viewer) {
+            viewer.classList.remove('annot-highlight', 'annot-text', 'annot-draw', 'annot-eraser');
+            if (mode) viewer.classList.add('annot-' + mode);
+        }
+        // 显示/隐藏颜色选择器
+        const colorPicker = _overlayEl.querySelector('#pdfColorPicker');
+        if (colorPicker) {
+            colorPicker.style.display = (mode === 'highlight' || mode === 'draw' || mode === 'text') ? 'flex' : 'none';
+        }
+        // 切换模式时移除临时元素
+        _removeTempAnnotElements();
+    }
+
+    function _removeTempAnnotElements() {
+        _overlayEl.querySelectorAll('.pdf-highlight-temp').forEach(el => el.remove());
+        _overlayEl.querySelectorAll('.pdf-text-input-popup').forEach(el => el.remove());
     }
 
     // ============ 阅读器开关 ============
@@ -445,6 +581,7 @@
         if (welcome) welcome.style.display = 'none';
 
         // 清除旧内容
+        viewer.querySelectorAll('.pdf-page-container').forEach(c => c.remove());
         viewer.querySelectorAll('canvas').forEach(c => c.remove());
 
         let loadingEl = document.getElementById('pdfLoadingIndicator');
@@ -553,23 +690,75 @@
             const viewer = document.getElementById('pdfViewer');
             const loadingEl = document.getElementById('pdfLoadingIndicator');
 
-            // 清除旧 canvas
+            // 清除旧内容
             viewer.querySelectorAll('canvas').forEach(c => c.remove());
+            viewer.querySelectorAll('.pdf-page-container').forEach(c => c.remove());
             if (loadingEl) loadingEl.style.display = 'none';
 
+            // 创建页面容器
+            const pageContainer = document.createElement('div');
+            pageContainer.className = 'pdf-page-container';
+            pageContainer.style.position = 'relative';
+            pageContainer.style.width = viewport.width + 'px';
+            pageContainer.style.height = viewport.height + 'px';
+            pageContainer.style.flexShrink = '0';
+
+            // PDF canvas
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.height = renderViewport.height;
             canvas.width = renderViewport.width;
             canvas.style.width = viewport.width + 'px';
             canvas.style.height = viewport.height + 'px';
+            canvas.style.display = 'block';
+            pageContainer.appendChild(canvas);
 
-            viewer.appendChild(canvas);
+            // 高亮层 (SVG)
+            const highlightLayer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            highlightLayer.classList.add('pdf-highlight-layer');
+            highlightLayer.style.width = viewport.width + 'px';
+            highlightLayer.style.height = viewport.height + 'px';
+            highlightLayer.setAttribute('viewBox', `0 0 ${viewport.width} ${viewport.height}`);
+            pageContainer.appendChild(highlightLayer);
 
+            // 画笔层 (canvas)
+            const drawCanvas = document.createElement('canvas');
+            drawCanvas.classList.add('pdf-draw-layer');
+            drawCanvas.width = viewport.width * dpr;
+            drawCanvas.height = viewport.height * dpr;
+            drawCanvas.style.width = viewport.width + 'px';
+            drawCanvas.style.height = viewport.height + 'px';
+            const drawCtx = drawCanvas.getContext('2d');
+            drawCtx.scale(dpr, dpr);
+            pageContainer.appendChild(drawCanvas);
+
+            // 文本批注层
+            const textLayer = document.createElement('div');
+            textLayer.classList.add('pdf-text-layer');
+            textLayer.style.width = viewport.width + 'px';
+            textLayer.style.height = viewport.height + 'px';
+            pageContainer.appendChild(textLayer);
+
+            // 交互层 (透明，接收鼠标事件)
+            const interactionLayer = document.createElement('div');
+            interactionLayer.classList.add('pdf-interaction-layer');
+            interactionLayer.style.width = viewport.width + 'px';
+            interactionLayer.style.height = viewport.height + 'px';
+            pageContainer.appendChild(interactionLayer);
+
+            viewer.appendChild(pageContainer);
+
+            // 渲染 PDF
             await page.render({
                 canvasContext: ctx,
                 viewport: renderViewport
             }).promise;
+
+            // 加载并绘制已有笔记
+            _renderAnnotations(pageNum, viewport, highlightLayer, drawCanvas, drawCtx, textLayer, dpr);
+
+            // 绑定交互层事件
+            _bindInteractionEvents(interactionLayer, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr);
 
             _currentPage = pageNum;
             document.getElementById('pdfPageInput').value = pageNum;
@@ -589,6 +778,227 @@
             const p = _pendingPage;
             _pendingPage = null;
             _renderPage(p);
+        }
+    }
+
+    // ============ 渲染已有笔记 ============
+
+    function _renderAnnotations(pageNum, viewport, highlightLayer, drawCanvas, drawCtx, textLayer, dpr) {
+        const annots = _getPageAnnotations(pageNum);
+
+        // 渲染高亮
+        if (annots.highlights && annots.highlights.length > 0) {
+            annots.highlights.forEach(h => {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', h.x);
+                rect.setAttribute('y', h.y);
+                rect.setAttribute('width', h.w);
+                rect.setAttribute('height', h.h);
+                rect.setAttribute('fill', h.color || '#FFEB3B');
+                rect.setAttribute('opacity', '0.35');
+                rect.setAttribute('rx', '2');
+                rect.dataset.annotId = h.id;
+                rect.classList.add('pdf-highlight-rect');
+                highlightLayer.appendChild(rect);
+            });
+        }
+
+        // 渲染画笔路径
+        if (annots.drawings && annots.drawings.length > 0) {
+            drawCtx.lineCap = 'round';
+            drawCtx.lineJoin = 'round';
+            annots.drawings.forEach(d => {
+                if (!d.points || d.points.length < 2) return;
+                drawCtx.beginPath();
+                drawCtx.strokeStyle = d.color || '#FF0000';
+                drawCtx.lineWidth = d.width || 2;
+                drawCtx.moveTo(d.points[0].x, d.points[0].y);
+                for (let i = 1; i < d.points.length; i++) {
+                    drawCtx.lineTo(d.points[i].x, d.points[i].y);
+                }
+                drawCtx.stroke();
+            });
+        }
+
+        // 渲染文本批注
+        if (annots.texts && annots.texts.length > 0) {
+            annots.texts.forEach(t => {
+                _createTextMarker(textLayer, t);
+            });
+        }
+    }
+
+    function _createTextMarker(textLayer, t) {
+        const marker = document.createElement('div');
+        marker.className = 'pdf-text-marker';
+        marker.style.left = t.x + 'px';
+        marker.style.top = t.y + 'px';
+        marker.dataset.annotId = t.id;
+
+        const icon = document.createElement('div');
+        icon.className = 'pdf-text-marker-icon';
+        icon.style.background = t.color || '#FFEB3B';
+        icon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'pdf-text-marker-tooltip';
+        tooltip.textContent = t.text;
+
+        marker.appendChild(icon);
+        marker.appendChild(tooltip);
+        textLayer.appendChild(marker);
+
+        // 点击显示/隐藏 tooltip
+        icon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = tooltip.classList.contains('show');
+            // 关闭所有其他 tooltip
+            textLayer.querySelectorAll('.pdf-text-marker-tooltip.show').forEach(t => t.classList.remove('show'));
+            if (!isOpen) tooltip.classList.add('show');
+        });
+    }
+
+    // ============ 交互层事件 ============
+
+    function _bindInteractionEvents(layer, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr) {
+        layer.addEventListener('mousedown', (e) => _onAnnotMouseDown(e, layer, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr));
+        layer.addEventListener('mousemove', (e) => _onAnnotMouseMove(e, layer, highlightLayer, drawCanvas, drawCtx, viewport, dpr));
+        layer.addEventListener('mouseup', (e) => _onAnnotMouseUp(e, layer, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr));
+        // 触摸支持
+        layer.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            _onAnnotMouseDown(_touchToMouse(touch, e.target), layer, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr);
+        }, { passive: false });
+        layer.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            _onAnnotMouseMove(_touchToMouse(touch, e.target), layer, highlightLayer, drawCanvas, drawCtx, viewport, dpr);
+        }, { passive: false });
+        layer.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            _onAnnotMouseUp(_touchToMouse(touch, e.target), layer, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr);
+        }, { passive: false });
+    }
+
+    function _touchToMouse(touch, target) {
+        return { clientX: touch.clientX, clientY: touch.clientY, target: target };
+    }
+
+    function _getPagePos(e, layer, viewport) {
+        const rect = layer.getBoundingClientRect();
+        return {
+            x: (e.clientX - rect.left) / rect.width * viewport.width,
+            y: (e.clientY - rect.top) / rect.height * viewport.height
+        };
+    }
+
+    function _onAnnotMouseDown(e, layer, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr) {
+        if (!_annotMode) return;
+        const pos = _getPagePos(e, layer, viewport);
+
+        if (_annotMode === 'highlight') {
+            _highlightStart = pos;
+            // 创建临时高亮矩形
+            const tempRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            tempRect.classList.add('pdf-highlight-temp');
+            tempRect.setAttribute('x', pos.x);
+            tempRect.setAttribute('y', pos.y);
+            tempRect.setAttribute('width', 0);
+            tempRect.setAttribute('height', 0);
+            tempRect.setAttribute('fill', _annotColor);
+            tempRect.setAttribute('opacity', '0.35');
+            tempRect.setAttribute('rx', '2');
+            highlightLayer.appendChild(tempRect);
+        } else if (_annotMode === 'text') {
+            _showTextInput(e, pos, textLayer, layer, viewport);
+        } else if (_annotMode === 'draw') {
+            _drawing = true;
+            _currentPath = [pos];
+            drawCtx.beginPath();
+            drawCtx.strokeStyle = _annotColor;
+            drawCtx.lineWidth = 2;
+            drawCtx.lineCap = 'round';
+            drawCtx.lineJoin = 'round';
+            drawCtx.moveTo(pos.x, pos.y);
+        } else if (_annotMode === 'eraser') {
+            _handleEraser(pos, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr);
+        }
+    }
+
+    function _onAnnotMouseMove(e, layer, highlightLayer, drawCanvas, drawCtx, viewport, dpr) {
+        if (!_annotMode) return;
+
+        if (_annotMode === 'highlight' && _highlightStart) {
+            const pos = _getPagePos(e, layer, viewport);
+            const tempRect = highlightLayer.querySelector('.pdf-highlight-temp');
+            if (tempRect) {
+                const x = Math.min(_highlightStart.x, pos.x);
+                const y = Math.min(_highlightStart.y, pos.y);
+                const w = Math.abs(pos.x - _highlightStart.x);
+                const h = Math.abs(pos.y - _highlightStart.y);
+                tempRect.setAttribute('x', x);
+                tempRect.setAttribute('y', y);
+                tempRect.setAttribute('width', w);
+                tempRect.setAttribute('height', h);
+            }
+        } else if (_annotMode === 'draw' && _drawing) {
+            const pos = _getPagePos(e, layer, viewport);
+            _currentPath.push(pos);
+            drawCtx.lineTo(pos.x, pos.y);
+            drawCtx.stroke();
+            drawCtx.beginPath();
+            drawCtx.moveTo(pos.x, pos.y);
+        }
+    }
+
+    function _onAnnotMouseUp(e, layer, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr) {
+        if (!_annotMode) return;
+        const pos = _getPagePos(e, layer, viewport);
+
+        if (_annotMode === 'highlight' && _highlightStart) {
+            const tempRect = highlightLayer.querySelector('.pdf-highlight-temp');
+            if (tempRect) {
+                const x = Math.min(_highlightStart.x, pos.x);
+                const y = Math.min(_highlightStart.y, pos.y);
+                const w = Math.abs(pos.x - _highlightStart.x);
+                const h = Math.abs(pos.y - _highlightStart.y);
+
+                if (w > 3 && h > 3) {
+                    // 保存高亮
+                    const annots = _getPageAnnotations(_currentPage);
+                    const id = 'hl_' + Date.now();
+                    annots.highlights.push({ id, x, y, w, h, color: _annotColor });
+                    _setPageAnnotations(_currentPage, annots);
+
+                    // 将临时矩形转为正式
+                    tempRect.classList.remove('pdf-highlight-temp');
+                    tempRect.setAttribute('x', x);
+                    tempRect.setAttribute('y', y);
+                    tempRect.setAttribute('width', w);
+                    tempRect.setAttribute('height', h);
+                    tempRect.dataset.annotId = id;
+                    tempRect.classList.add('pdf-highlight-rect');
+                } else {
+                    tempRect.remove();
+                }
+            }
+            _highlightStart = null;
+        } else if (_annotMode === 'draw' && _drawing) {
+            _drawing = false;
+            if (_currentPath.length >= 2) {
+                const annots = _getPageAnnotations(_currentPage);
+                const id = 'dr_' + Date.now();
+                annots.drawings.push({
+                    id,
+                    points: _currentPath.map(p => ({ x: p.x, y: p.y })),
+                    color: _annotColor,
+                    width: 2
+                });
+                _setPageAnnotations(_currentPage, annots);
+            }
+            _currentPath = [];
         }
     }
 
@@ -621,6 +1031,141 @@
             sidebar.classList.remove('open');
             btn.classList.remove('active');
         }
+    }
+
+    // ============ 文本批注输入 ============
+
+    function _showTextInput(e, pos, textLayer, interactionLayer, viewport) {
+        // 移除已有弹窗
+        _overlayEl.querySelectorAll('.pdf-text-input-popup').forEach(el => el.remove());
+
+        const popup = document.createElement('div');
+        popup.className = 'pdf-text-input-popup';
+
+        // 转换为屏幕坐标定位弹窗
+        const layerRect = interactionLayer.getBoundingClientRect();
+        popup.style.left = (e.clientX - layerRect.left) + 'px';
+        popup.style.top = (e.clientY - layerRect.top) + 'px';
+
+        const textarea = document.createElement('textarea');
+        textarea.className = 'pdf-text-input-field';
+        textarea.placeholder = '输入批注...';
+        textarea.rows = 3;
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'pdf-text-input-btns';
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.textContent = '确定';
+        confirmBtn.className = 'pdf-text-input-confirm';
+        confirmBtn.addEventListener('click', () => {
+            const text = textarea.value.trim();
+            if (text) {
+                const annots = _getPageAnnotations(_currentPage);
+                const id = 'tx_' + Date.now();
+                const t = { id, x: pos.x, y: pos.y, text: text, color: _annotColor };
+                annots.texts.push(t);
+                _setPageAnnotations(_currentPage, annots);
+                _createTextMarker(textLayer, t);
+            }
+            popup.remove();
+        });
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = '取消';
+        cancelBtn.className = 'pdf-text-input-cancel';
+        cancelBtn.addEventListener('click', () => popup.remove());
+
+        btnRow.appendChild(cancelBtn);
+        btnRow.appendChild(confirmBtn);
+        popup.appendChild(textarea);
+        popup.appendChild(btnRow);
+
+        interactionLayer.parentElement.appendChild(popup);
+        textarea.focus();
+
+        // 回车确认
+        textarea.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' && !ev.shiftKey) {
+                ev.preventDefault();
+                confirmBtn.click();
+            }
+            if (ev.key === 'Escape') {
+                popup.remove();
+            }
+        });
+    }
+
+    // ============ 橡皮擦 ============
+
+    function _handleEraser(pos, highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr) {
+        const annots = _getPageAnnotations(_currentPage);
+        let modified = false;
+        const ERASER_RADIUS = 15;
+
+        // 检查文本批注
+        if (annots.texts) {
+            const newTexts = annots.texts.filter(t => {
+                const dx = pos.x - t.x;
+                const dy = pos.y - t.y;
+                if (Math.sqrt(dx * dx + dy * dy) < ERASER_RADIUS + 10) {
+                    modified = true;
+                    return false;
+                }
+                return true;
+            });
+            annots.texts = newTexts;
+        }
+
+        // 检查高亮
+        if (annots.highlights) {
+            const newHighlights = annots.highlights.filter(h => {
+                // 检查点击位置是否在高亮矩形内
+                if (pos.x >= h.x && pos.x <= h.x + h.w && pos.y >= h.y && pos.y <= h.y + h.h) {
+                    modified = true;
+                    return false;
+                }
+                return true;
+            });
+            annots.highlights = newHighlights;
+        }
+
+        // 检查画笔路径
+        if (annots.drawings) {
+            const newDrawings = annots.drawings.filter(d => {
+                if (!d.points) return true;
+                const hit = d.points.some(p => {
+                    const dx = pos.x - p.x;
+                    const dy = pos.y - p.y;
+                    return Math.sqrt(dx * dx + dy * dy) < ERASER_RADIUS;
+                });
+                if (hit) { modified = true; return false; }
+                return true;
+            });
+            annots.drawings = newDrawings;
+        }
+
+        if (modified) {
+            _setPageAnnotations(_currentPage, annots);
+            // 重绘整个页面的笔记
+            _redrawAnnotations(highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr);
+        }
+    }
+
+    function _redrawAnnotations(highlightLayer, drawCanvas, drawCtx, textLayer, viewport, dpr) {
+        const annots = _getPageAnnotations(_currentPage);
+
+        // 清空高亮层
+        while (highlightLayer.firstChild) highlightLayer.firstChild.remove();
+
+        // 清空画笔层
+        drawCtx.clearRect(0, 0, drawCanvas.width / dpr, drawCanvas.height / dpr);
+
+        // 清空文本层（保留交互层）
+        textLayer.querySelectorAll('.pdf-text-marker').forEach(el => el.remove());
+
+        // 重新渲染
+        _renderAnnotations(_currentPage, viewport, highlightLayer, drawCanvas, drawCtx, textLayer, dpr);
     }
 
     // ============ 注册插件 ============
