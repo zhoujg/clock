@@ -28,13 +28,10 @@
             return;
         }
 
-        console.log('[工具栏按钮管理] 初始化成功');
-
         // 如果有保存的顺序，先短暂隐藏工具栏避免闪烁
         const hasSavedOrder = localStorage.getItem(STORAGE_KEY);
         if (hasSavedOrder) {
             toolbar.classList.add('toolbar-initializing');
-            console.log('[工具栏按钮管理] 检测到保存顺序，临时隐藏工具栏');
         }
 
         // 先读取保存的顺序
@@ -45,7 +42,6 @@
 
         // 为现有按钮添加拖拽功能
         const existingButtons = toolbar.querySelectorAll('.bottom-tool-btn');
-        console.log(`[工具栏按钮管理] 找到 ${existingButtons.length} 个现有按钮`);
         existingButtons.forEach(btn => {
             makeButtonDraggable(btn);
         });
@@ -54,7 +50,6 @@
         if (hasSavedOrder) {
             setTimeout(() => {
                 toolbar.classList.remove('toolbar-initializing');
-                console.log('[工具栏按钮管理] 工具栏初始化完成，显示');
             }, 600);
         }
     }
@@ -68,7 +63,6 @@
             const savedOrder = localStorage.getItem(STORAGE_KEY);
             if (savedOrder) {
                 savedButtonOrder = JSON.parse(savedOrder);
-                console.log('[工具栏按钮管理] 读取保存的顺序:', savedButtonOrder);
             }
         } catch (e) {
             console.warn('[工具栏按钮管理] 读取顺序失败:', e);
@@ -85,15 +79,12 @@
         buttonObserver = new MutationObserver((mutations) => {
             // 如果正在重新排列，忽略这次变化
             if (isReordering) {
-                console.log('[工具栏按钮管理] 正在重新排列，忽略此次变化');
                 return;
             }
 
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
                     if (node.nodeType === 1 && node.classList.contains('bottom-tool-btn')) {
-                        console.log('[工具栏按钮管理] 检测到新按钮:', node.id);
-                        
                         // 设置重排标记
                         isReordering = true;
                         
@@ -122,7 +113,6 @@
 
     function insertButtonAtSavedPosition(button) {
         if (!savedButtonOrder || !button.id) {
-            console.log('[工具栏按钮管理] 无保存顺序或按钮无ID，保持默认位置');
             return;
         }
 
@@ -131,7 +121,6 @@
 
         if (savedIndex === -1) {
             // 这是一个新按钮，不在保存的列表中，保持在末尾
-            console.log('[工具栏按钮管理] 新按钮不在保存列表中，添加到末尾:', buttonId);
             return;
         }
 
@@ -150,26 +139,20 @@
         }
 
         if (insertBefore && insertBefore !== button.nextSibling) {
-            console.log(`[工具栏按钮管理] 将 ${buttonId} 插入到 ${insertBefore.id} 之前`);
             toolbar.insertBefore(button, insertBefore);
         } else if (!insertBefore && toolbar.lastChild !== button) {
             // 如果没有找到，说明应该在最后
-            console.log(`[工具栏按钮管理] 将 ${buttonId} 移到末尾`);
             toolbar.appendChild(button);
-        } else {
-            console.log(`[工具栏按钮管理] ${buttonId} 已在正确位置`);
-        }
+        } 
     }
 
     // ============ 使按钮可拖拽 ============
 
     function makeButtonDraggable(button) {
         if (button.hasAttribute('data-draggable')) {
-            console.log('[工具栏按钮管理] 按钮已设置为可拖拽:', button.id);
             return;
         }
         
-        console.log('[工具栏按钮管理] 设置按钮为可拖拽:', button.id);
         button.setAttribute('data-draggable', 'true');
         button.setAttribute('draggable', 'true');
 
@@ -238,7 +221,6 @@
         
         // 触摸开始
         button.addEventListener('touchstart', (e) => {
-            console.log('[工具栏按钮管理] 触摸开始:', button.id);
             touchMoved = false;
             const touch = e.touches[0];
             touchStartX = touch.clientX;
@@ -246,7 +228,6 @@
 
             // 启动长按计时器
             longPressTimer = setTimeout(() => {
-                console.log('[工具栏按钮管理] 长按触发，进入拖拽模式:', button.id);
                 isDraggingTouch = true;
                 draggedElement = button;
                 button.classList.add('dragging');
@@ -254,7 +235,6 @@
                 // 触觉反馈
                 if (navigator.vibrate) {
                     navigator.vibrate(50);
-                    console.log('[工具栏按钮管理] 触觉反馈已触发');
                 }
                 
                 // 显示拖拽提示
@@ -394,7 +374,6 @@
     let dragHintOverlay = null;
 
     function showDragHint() {
-        console.log('[工具栏按钮管理] 显示拖拽提示');
         if (!dragHintOverlay) {
             dragHintOverlay = document.createElement('div');
             dragHintOverlay.className = 'toolbar-drag-hint-overlay';
@@ -414,13 +393,11 @@
                 animation: fadeIn 0.3s;
             `;
             document.body.appendChild(dragHintOverlay);
-            console.log('[工具栏按钮管理] 拖拽提示层已创建');
         }
         dragHintOverlay.style.display = 'block';
     }
 
     function hideDragHint() {
-        console.log('[工具栏按钮管理] 隐藏拖拽提示');
         if (dragHintOverlay) {
             dragHintOverlay.style.display = 'none';
         }
@@ -431,11 +408,8 @@
     function addDragHint(button) {
         // 添加一个小图标表示可拖拽
         if (button.querySelector('.drag-hint')) {
-            console.log('[工具栏按钮管理] 按钮已有拖拽提示:', button.id);
             return;
         }
-
-        console.log('[工具栏按钮管理] 添加拖拽提示图标:', button.id);
 
         const hint = document.createElement('div');
         hint.className = 'drag-hint';
@@ -460,18 +434,15 @@
         }
         
         button.appendChild(hint);
-        console.log('[工具栏按钮管理] 拖拽提示已添加到:', button.id);
 
         // 桌面端：鼠标悬停时显示提示
         button.addEventListener('mouseenter', () => {
             if (!isDraggingTouch) {
-                console.log('[工具栏按钮管理] 鼠标进入按钮:', button.id);
                 hint.style.opacity = '1';
             }
         });
 
         button.addEventListener('mouseleave', () => {
-            console.log('[工具栏按钮管理] 鼠标离开按钮:', button.id);
             hint.style.opacity = '0';
         });
 
@@ -498,7 +469,6 @@
             
             localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
             savedButtonOrder = order; // 同时更新内存中的顺序
-            console.log('[工具栏按钮管理] 顺序已保存:', order);
             
             // 清除标记
             setTimeout(() => {
@@ -514,15 +484,12 @@
         try {
             const savedOrder = localStorage.getItem(STORAGE_KEY);
             if (!savedOrder) {
-                console.log('[工具栏按钮管理] 没有保存的顺序');
                 return;
             }
 
             const order = JSON.parse(savedOrder);
-            console.log('[工具栏按钮管理] 读取到保存的顺序:', order);
             
             const buttons = Array.from(toolbar.querySelectorAll('.bottom-tool-btn'));
-            console.log('[工具栏按钮管理] 当前按钮列表:', buttons.map(b => b.id));
             
             // 创建按钮映射
             const buttonMap = {};
@@ -545,11 +512,9 @@
             buttons.forEach(btn => {
                 if (btn.id && buttonMap[btn.id] && btn.parentNode === toolbar) {
                     toolbar.appendChild(btn);
-                    console.log('[工具栏按钮管理] 新按钮添加到末尾:', btn.id);
                 }
             });
 
-            console.log(`[工具栏按钮管理] 顺序已恢复，重新排列了 ${reordered} 个按钮`);
         } catch (e) {
             console.warn('[工具栏按钮管理] 恢复顺序失败:', e);
         }
@@ -638,7 +603,6 @@
         restoreOrder: applySavedOrder,
         clearOrder: () => {
             localStorage.removeItem(STORAGE_KEY);
-            console.log('[工具栏按钮管理] 已清除保存的顺序');
         },
         getOrder: () => {
             const savedOrder = localStorage.getItem(STORAGE_KEY);

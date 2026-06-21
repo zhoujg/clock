@@ -82,6 +82,12 @@
     color: #1d1d1f;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .word-typer-close-btn {
     background: rgba(0, 0, 0, 0.05);
     border: none;
@@ -103,101 +109,350 @@
     transform: scale(1.1);
 }
 
+/* ========== 词库画廊 ========== */
+.dict-gallery {
+    margin-bottom: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.dict-gallery::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dict-gallery::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 3px;
+}
+
+.dict-gallery::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+}
+
+.dict-gallery::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.dict-category {
+    margin-bottom: 32px;
+}
+
+.dict-category:last-child {
+    margin-bottom: 0;
+}
+
+.category-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+.category-icon {
+    font-size: 20px;
+}
+
+.dict-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.dict-card {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.dict-card:hover {
+    border-color: #007AFF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.15);
+}
+
+.dict-card-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.dict-card-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+}
+
+.dict-card-desc {
+    font-size: 13px;
+    color: #86868b;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    min-height: 36px;
+}
+
+.dict-card-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.dict-card-btn {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #007AFF;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dict-card-btn:hover {
+    background: #0051D5;
+    transform: scale(1.02);
+}
+
+.dict-card-btn:active {
+    transform: scale(0.98);
+}
+
+.dict-card-btn-secondary {
+    background: rgba(0, 0, 0, 0.05);
+    color: #1d1d1f;
+}
+
+.dict-card-btn-secondary:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
 /* ========== 词库选择区 ========== */
 .word-typer-selector {
     margin-bottom: 24px;
 }
 
-.dict-selector {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+/* ========== 章节选择界面 ========== */
+.chapter-selection {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chapter-header {
+    margin-bottom: 24px;
+}
+
+.btn-back {
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 8px;
+    color: #1d1d1f;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
     margin-bottom: 16px;
 }
 
-.dict-selector label {
+.btn-back:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: translateX(-2px);
+}
+
+.chapter-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+.chapter-stats {
+    margin: 0 0 8px 0;
     font-size: 15px;
     font-weight: 500;
-    color: #1d1d1f;
-}
-
-.dict-selector select {
-    flex: 1;
-    padding: 10px 16px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
-    background: white;
-    font-size: 15px;
-    color: #1d1d1f;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.dict-selector select:focus {
-    outline: none;
-    border-color: #007AFF;
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
-}
-
-.dict-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: rgba(0, 122, 255, 0.05);
-    border-radius: 12px;
-    margin-bottom: 20px;
-}
-
-.dict-icon {
-    font-size: 24px;
-}
-
-.dict-desc {
-    font-size: 14px;
     color: #007AFF;
 }
 
-/* ========== 学习选项按钮 ========== */
-.learn-options {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+.chapter-desc {
+    margin: 0;
+    font-size: 14px;
+    color: #86868b;
 }
 
-.option-btn {
+.chapter-tabs {
     display: flex;
-    flex-direction: column;
-    align-items: center;
     gap: 8px;
-    padding: 20px 16px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
-    background: white;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 12px;
+}
+
+.chapter-tab {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #86868b;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.option-btn:hover {
+.chapter-tab:hover {
     background: rgba(0, 122, 255, 0.05);
+    color: #007AFF;
+}
+
+.chapter-tab.active {
+    background: #007AFF;
+    color: white;
+}
+
+.chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.chapter-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chapter-grid::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 3px;
+}
+
+.chapter-grid::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+}
+
+.chapter-card {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+.chapter-card:hover {
     border-color: #007AFF;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
 }
 
-.option-btn:active {
-    transform: translateY(0);
+.chapter-card.completed {
+    background: linear-gradient(135deg, rgba(52, 199, 89, 0.05), rgba(52, 199, 89, 0.1));
+    border-color: #34C759;
 }
 
-.option-btn span:first-child {
-    font-size: 32px;
+.chapter-card.completed::before {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #34C759;
+    font-size: 16px;
+    font-weight: 600;
 }
 
-.option-btn span:last-child {
-    font-size: 14px;
-    font-weight: 500;
+.chapter-number {
+    font-size: 16px;
+    font-weight: 600;
     color: #1d1d1f;
+    margin-bottom: 8px;
+}
+
+.chapter-word-count {
+    font-size: 13px;
+    color: #86868b;
+    margin-bottom: 12px;
+}
+
+.chapter-progress {
+    width: 100%;
+}
+
+.chapter-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.chapter-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #007AFF, #34C759);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.chapter-card.completed .chapter-progress-fill {
+    background: #34C759;
+}
+
+.chapter-progress-text {
+    font-size: 11px;
+    color: #86868b;
+    font-weight: 500;
+}
+
+.chapter-card.completed .chapter-progress-text {
+    color: #34C759;
+}
+
+/* ========== 语音按钮 ========== */
+.word-typer-voice-toggle {
+    padding: 6px 14px;
+    background: #007AFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.word-typer-voice-toggle:hover {
+    background: #0051D5;
+    transform: scale(1.05);
+}
+
+.word-typer-voice-toggle:active {
+    transform: scale(0.95);
 }
 
 /* ========== 设置面板 ========== */
@@ -454,15 +709,17 @@
 
 /* ========== 语音按钮 ========== */
 .word-typer-voice-toggle {
-    padding: 8px 16px;
+    padding: 6px 14px;
     background: #007AFF;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.2s;
-    margin-left: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .word-typer-voice-toggle:hover {
@@ -473,7 +730,6 @@
 .word-typer-voice-toggle:active {
     transform: scale(0.95);
 }
-
 
 /* ========== 打字区域 ========== */
 .typing-area {
@@ -601,6 +857,11 @@
     color: white;
 }
 
+.word-typer-feedback.info {
+    background: #007AFF;
+    color: white;
+}
+
 /* ========== 响应式设计 ========== */
 @media (max-width: 768px) {
     .word-typer-panel {
@@ -613,12 +874,21 @@
         font-size: 20px;
     }
 
-    .learn-options {
+    .dict-cards {
         grid-template-columns: 1fr;
     }
+    
+    .dict-gallery {
+        max-height: 55vh;
+    }
 
-    .option-btn {
-        padding: 16px;
+    .chapter-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .chapter-info h3 {
+        font-size: 20px;
     }
 
     .settings-panel {
@@ -677,10 +947,13 @@
     }
 
     .word-typer-header h3,
-    .option-btn span:last-child,
+    .category-title,
+    .dict-card-name,
     .setting-item,
     .word-translation,
-    .word-typer-stats h4 {
+    .word-typer-stats h4,
+    .chapter-info h3,
+    .chapter-number {
         color: #f5f5f7;
     }
 
@@ -693,20 +966,66 @@
         background: rgba(255, 255, 255, 0.2);
     }
 
-    .dict-selector select {
-        background: rgba(255, 255, 255, 0.05);
+    .btn-back {
+        background: rgba(255, 255, 255, 0.1);
         color: #f5f5f7;
-        border-color: rgba(255, 255, 255, 0.1);
     }
 
-    .option-btn {
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .chapter-tabs {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .chapter-tab {
+        color: #86868b;
+    }
+
+    .chapter-tab:hover {
+        background: rgba(0, 122, 255, 0.15);
+        color: #5AC8FA;
+    }
+
+    .chapter-card {
         background: rgba(255, 255, 255, 0.05);
         border-color: rgba(255, 255, 255, 0.1);
     }
 
-    .option-btn:hover {
-        background: rgba(0, 122, 255, 0.2);
+    .chapter-card:hover {
+        background: rgba(0, 122, 255, 0.15);
         border-color: #007AFF;
+    }
+
+    .chapter-card.completed {
+        background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(52, 199, 89, 0.15));
+        border-color: #34C759;
+    }
+
+    .dict-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .dict-card:hover {
+        background: rgba(0, 122, 255, 0.15);
+        border-color: #007AFF;
+    }
+
+    .dict-card-desc,
+    .chapter-desc,
+    .chapter-word-count {
+        color: #86868b;
+    }
+
+    .dict-card-btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #f5f5f7;
+    }
+
+    .dict-card-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
     }
 
     .settings-panel {

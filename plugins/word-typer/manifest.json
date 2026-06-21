@@ -1,8 +1,8 @@
 {
   "id": "word-typer",
   "name": "单词打字背诵",
-  "version": "1.0.0",
-  "description": "通过打字的方式背单词，结合英语学习和打字练习，支持多种词库（四级、六级、托福、雅思等）",
+  "version": "1.2.0",
+  "description": "通过打字的方式背单词，结合英语学习和打字练习。集成 qwerty-learner 真实词库（CET4/6、托福、雅思、GRE），支持动态加载和智能缓存，含键盘练习模式。",
   "author": "Clock Team",
   "icon": "📖",
   "category": "learning",

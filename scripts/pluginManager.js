@@ -278,7 +278,6 @@ class PluginManager {
             if (resp.ok) {
                 const data = await resp.json();
                 seedIds = data.plugins || [];
-                console.log(`[PluginManager] 从 plugins.json 读取到 ${seedIds.length} 个插件`);
             }
         } catch (e) {
             console.warn('[PluginManager] 无法读取 plugins.json，使用空列表:', e);
@@ -316,7 +315,6 @@ class PluginManager {
             }
         }
 
-        console.log(`[PluginManager] 发现 ${Object.keys(this.manifests).length} 个插件`);
         return Object.values(this.manifests);
     }
 
@@ -377,7 +375,6 @@ class PluginManager {
         // 第二步：自动安装标记为 default 的插件（仅首次，尊重用户卸载选择）
         for (const manifest of Object.values(this.manifests)) {
             if (manifest.default && !this.installed[manifest.id] && !this._wasUninstalled(manifest.id)) {
-                console.log(`[PluginManager] 自动安装默认插件: ${manifest.id}`);
                 this.installed[manifest.id] = { enabled: true, installDate: Date.now(), default: true };
             }
         }

@@ -10,53 +10,60 @@ const WORD_DICTIONARIES = {
         icon: '⌨️',
         description: '适合初学者的键盘指法练习',
         color: '#5AC8FA',
+        url: null, // 内置数据，不需要加载
         words: [] // 稍后加载
     },
     'cet4': {
         name: '大学英语四级',
         icon: '📘',
-        description: 'CET-4 核心词汇 2500+',
+        description: 'CET-4 核心词汇 2607 词',
         color: '#007AFF',
-        words: [] // 稍后加载
+        url: '/dicts/CET4_T.json',
+        words: []
     },
     'cet6': {
         name: '大学英语六级',
         icon: '📙',
-        description: 'CET-6 核心词汇 2000+',
+        description: 'CET-6 核心词汇 2345 词',
         color: '#5856D6',
+        url: '/dicts/CET6_T.json',
         words: []
     },
     'toefl': {
         name: '托福词汇',
         icon: '📕',
-        description: 'TOEFL 核心词汇 3000+',
+        description: 'TOEFL 核心词汇 4264 词',
         color: '#FF9500',
+        url: '/dicts/TOEFL_3_T.json',
         words: []
     },
     'ielts': {
         name: '雅思词汇',
         icon: '📗',
-        description: 'IELTS 核心词汇 3000+',
+        description: 'IELTS 核心词汇 3575 词',
         color: '#34C759',
+        url: '/dicts/IELTS_3_T.json',
         words: []
     },
     'gre': {
         name: 'GRE词汇',
         icon: '📓',
-        description: 'GRE 核心词汇 3500+',
+        description: 'GRE 核心词汇 6515 词',
         color: '#AF52DE',
+        url: '/dicts/GRE_3_T.json',
         words: []
     },
     'common': {
         name: '常用词汇',
         icon: '📔',
-        description: '日常英语 1000 词',
+        description: '日常英语 2000 词',
         color: '#FF2D55',
+        url: '/dicts/top2000words.json',
         words: []
     }
 };
 
-// 初始化词库示例数据（实际使用时应该从文件加载）
+// 初始化词库示例数据（仅用于降级，不要自动调用）
 function initSampleWords() {
     // 键盘练习词汇（新增）
     WORD_DICTIONARIES.keyboard.words = [
@@ -75,49 +82,9 @@ function initSampleWords() {
         { word: 'and', phonetic: '/ænd/', translation: '常用词', sentence: 'Practice makes perfect and patience is key.', sentenceTrans: '熟练和耐心都很重要' },
         { word: 'for', phonetic: '/fɔː/', translation: '常用词', sentence: 'This exercise is for beginners.', sentenceTrans: '这个练习适合初学者' }
     ];
-
-    // CET-4 示例词汇（实际应用中应该加载完整词库）
-    WORD_DICTIONARIES.cet4.words = [
-        { word: 'abandon', phonetic: '/əˈbændən/', translation: 'v. 放弃，抛弃', usNote: 'US: əˈbændən', ukNote: 'UK: əˈbændən', sentence: 'Never abandon your dreams.', sentenceTrans: '永远不要放弃梦想。' },
-        { word: 'ability', phonetic: '/əˈbɪləti/', translation: 'n. 能力，才能', sentence: 'She has the ability to succeed.', sentenceTrans: '她有成功的能力。' },
-        { word: 'absolute', phonetic: '/ˈæbsəluːt/', translation: 'adj. 绝对的，完全的', sentence: 'There is no absolute truth.', sentenceTrans: '没有绝对的真理。' },
-        { word: 'absorb', phonetic: '/əbˈsɔːrb/', translation: 'v. 吸收，理解', sentence: 'Plants absorb water from soil.', sentenceTrans: '植物从土壤中吸收水分。' },
-        { word: 'abstract', phonetic: '/ˈæbstrækt/', translation: 'adj. 抽象的; n. 摘要', sentence: 'Love is an abstract concept.', sentenceTrans: '爱是一个抽象的概念。' },
-        { word: 'academic', phonetic: '/ˌækəˈdemɪk/', translation: 'adj. 学术的，学业的', sentence: 'He achieved academic excellence.', sentenceTrans: '他取得了学术上的卓越成就。' },
-        { word: 'accelerate', phonetic: '/əkˈseləreɪt/', translation: 'v. 加速，促进', sentence: 'We need to accelerate the process.', sentenceTrans: '我们需要加快进程。' },
-        { word: 'accent', phonetic: '/ˈæksent/', translation: 'n. 口音，重音', sentence: 'She speaks English with a French accent.', sentenceTrans: '她说英语带有法国口音。' },
-        { word: 'accept', phonetic: '/əkˈsept/', translation: 'v. 接受，承认', sentence: 'Please accept my apology.', sentenceTrans: '请接受我的道歉。' },
-        { word: 'access', phonetic: '/ˈækses/', translation: 'n./v. 通道，进入，访问', sentence: 'Students have access to the library.', sentenceTrans: '学生们可以使用图书馆。' },
-        { word: 'accident', phonetic: '/ˈæksɪdənt/', translation: 'n. 事故，意外', sentence: 'He had a car accident yesterday.', sentenceTrans: '他昨天出了车祸。' },
-        { word: 'accompany', phonetic: '/əˈkʌmpəni/', translation: 'v. 陪伴，伴随', sentence: 'May I accompany you home?', sentenceTrans: '我可以陪你回家吗？' },
-        { word: 'accomplish', phonetic: '/əˈkɑːmplɪʃ/', translation: 'v. 完成，实现', sentence: 'We accomplished our mission.', sentenceTrans: '我们完成了任务。' },
-        { word: 'accord', phonetic: '/əˈkɔːrd/', translation: 'n. 一致，协议; v. 给予', sentence: 'The two sides reached an accord.', sentenceTrans: '双方达成了协议。' },
-        { word: 'account', phonetic: '/əˈkaʊnt/', translation: 'n. 账户，描述; v. 解释', sentence: 'Open a bank account.', sentenceTrans: '开一个银行账户。' },
-        { word: 'accurate', phonetic: '/ˈækjərət/', translation: 'adj. 准确的，精确的', sentence: 'The report was accurate.', sentenceTrans: '报告很准确。' },
-        { word: 'accuse', phonetic: '/əˈkjuːz/', translation: 'v. 指责，控告', sentence: 'She was accused of theft.', sentenceTrans: '她被指控盗窃。' },
-        { word: 'achieve', phonetic: '/əˈtʃiːv/', translation: 'v. 达到，完成，实现', sentence: 'Work hard to achieve your goals.', sentenceTrans: '努力工作以实现你的目标。' },
-        { word: 'acknowledge', phonetic: '/əkˈnɑːlɪdʒ/', translation: 'v. 承认，感谢', sentence: 'He acknowledged his mistake.', sentenceTrans: '他承认了自己的错误。' },
-        { word: 'acquire', phonetic: '/əˈkwaɪər/', translation: 'v. 获得，学到', sentence: 'Children acquire language naturally.', sentenceTrans: '儿童自然地习得语言。' }
-    ];
-
-    // 其他词库使用类似结构...（简化版本）
-    WORD_DICTIONARIES.common.words = [
-        { word: 'hello', phonetic: '/həˈloʊ/', translation: 'int. 你好，喂', sentence: 'Hello, how are you?', sentenceTrans: '你好，你怎么样？' },
-        { word: 'world', phonetic: '/wɜːrld/', translation: 'n. 世界，地球', sentence: 'Welcome to the world.', sentenceTrans: '欢迎来到这个世界。' },
-        { word: 'time', phonetic: '/taɪm/', translation: 'n. 时间', sentence: 'Time flies.', sentenceTrans: '时光飞逝。' },
-        { word: 'people', phonetic: '/ˈpiːpl/', translation: 'n. 人，人们', sentence: 'Many people came.', sentenceTrans: '很多人来了。' },
-        { word: 'learn', phonetic: '/lɜːrn/', translation: 'v. 学习', sentence: 'We learn every day.', sentenceTrans: '我们每天都在学习。' }
-    ];
-
-    // 复制部分数据给其他词库
-    WORD_DICTIONARIES.cet6.words = WORD_DICTIONARIES.cet4.words.slice(5, 15);
-    WORD_DICTIONARIES.toefl.words = WORD_DICTIONARIES.cet4.words.slice(0, 10);
-    WORD_DICTIONARIES.ielts.words = WORD_DICTIONARIES.cet4.words.slice(3, 13);
-    WORD_DICTIONARIES.gre.words = WORD_DICTIONARIES.cet4.words.slice(7, 17);
 }
 
-// 初始化示例数据
-initSampleWords();
+// 不要自动初始化示例数据！让词库保持空数组，等待CDN加载
 
 class WordTyperManager {
     constructor() {
@@ -134,6 +101,7 @@ class WordTyperManager {
         this.userInput = '';
         this.isLearning = false;
         this.startTime = null;
+        this.selectedChapter = null; // 当前选择的章节
         
         // 学习模式设置
         this.settings = {
@@ -283,46 +251,221 @@ class WordTyperManager {
         this.updateStatsDisplay();
     }
 
-    getPanelHTML() {
-        const dictOptions = Object.entries(WORD_DICTIONARIES)
-            .map(([key, dict]) => `<option value="${key}">${dict.icon} ${dict.name}</option>`)
-            .join('');
+    getGalleryHTML() {
+        // 按分类组织词库
+        const categories = {
+            'practice': {
+                name: '入门练习',
+                icon: '⌨️',
+                dicts: ['keyboard']
+            },
+            'cet': {
+                name: '中国考试',
+                icon: '🇨🇳',
+                dicts: ['cet4', 'cet6']
+            },
+            'international': {
+                name: '国际考试',
+                icon: '🌏',
+                dicts: ['toefl', 'ielts', 'gre']
+            },
+            'common': {
+                name: '日常词汇',
+                icon: '📚',
+                dicts: ['common']
+            }
+        };
 
+        let html = '<div class="dict-gallery">';
+        
+        for (const [catKey, category] of Object.entries(categories)) {
+            html += `
+                <div class="dict-category">
+                    <h4 class="category-title">
+                        <span class="category-icon">${category.icon}</span>
+                        <span>${category.name}</span>
+                    </h4>
+                    <div class="dict-cards">
+            `;
+            
+            for (const dictKey of category.dicts) {
+                const dict = WORD_DICTIONARIES[dictKey];
+                if (!dict) continue;
+                
+                html += `
+                    <div class="dict-card" data-dict="${dictKey}">
+                        <div class="dict-card-icon">${dict.icon}</div>
+                        <div class="dict-card-name">${dict.name}</div>
+                        <div class="dict-card-desc">${dict.description}</div>
+                        <div class="dict-card-actions">
+                            <button class="dict-card-btn" data-dict="${dictKey}" data-mode="new">
+                                📚 学习
+                            </button>
+                            <button class="dict-card-btn dict-card-btn-secondary" data-dict="${dictKey}" data-mode="review">
+                                🔄 复习
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        return html;
+    }
+
+    /**
+     * 显示章节选择界面
+     * @param {string} mode - 学习模式 ('new' 或 'review')
+     */
+    async showChapterSelection(mode) {
+        const dict = WORD_DICTIONARIES[this.currentDict];
+        if (!dict) return;
+
+        // 先显示加载提示
+        const selectorEl = document.getElementById('wordTyperSelector');
+        if (!selectorEl) return;
+
+        selectorEl.innerHTML = `
+            <div style="text-align:center;padding:40px;color:#86868b;">
+                <div style="font-size:48px;margin-bottom:16px;">${dict.icon}</div>
+                <div style="font-size:18px;font-weight:600;color:#1d1d1f;margin-bottom:8px;">${dict.name}</div>
+                <div style="font-size:14px;margin-bottom:20px;">${dict.description}</div>
+                <div style="font-size:15px;color:#007AFF;">正在加载词库...</div>
+            </div>
+        `;
+
+        // 从CDN加载完整词库数据
+        const words = await this.loadDictionaryWords(this.currentDict);
+        
+        if (!words || words.length === 0) {
+            selectorEl.innerHTML = `
+                <div style="text-align:center;padding:40px;">
+                    <p style="color:#FF3B30;margin-bottom:20px;font-size:16px;">❌ 词库加载失败</p>
+                    <p style="color:#86868b;margin-bottom:20px;font-size:14px;">请检查网络连接或稍后重试</p>
+                    <button class="dict-card-btn" id="btnBackToGallery">返回词库列表</button>
+                </div>
+            `;
+            return;
+        }
+
+        console.log(`[word-typer] ✅ 从CDN加载完成: ${this.currentDict}, ${words.length} 词`);
+
+        // 根据实际单词数量自动分章节（每章20词）
+        const wordsPerChapter = 20;
+        const totalChapters = Math.ceil(words.length / wordsPerChapter);
+        
+        console.log(`[word-typer] 📚 自动分章节: ${totalChapters} 章 (每章 ${wordsPerChapter} 词)`);
+        
+        // 生成章节列表HTML
+        let chaptersHTML = `
+            <div class="chapter-selection">
+                <div class="chapter-header">
+                    <button class="btn-back" id="btnBackToGallery">← 返回</button>
+                    <div class="chapter-info">
+                        <h3>${dict.icon} ${dict.name}</h3>
+                        <p class="chapter-stats">${totalChapters} 章节 · 共 ${words.length} 词 · 每章 ${wordsPerChapter} 词</p>
+                        <p class="chapter-desc">${dict.description}</p>
+                    </div>
+                </div>
+                
+                <div class="chapter-tabs">
+                    <button class="chapter-tab active" data-tab="sequence">📖 章节选择</button>
+                    <button class="chapter-tab" data-tab="random">🎲 随机练习</button>
+                    <button class="chapter-tab" data-tab="mistake">📝 错题回顾</button>
+                </div>
+                
+                <div class="chapter-grid">
+        `;
+
+        // 生成章节卡片（基于实际单词数）
+        for (let i = 0; i < totalChapters; i++) {
+            const chapterNum = i + 1;
+            const startIdx = i * wordsPerChapter;
+            const endIdx = Math.min(startIdx + wordsPerChapter, words.length);
+            const chapterWordCount = endIdx - startIdx;
+            
+            // 计算本章节的完成进度
+            const chapterWords = words.slice(startIdx, endIdx);
+            let masteredCount = 0;
+            chapterWords.forEach(w => {
+                const progress = this.getWordProgress(w.word);
+                if (progress.familiarity >= 4) {
+                    masteredCount++;
+                }
+            });
+            
+            const completionRate = chapterWordCount > 0 ? Math.round((masteredCount / chapterWordCount) * 100) : 0;
+            const isCompleted = completionRate === 100;
+            
+            chaptersHTML += `
+                <div class="chapter-card ${isCompleted ? 'completed' : ''}" data-chapter="${chapterNum}" data-mode="${mode}">
+                    <div class="chapter-number">第 ${chapterNum} 章</div>
+                    <div class="chapter-word-count">${chapterWordCount} 词</div>
+                    <div class="chapter-progress">
+                        <div class="chapter-progress-bar">
+                            <div class="chapter-progress-fill" style="width: ${completionRate}%"></div>
+                        </div>
+                        <div class="chapter-progress-text">${isCompleted ? '✓ 已完成' : (completionRate > 0 ? `${completionRate}%` : '未练习')}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        chaptersHTML += `
+                </div>
+            </div>
+        `;
+
+        selectorEl.innerHTML = chaptersHTML;
+        
+        // 显示加载成功提示
+        this.showFeedback(`✓ 成功加载 ${words.length} 个单词，已分为 ${totalChapters} 章节`, 'success');
+    }
+
+    /**
+     * 显示词库画廊
+     */
+    showGallery() {
+        const selectorEl = document.getElementById('wordTyperSelector');
+        if (selectorEl) {
+            selectorEl.innerHTML = this.getGalleryHTML() + `
+                <div class="settings-panel">
+                    <label class="setting-item">
+                        <input type="checkbox" id="chkShowPhonetic" ${this.settings.showPhonetic ? 'checked' : ''}>
+                        <span>显示音标</span>
+                    </label>
+                    <label class="setting-item">
+                        <input type="checkbox" id="chkShowTranslation" ${this.settings.showTranslation ? 'checked' : ''}>
+                        <span>显示释义</span>
+                    </label>
+                    <label class="setting-item">
+                        <input type="checkbox" id="chkAutoVoice" ${this.settings.autoVoice ? 'checked' : ''}>
+                        <span>自动发音</span>
+                    </label>
+                </div>
+            `;
+        }
+    }
+
+    getPanelHTML() {
         return `
             <div class="word-typer-header">
                 <h3>📖 单词打字背诵</h3>
-                <button class="word-typer-close-btn" id="wordTyperCloseBtn">✕</button>
+                <div class="header-actions">
+                    <button class="word-typer-voice-toggle" id="wordTyperVoiceToggle" title="切换发音">🔊</button>
+                    <button class="word-typer-close-btn" id="wordTyperCloseBtn">✕</button>
+                </div>
             </div>
             
-            <!-- 词库选择区 -->
+            <!-- 词库画廊 -->
             <div class="word-typer-selector" id="wordTyperSelector">
-                <div class="dict-selector">
-                    <label>选择词库：</label>
-                    <select id="wordTyperDictSelect">
-                        ${dictOptions}
-                    </select>
-                    <button class="word-typer-voice-toggle" id="wordTyperVoiceToggle" title="切换发音">🔊</button>
-                </div>
-                
-                <div class="dict-info" id="dictInfo">
-                    <span class="dict-icon">${WORD_DICTIONARIES.cet4.icon}</span>
-                    <span class="dict-desc">${WORD_DICTIONARIES.cet4.description}</span>
-                </div>
-                
-                <div class="learn-options">
-                    <button class="option-btn" id="btnLearnNew">
-                        <span>📚</span>
-                        <span>学习新词</span>
-                    </button>
-                    <button class="option-btn" id="btnReviewWrong">
-                        <span>🔄</span>
-                        <span>复习错词</span>
-                    </button>
-                    <button class="option-btn" id="btnReviewAll">
-                        <span>📝</span>
-                        <span>全部复习</span>
-                    </button>
-                </div>
+                ${this.getGalleryHTML()}
                 
                 <div class="settings-panel">
                     <label class="setting-item">
@@ -462,14 +605,6 @@ class WordTyperManager {
             });
         }
 
-        // 词库选择
-        document.addEventListener('change', (e) => {
-            if (e.target.id === 'wordTyperDictSelect') {
-                this.currentDict = e.target.value;
-                this.updateDictInfo();
-            }
-        });
-
         // 语音切换按钮
         document.addEventListener('click', (e) => {
             if (e.target.id === 'wordTyperVoiceToggle') {
@@ -478,14 +613,40 @@ class WordTyperManager {
             }
         });
 
-        // 学习模式按钮
+        // 词库卡片点击
         document.addEventListener('click', (e) => {
-            if (e.target.closest('#btnLearnNew')) {
-                this.startLearning('new');
-            } else if (e.target.closest('#btnReviewWrong')) {
-                this.startLearning('wrong');
-            } else if (e.target.closest('#btnReviewAll')) {
-                this.startLearning('all');
+            const btn = e.target.closest('.dict-card-btn');
+            if (btn) {
+                const dictKey = btn.dataset.dict;
+                const mode = btn.dataset.mode;
+                
+                if (dictKey) {
+                    this.currentDict = dictKey;
+                    
+                    // 显示章节选择界面
+                    this.showChapterSelection(mode);
+                }
+            }
+        });
+
+        // 章节卡片点击
+        document.addEventListener('click', (e) => {
+            const chapterBtn = e.target.closest('.chapter-card');
+            if (chapterBtn) {
+                const chapter = parseInt(chapterBtn.dataset.chapter);
+                const mode = chapterBtn.dataset.mode;
+                
+                if (!isNaN(chapter)) {
+                    this.selectedChapter = chapter;
+                    this.startLearning(mode);
+                }
+            }
+        });
+
+        // 返回词库列表
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#btnBackToGallery')) {
+                this.showGallery();
             }
         });
 
@@ -577,51 +738,294 @@ class WordTyperManager {
         }
     }
 
-    updateDictInfo() {
+    /* ========== 词库加载 ========== */
+
+    /**
+     * 重新加载当前词库（清除缓存）
+     */
+    async reloadDictionary() {
         const dict = WORD_DICTIONARIES[this.currentDict];
-        if (!dict) return;
+        if (!dict) {
+            alert('请先选择词库');
+            return;
+        }
+
+        if (!confirm(`确定要重新加载 ${dict.name} 吗？\n这将清除内存和本地缓存，从网络重新下载。`)) {
+            return;
+        }
+
+        // 清除内存缓存
+        dict.words = [];
         
-        const infoEl = document.getElementById('dictInfo');
-        if (infoEl) {
-            infoEl.innerHTML = `
-                <span class="dict-icon">${dict.icon}</span>
-                <span class="dict-desc">${dict.description}</span>
-            `;
+        // 清除 localStorage 缓存
+        localStorage.removeItem(`wordTyperDict_${this.currentDict}`);
+        localStorage.removeItem(`wordTyperDict_${this.currentDict}_time`);
+        
+        console.log('[word-typer] 已清除缓存，开始重新加载...');
+        
+        // 显示加载提示
+        this.showFeedback('正在从网络重新加载词库...', 'info');
+        
+        try {
+            const words = await this.loadDictionaryWords(this.currentDict);
+            
+            if (words && words.length > 100) {
+                this.showFeedback(`✓ 成功加载 ${words.length} 个单词`, 'success');
+                console.log('[word-typer] ✅ 重新加载成功:', words.length, '词');
+            } else {
+                this.showFeedback('⚠️ 加载的单词数较少，可能是网络问题', 'error');
+                console.warn('[word-typer] ⚠️ 加载的单词数较少:', words.length);
+            }
+        } catch (error) {
+            this.showFeedback('✗ 重新加载失败', 'error');
+            console.error('[word-typer] ❌ 重新加载失败:', error);
+        }
+    }
+
+    /**
+     * 从 qwerty-learner 加载词库数据
+     * @param {string} dictId - 词库ID
+     * @returns {Promise<Array>} 单词数组
+     */
+    async loadDictionaryWords(dictId) {
+        const dict = WORD_DICTIONARIES[dictId];
+        if (!dict) {
+            console.error('[word-typer] 词库不存在:', dictId);
+            return [];
+        }
+
+        // 键盘练习使用内置数据
+        if (dictId === 'keyboard') {
+            if (!dict.words || dict.words.length === 0) {
+                initSampleWords();
+            }
+            console.log('[word-typer] 使用内置键盘练习数据:', dict.words.length, '项');
+            return dict.words;
+        }
+
+        // 1. 优先从内存缓存返回（已加载过）
+        if (dict.words && dict.words.length > 0) {
+            console.log('[word-typer] 📦 从内存缓存返回:', dictId, dict.words.length, '词');
+            return dict.words;
+        }
+
+        // 2. 尝试从localStorage加载
+        const cached = this.loadFromCache(dictId);
+        if (cached && cached.length > 0) {
+            dict.words = cached;
+            console.log('[word-typer] 💾 从localStorage缓存加载:', dictId, cached.length, '词');
+            return cached;
+        }
+
+        // 3. 从CDN加载（首次加载）
+        if (!dict.url) {
+            console.error('[word-typer] 词库URL未配置:', dictId);
+            return [];
+        }
+
+        try {
+            console.log('[word-typer] 🌐 首次加载，开始从CDN下载:', dictId);
+            
+            // 使用 CDN 加速（jsDelivr）
+            const baseUrls = [
+                'https://cdn.jsdelivr.net/gh/RealKai42/qwerty-learner@master/public',
+                'https://raw.githubusercontent.com/RealKai42/qwerty-learner/master/public',
+                'https://cdn.statically.io/gh/RealKai42/qwerty-learner/master/public'
+            ];
+
+            let data = null;
+            let lastError = null;
+
+            // 依次尝试多个CDN
+            for (const baseUrl of baseUrls) {
+                try {
+                    const url = baseUrl + dict.url;
+                    console.log('[word-typer] 📡 尝试CDN:', url);
+                    
+                    const response = await fetch(url, {
+                        cache: 'default',
+                        mode: 'cors'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    data = await response.json();
+                    console.log('[word-typer] ✅ CDN加载成功:', dictId, data.length, '词，来源:', baseUrl.split('/').slice(2,4).join('/'));
+                    break;
+                } catch (error) {
+                    console.warn('[word-typer] ❌ CDN加载失败:', baseUrl.split('/').slice(2,4).join('/'), error.message);
+                    lastError = error;
+                    continue;
+                }
+            }
+
+            if (!data || data.length === 0) {
+                throw lastError || new Error('所有CDN加载失败或数据为空');
+            }
+
+            // 转换格式：qwerty-learner -> 插件格式
+            console.log('[word-typer] 🔄 开始格式转换，原始数据:', data.length, '项');
+            const words = data.map(w => ({
+                word: w.name || '',
+                phonetic: w.usphone ? `/${w.usphone}/` : (w.ukphone ? `/${w.ukphone}/` : ''),
+                translation: Array.isArray(w.trans) ? w.trans.join('; ') : (w.trans || ''),
+                sentence: '',  // qwerty-learner 词库没有例句
+                sentenceTrans: ''
+            })).filter(w => w.word); // 过滤空单词
+
+            console.log('[word-typer] ✅ 格式转换完成:', words.length, '词');
+
+            // 保存到内存和localStorage缓存
+            dict.words = words;
+            this.saveToCache(dictId, words);
+            console.log('[word-typer] 💾 已保存到缓存');
+
+            return words;
+
+        } catch (error) {
+            console.error('[word-typer] ❌ 加载词库失败:', dictId, error);
+            this.showFeedback(`加载词库失败: ${error.message}`, 'error');
+            return [];
+        }
+    }
+
+    /**
+     * 从缓存加载词库
+     */
+    loadFromCache(dictId) {
+        try {
+            const cached = localStorage.getItem(`wordTyperDict_${dictId}`);
+            const cacheTime = localStorage.getItem(`wordTyperDict_${dictId}_time`);
+            
+            if (cached && cacheTime) {
+                const cacheAge = Date.now() - parseInt(cacheTime);
+                const maxAge = 7 * 24 * 60 * 60 * 1000; // 7天
+                
+                if (cacheAge < maxAge) {
+                    return JSON.parse(cached);
+                } else {
+                    console.log(`词库缓存已过期: ${dictId}`);
+                    // 清理过期缓存
+                    localStorage.removeItem(`wordTyperDict_${dictId}`);
+                    localStorage.removeItem(`wordTyperDict_${dictId}_time`);
+                }
+            }
+        } catch (error) {
+            console.error('读取缓存失败:', error);
+        }
+        return null;
+    }
+
+    /**
+     * 保存词库到缓存
+     */
+    saveToCache(dictId, words) {
+        try {
+            localStorage.setItem(`wordTyperDict_${dictId}`, JSON.stringify(words));
+            localStorage.setItem(`wordTyperDict_${dictId}_time`, Date.now().toString());
+            console.log(`词库已缓存: ${dictId}, ${words.length} 词`);
+        } catch (error) {
+            console.error('缓存词库失败:', error);
+            // localStorage 可能已满，尝试清理旧缓存
+            if (error.name === 'QuotaExceededError') {
+                this.clearOldCache();
+            }
+        }
+    }
+
+    /**
+     * 清理旧缓存
+     */
+    clearOldCache() {
+        try {
+            const keys = Object.keys(localStorage);
+            const dictKeys = keys.filter(k => k.startsWith('wordTyperDict_') && k.endsWith('_time'));
+            
+            // 按时间排序，删除最旧的
+            const caches = dictKeys.map(key => ({
+                key: key.replace('_time', ''),
+                time: parseInt(localStorage.getItem(key) || '0')
+            })).sort((a, b) => a.time - b.time);
+
+            // 删除最旧的缓存
+            if (caches.length > 0) {
+                const oldest = caches[0];
+                localStorage.removeItem(oldest.key);
+                localStorage.removeItem(oldest.key + '_time');
+                console.log('清理旧缓存:', oldest.key);
+            }
+        } catch (error) {
+            console.error('清理缓存失败:', error);
         }
     }
 
     /* ========== 学习逻辑 ========== */
 
-    startLearning(mode) {
+    async startLearning(mode) {
         const dict = WORD_DICTIONARIES[this.currentDict];
-        if (!dict || !dict.words || dict.words.length === 0) {
-            alert('该词库暂无内容');
+        if (!dict) {
+            alert('词库不存在');
             return;
+        }
+
+        // 保存学习模式，用于"继续学习"
+        this.lastLearningMode = mode;
+
+        // 显示加载提示
+        this.showFeedback('正在加载词库...', 'info');
+
+        // 动态加载词库
+        const allWords = await this.loadDictionaryWords(this.currentDict);
+        
+        console.log(`[word-typer] 加载词库 ${this.currentDict}:`, allWords ? allWords.length : 0, '词');
+        
+        if (!allWords || allWords.length === 0) {
+            alert('词库加载失败或为空，请检查网络连接');
+            return;
+        }
+
+        // 如果选择了章节，只使用该章节的单词
+        let words = allWords;
+        if (this.selectedChapter) {
+            const wordsPerChapter = 20;
+            const startIdx = (this.selectedChapter - 1) * wordsPerChapter;
+            const endIdx = Math.min(startIdx + wordsPerChapter, allWords.length);
+            words = allWords.slice(startIdx, endIdx);
+            console.log(`[word-typer] 选择第 ${this.selectedChapter} 章:`, words.length, '词');
         }
 
         // 根据模式筛选单词
         let wordsToLearn = [];
         if (mode === 'new') {
-            // 学习新词：未学习或熟练度低的词
-            wordsToLearn = dict.words.filter(w => {
+            // 学习新词：未学习或熟练度 <= 2 的词（更宽松）
+            wordsToLearn = words.filter(w => {
                 const progress = this.getWordProgress(w.word);
-                return progress.familiarity < 3;
+                return progress.familiarity <= 2;
             });
+            console.log(`[word-typer] "学习新词"模式筛选出:`, wordsToLearn.length, '词');
         } else if (mode === 'wrong') {
             // 复习错词：错误次数多的词
-            wordsToLearn = dict.words.filter(w => {
+            wordsToLearn = words.filter(w => {
                 const progress = this.getWordProgress(w.word);
                 return progress.wrong > 0 && progress.familiarity < 4;
             });
+            console.log(`[word-typer] "复习错词"模式筛选出:`, wordsToLearn.length, '词');
         } else {
             // 全部复习
-            wordsToLearn = [...dict.words];
+            wordsToLearn = [...words];
+            console.log(`[word-typer] "全部复习"模式:`, wordsToLearn.length, '词');
         }
 
         if (wordsToLearn.length === 0) {
-            alert(mode === 'wrong' ? '没有需要复习的错词' : '所有单词已掌握！');
+            const chapterText = this.selectedChapter ? `第 ${this.selectedChapter} 章` : '';
+            alert(mode === 'wrong' ? `${chapterText}没有需要复习的错词` : `${chapterText}所有单词已掌握！`);
             return;
         }
+        
+        console.log(`[word-typer] 开始学习:`, wordsToLearn.length, '词，前3个:', 
+            wordsToLearn.slice(0, 3).map(w => w.word));
 
         // 打乱顺序
         this.currentWords = this.shuffleArray(wordsToLearn);
@@ -956,7 +1360,7 @@ class WordTyperManager {
         }
     }
 
-    finishLearning() {
+    async finishLearning() {
         this.isLearning = false;
         const endTime = Date.now();
         this.sessionStats.totalTime = Math.floor((endTime - this.startTime) / 1000);
@@ -964,14 +1368,27 @@ class WordTyperManager {
         const total = this.sessionStats.correct + this.sessionStats.wrong;
         const accuracy = total > 0 ? ((this.sessionStats.correct / total) * 100).toFixed(1) : 0;
 
-        alert(`学习完成！\n\n` +
+        const message = `学习完成！\n\n` +
             `总计: ${total} 个单词\n` +
             `正确: ${this.sessionStats.correct}\n` +
             `错误: ${this.sessionStats.wrong}\n` +
             `准确率: ${accuracy}%\n` +
-            `用时: ${this.sessionStats.totalTime} 秒`);
+            `用时: ${this.sessionStats.totalTime} 秒\n\n` +
+            `是否继续学习下一组？`;
 
-        this.quitLearning();
+        // 询问是否继续
+        if (confirm(message)) {
+            console.log('[word-typer] 用户选择继续学习');
+            
+            // 获取当前学习模式（从上次会话保存）
+            const lastMode = this.lastLearningMode || 'new';
+            
+            // 重新开始学习
+            await this.startLearning(lastMode);
+        } else {
+            console.log('[word-typer] 用户选择退出');
+            this.quitLearning();
+        }
     }
 
     quitLearning() {
@@ -980,11 +1397,14 @@ class WordTyperManager {
         this.currentIndex = 0;
         this.currentWord = null;
         this.userInput = '';
+        this.selectedChapter = null; // 清除章节选择
 
         document.getElementById('wordTyperSelector').style.display = 'block';
         document.getElementById('wordTyperLearningArea').style.display = 'none';
         document.getElementById('wordTyperStats').style.display = 'block';
 
+        // 返回到词库画廊
+        this.showGallery();
         this.updateStatsDisplay();
     }
 
