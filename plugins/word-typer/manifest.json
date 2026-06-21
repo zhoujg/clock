@@ -1,0 +1,23 @@
+{
+  "id": "word-typer",
+  "name": "单词打字背诵",
+  "version": "1.0.0",
+  "description": "通过打字的方式背单词，结合英语学习和打字练习，支持多种词库（四级、六级、托福、雅思等）",
+  "author": "Clock Team",
+  "icon": "📖",
+  "category": "learning",
+  "enabled": true,
+  "files": {
+    "main": "plugin.js",
+    "style": "style.css",
+    "class": "word-typer-class.js"
+  },
+  "dependencies": [],
+  "settings": {
+    "defaultLibrary": "cet4",
+    "showPhonetic": true,
+    "showTranslation": true,
+    "autoVoice": true,
+    "reviewMode": "smart"
+  }
+}
