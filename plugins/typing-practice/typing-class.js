@@ -5,6 +5,85 @@
 
 // 内置词库（示例单词）- 参考 TypeWords
 const WORD_LIBRARIES = {
+    'keyboard': {
+        name: '键盘练习',
+        words: [
+            // 基础键位 - 中排（Home Row）
+            { 
+                word: 'asdf', 
+                translation: '左手基准键位', 
+                phonetic: '中排左手',
+                sentence: '左手：小指(A) 无名指(S) 中指(D) 食指(F)',
+                sentenceTrans: '熟悉这四个键是打字的基础'
+            },
+            { 
+                word: 'jkl', 
+                translation: '右手基准键位', 
+                phonetic: '中排右手',
+                sentence: '右手：食指(J) 中指(K) 无名指(L)',
+                sentenceTrans: 'J键上有一个小凸点，帮助定位'
+            },
+            { 
+                word: 'asdfjkl', 
+                translation: '中排全部键位', 
+                phonetic: '基准行',
+                sentence: '这是打字的"家"，手指应该放在这里',
+                sentenceTrans: '打完其他键后，手指要回到这里'
+            },
+            // 上排练习
+            { 
+                word: 'qwerty', 
+                translation: '上排字母', 
+                phonetic: '标准键盘',
+                sentence: 'QWERTY键盘布局源于打字机时代',
+                sentenceTrans: '练习从中排移动到上排'
+            },
+            { 
+                word: 'uiop', 
+                translation: '上排右侧', 
+                phonetic: '右手上排',
+                sentence: '右手小指负责P键及其周围',
+                sentenceTrans: '保持手腕平直'
+            },
+            // 下排练习
+            { 
+                word: 'zxcv', 
+                translation: '下排左侧', 
+                phonetic: '左手下排',
+                sentence: '左手从中排向下移动练习',
+                sentenceTrans: '手指要回到ASDF'
+            },
+            { 
+                word: 'bnm', 
+                translation: '下排右侧', 
+                phonetic: '右手下排',
+                sentence: '右手食指和中指练习',
+                sentenceTrans: '注意B和N的位置'
+            },
+            // 组合练习
+            { 
+                word: 'the', 
+                translation: '常用词', 
+                phonetic: '/ðə/',
+                sentence: 'The quick brown fox jumps over the lazy dog.',
+                sentenceTrans: '最常用的英文单词'
+            },
+            { 
+                word: 'and', 
+                translation: '常用词', 
+                phonetic: '/ænd/',
+                sentence: 'Practice makes perfect and patience is key.',
+                sentenceTrans: '熟练和耐心都很重要'
+            },
+            { 
+                word: 'for', 
+                translation: '常用词', 
+                phonetic: '/fɔː/',
+                sentence: 'This exercise is for beginners.',
+                sentenceTrans: '这个练习适合初学者'
+            }
+        ]
+    },
     'basic': {
         name: '基础词汇',
         words: [
@@ -352,10 +431,12 @@ class TypingPracticeManager {
             <div class="typing-library-selector">
                 <label>选择词库：</label>
                 <select id="typingLibrarySelect">
-                    <option value="basic">基础词汇</option>
-                    <option value="cet4">大学英语四级</option>
-                    <option value="cet6">大学英语六级</option>
+                    <option value="keyboard">⌨️ 键盘练习（初学者）</option>
+                    <option value="basic">📝 基础词汇</option>
+                    <option value="cet4">📚 大学英语四级</option>
+                    <option value="cet6">🎓 大学英语六级</option>
                 </select>
+                <button class="typing-voice-toggle" id="typingVoiceToggle" title="切换发音">🔊</button>
                 <button class="typing-start-btn" id="typingStartBtn">开始练习</button>
             </div>
             
@@ -365,10 +446,51 @@ class TypingPracticeManager {
                     <div class="typing-word" id="typingWord"></div>
                     <div class="typing-translation" id="typingTranslation"></div>
                 </div>
+                                
+                <!-- 虚拟键盘（仅键盘练习模式显示） -->
+                <div class="virtual-keyboard" id="virtualKeyboard" style="display:none;">
+                    <div class="keyboard-row">
+                        <div class="key" data-key="q">Q</div>
+                        <div class="key" data-key="w">W</div>
+                        <div class="key" data-key="e">E</div>
+                        <div class="key" data-key="r">R</div>
+                        <div class="key" data-key="t">T</div>
+                        <div class="key" data-key="y">Y</div>
+                        <div class="key" data-key="u">U</div>
+                        <div class="key" data-key="i">I</div>
+                        <div class="key" data-key="o">O</div>
+                        <div class="key" data-key="p">P</div>
+                    </div>
+                    <div class="keyboard-row">
+                        <div class="key home-key" data-key="a">A</div>
+                        <div class="key home-key" data-key="s">S</div>
+                        <div class="key home-key" data-key="d">D</div>
+                        <div class="key home-key" data-key="f">F</div>
+                        <div class="key home-key" data-key="g">G</div>
+                        <div class="key home-key" data-key="h">H</div>
+                        <div class="key home-key" data-key="j">J</div>
+                        <div class="key home-key" data-key="k">K</div>
+                        <div class="key home-key" data-key="l">L</div>
+                    </div>
+                    <div class="keyboard-row">
+                        <div class="key" data-key="z">Z</div>
+                        <div class="key" data-key="x">X</div>
+                        <div class="key" data-key="c">C</div>
+                        <div class="key" data-key="v">V</div>
+                        <div class="key" data-key="b">B</div>
+                        <div class="key" data-key="n">N</div>
+                        <div class="key" data-key="m">M</div>
+                    </div>
+                    <div class="keyboard-hint">
+                        <span class="hint-left">左手区域</span>
+                        <span class="hint-home">基准键位 (Home Row)</span>
+                        <span class="hint-right">右手区域</span>
+                    </div>
+                </div>
                 
                 <div class="typing-sentence" id="typingSentence" style="display:none;"></div>
                 <div class="typing-sentence-trans" id="typingSentenceTrans" style="display:none;"></div>
-                
+
                 <div class="typing-progress">
                     <div class="typing-progress-text">
                         <span>进度: <span id="typingProgress">0/0</span></span>
@@ -429,6 +551,14 @@ class TypingPracticeManager {
                 }
             });
         }
+
+        // 语音切换按钮
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'typingVoiceToggle') {
+                const enabled = this.toggleVoice();
+                this.showFeedback(enabled ? '✓ 已开启发音' : '✓ 已关闭发音', 'success');
+            }
+        });
 
         // 开始练习
         document.addEventListener('click', (e) => {
@@ -496,6 +626,7 @@ class TypingPracticeManager {
             this.overlay.style.display = 'block';
             this.isPanelOpen = true;
             this.updateStatsDisplay();
+            this.updateVoiceButton();
         }
     }
 
@@ -534,6 +665,12 @@ class TypingPracticeManager {
         // 显示练习区域
         document.querySelector('.typing-library-selector').style.display = 'none';
         document.getElementById('typingPracticeArea').style.display = 'block';
+        
+        // 如果是键盘练习模式，显示虚拟键盘
+        const keyboard = document.getElementById('virtualKeyboard');
+        if (keyboard) {
+            keyboard.style.display = this.currentLibrary === 'keyboard' ? 'block' : 'none';
+        }
         
         // 显示第一个单词
         this.showNextWord();
@@ -601,9 +738,18 @@ class TypingPracticeManager {
         const wordEl = document.getElementById('typingWord');
         const letters = wordEl.querySelectorAll('.word-letter');
         
+        // 清除所有键盘高亮
+        if (this.currentLibrary === 'keyboard') {
+            const keys = document.querySelectorAll('.virtual-keyboard .key');
+            keys.forEach(key => {
+                key.classList.remove('highlight', 'pressed', 'next');
+            });
+        }
+        
         // 实时检查输入并高亮字母
         if (this.currentWord && this.userInput.length > 0) {
             let allCorrect = true;
+            let nextKeyToPress = null;
             
             // 遍历每个字母，更新状态
             for (let i = 0; i < letters.length; i++) {
@@ -614,6 +760,14 @@ class TypingPracticeManager {
                     if (inputChar === targetChar) {
                         letters[i].classList.add('correct');
                         letters[i].classList.remove('error', 'current');
+                        
+                        // 在键盘上显示已按下的效果
+                        if (this.currentLibrary === 'keyboard') {
+                            const key = document.querySelector(`.virtual-keyboard .key[data-key="${targetChar}"]`);
+                            if (key) {
+                                key.classList.add('pressed');
+                            }
+                        }
                     } else {
                         letters[i].classList.add('error');
                         letters[i].classList.remove('correct', 'current');
@@ -623,9 +777,18 @@ class TypingPracticeManager {
                     // 当前要输入的字母
                     letters[i].classList.add('current');
                     letters[i].classList.remove('correct', 'error');
+                    nextKeyToPress = this.currentWord.word[i].toLowerCase();
                 } else {
                     // 还没输入到的字母
                     letters[i].classList.remove('correct', 'error', 'current');
+                }
+            }
+            
+            // 高亮下一个要按的键
+            if (this.currentLibrary === 'keyboard' && nextKeyToPress) {
+                const nextKey = document.querySelector(`.virtual-keyboard .key[data-key="${nextKeyToPress}"]`);
+                if (nextKey) {
+                    nextKey.classList.add('next');
                 }
             }
             
@@ -644,6 +807,15 @@ class TypingPracticeManager {
             // 标记第一个字母为当前
             if (letters.length > 0) {
                 letters[0].classList.add('current');
+                
+                // 高亮第一个要按的键
+                if (this.currentLibrary === 'keyboard') {
+                    const firstChar = this.currentWord.word[0].toLowerCase();
+                    const firstKey = document.querySelector(`.virtual-keyboard .key[data-key="${firstChar}"]`);
+                    if (firstKey) {
+                        firstKey.classList.add('next');
+                    }
+                }
             }
         }
     }
@@ -790,11 +962,112 @@ class TypingPracticeManager {
     }
 
     speak(text) {
+        // 检查是否启用语音（可以添加设置选项）
+        const enableVoice = localStorage.getItem('typingPracticeVoice') !== 'false';
+        if (!enableVoice) return;
+        
         if ('speechSynthesis' in window) {
+            // 取消之前的语音
+            window.speechSynthesis.cancel();
+            
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.8;
-            window.speechSynthesis.speak(utterance);
+            utterance.rate = 0.8;  // 0.8倍速，更清晰
+            utterance.pitch = 1.0; // 标准音调
+            utterance.volume = 0.9; // 适中音量
+            
+            // 加载语音列表（如果还没加载）
+            let voices = window.speechSynthesis.getVoices();
+            
+            // 如果语音列表为空，等待加载
+            if (voices.length === 0) {
+                window.speechSynthesis.addEventListener('voiceschanged', () => {
+                    voices = window.speechSynthesis.getVoices();
+                    this.setPreferredVoice(utterance, voices);
+                    window.speechSynthesis.speak(utterance);
+                }, { once: true });
+            } else {
+                this.setPreferredVoice(utterance, voices);
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    }
+    
+    // 选择最佳语音
+    setPreferredVoice(utterance, voices) {
+        // macOS 优质语音（按优先级排序）
+        const macOSVoices = [
+            'Samantha',           // 最优质的女声
+            'Karen',              // 澳大利亚英语女声
+            'Moira',              // 爱尔兰英语女声
+            'Tessa',              // 南非英语女声
+            'Alex',               // 男声
+            'Daniel (Enhanced)',  // 增强版男声
+            'Fiona',              // 苏格兰英语女声
+        ];
+        
+        // Windows 优质语音
+        const windowsVoices = [
+            'Microsoft Zira',     // Windows 女声
+            'Microsoft David',    // Windows 男声
+            'Microsoft Mark',     // Windows 男声
+        ];
+        
+        // Google Chrome 语音
+        const googleVoices = [
+            'Google US English',
+            'Chrome OS US English',
+        ];
+        
+        const allPreferredVoices = [...macOSVoices, ...windowsVoices, ...googleVoices];
+        
+        // 尝试按优先级查找语音
+        for (const preferred of allPreferredVoices) {
+            const voice = voices.find(v => 
+                v.name.includes(preferred) && 
+                (v.lang.startsWith('en-US') || v.lang.startsWith('en-GB') || v.lang.startsWith('en'))
+            );
+            if (voice) {
+                utterance.voice = voice;
+                console.log('使用语音:', voice.name, voice.lang);
+                return;
+            }
+        }
+        
+        // 备选：任何英文语音，优先美式英语
+        const usEnglish = voices.find(v => v.lang.startsWith('en-US'));
+        if (usEnglish) {
+            utterance.voice = usEnglish;
+            console.log('使用备用美式英语语音:', usEnglish.name);
+            return;
+        }
+        
+        // 最后备选：任何英文语音
+        const anyEnglish = voices.find(v => v.lang.startsWith('en'));
+        if (anyEnglish) {
+            utterance.voice = anyEnglish;
+            console.log('使用备用英语语音:', anyEnglish.name);
+        }
+    }
+    
+    // 切换语音开关
+    toggleVoice() {
+        const currentState = localStorage.getItem('typingPracticeVoice') !== 'false';
+        const newState = !currentState;
+        localStorage.setItem('typingPracticeVoice', newState.toString());
+        
+        this.updateVoiceButton();
+        
+        return newState;
+    }
+    
+    // 更新语音按钮状态
+    updateVoiceButton() {
+        const voiceBtn = document.getElementById('typingVoiceToggle');
+        if (voiceBtn) {
+            const enabled = localStorage.getItem('typingPracticeVoice') !== 'false';
+            voiceBtn.textContent = enabled ? '🔊' : '🔇';
+            voiceBtn.title = enabled ? '关闭发音' : '开启发音';
         }
     }
 }
