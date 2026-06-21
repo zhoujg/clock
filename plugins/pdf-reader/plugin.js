@@ -21,6 +21,94 @@
     let _pdfjsReady = false;
     let _rendering = false;
     let _pendingPage = null;
+    let _lastFileName = '';
+
+    const STORAGE_KEY = 'pdfReaderState';
+
+    // ============ 持久化（IndexedDB 存文件，localStorage 存状态） ============
+
+    function _openDB() {
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open('PdfReaderDB', 1);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('files')) {
+                    db.createObjectStore('files');
+                }
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    }
+
+    async function _savePdfData(arrayBuffer, fileName) {
+        try {
+            // 复制 ArrayBuffer，防止 pdf.js detach 后数据丢失
+            const copy = new Uint8Array(arrayBuffer).slice().buffer;
+            const db = await _openDB();
+            const tx = db.transaction('files', 'readwrite');
+            const store = tx.objectStore('files');
+            store.put(copy, 'lastPdf');
+            store.put(fileName, 'lastPdfName');
+            // 等待事务完成，确保页面刷新前数据已持久化
+            await new Promise((resolve, reject) => {
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error);
+            });
+            // 同时保存状态到 localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                fileName: fileName,
+                page: _currentPage,
+                scale: _scale,
+                timestamp: Date.now()
+            }));
+            console.log('[PDF阅读器] 文件已保存:', fileName, '大小:', copy.byteLength);
+        } catch (e) {
+            console.warn('[PDF阅读器] 保存文件失败:', e);
+        }
+    }
+
+    async function _loadPdfData() {
+        try {
+            const db = await _openDB();
+            return new Promise((resolve) => {
+                const tx = db.transaction('files', 'readonly');
+                const store = tx.objectStore('files');
+                const nameReq = store.get('lastPdfName');
+                nameReq.onsuccess = () => {
+                    const name = nameReq.result;
+                    if (!name) { resolve(null); return; }
+                    const dataReq = store.get('lastPdf');
+                    dataReq.onsuccess = () => {
+                        if (!dataReq.result) { resolve(null); return; }
+                        resolve({ name: name, data: dataReq.result });
+                    };
+                    dataReq.onerror = () => resolve(null);
+                };
+                nameReq.onerror = () => resolve(null);
+            });
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function _loadState() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function _saveCurrentPage() {
+        try {
+            const state = _loadState() || {};
+            state.page = _currentPage;
+            state.scale = _scale;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {}
+    }
 
     // ============ 加载 pdf.js ============
 
@@ -245,6 +333,20 @@
             if (e.key === '+' || e.key === '=') { e.preventDefault(); _setZoom(_scale + 0.1); }
             if (e.key === '-') { e.preventDefault(); _setZoom(_scale - 0.1); }
         });
+
+        // 滚轮翻页（防抖模式：滚动停止后只翻一页）
+        let _wheelTimer = null;
+        let _wheelDir = 0;
+        viewer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            _wheelDir = e.deltaY > 0 ? 1 : -1;
+            clearTimeout(_wheelTimer);
+            _wheelTimer = setTimeout(() => {
+                if (_wheelDir > 0) _goToPage(_currentPage + 1);
+                else if (_wheelDir < 0) _goToPage(_currentPage - 1);
+                _wheelDir = 0;
+            }, 50);
+        }, { passive: false });
     }
 
     // ============ 阅读器开关 ============
@@ -253,10 +355,64 @@
         _createOverlay();
         _overlayEl.classList.add('active');
         _overlayEl.focus();
+        // 尝试恢复上次文档
+        _tryRestoreLastDoc();
     }
 
     function _closeReader() {
+        // 保存当前阅读进度
+        _saveCurrentPage();
         if (_overlayEl) _overlayEl.classList.remove('active');
+    }
+
+    async function _tryRestoreLastDoc() {
+        // 如果已有文档打开，不恢复
+        if (_pdfDoc) return;
+        const state = _loadState();
+        if (!state || !state.fileName) {
+            console.log('[PDF阅读器] 无上次阅读记录');
+            return;
+        }
+
+        console.log('[PDF阅读器] 尝试恢复:', state.fileName, '页码:', state.page);
+
+        try {
+            const saved = await _loadPdfData();
+            if (!saved) {
+                console.warn('[PDF阅读器] IndexedDB 中无文件数据');
+                return;
+            }
+            console.log('[PDF阅读器] 从 IndexedDB 读取到文件:', saved.name, '大小:', saved.data.byteLength);
+
+            // 确保欢迎页隐藏
+            const welcome = document.getElementById('pdfWelcome');
+            if (welcome) welcome.style.display = 'none';
+
+            await _loadPdfJs();
+
+            // 复制 buffer 再传给 pdf.js，防止 detach
+            const pdfBuffer = new Uint8Array(saved.data).slice().buffer;
+            const loadingTask = window.pdfjsLib.getDocument({ data: pdfBuffer });
+            _pdfDoc = await loadingTask.promise;
+            _totalPages = _pdfDoc.numPages;
+            _currentPage = state.page || 1;
+            _scale = state.scale || 1.2;
+            _lastFileName = saved.name;
+
+            // 更新 UI
+            document.getElementById('pdfTotalPages').textContent = _totalPages;
+            document.getElementById('pdfFilename').textContent = saved.name;
+            document.getElementById('pdfZoomInfo').textContent = Math.round(_scale * 100) + '%';
+
+            await _loadOutline();
+            await _renderPage(Math.min(_currentPage, _totalPages));
+            console.log('[PDF阅读器] 恢复成功，页码:', _currentPage);
+        } catch (e) {
+            console.warn('[PDF阅读器] 恢复上次文档失败:', e);
+            // 恢复失败，显示欢迎页
+            const welcome = document.getElementById('pdfWelcome');
+            if (welcome) welcome.style.display = '';
+        }
     }
 
     // ============ 文件选择 ============
@@ -303,6 +459,8 @@
 
         try {
             const arrayBuffer = await file.arrayBuffer();
+            // 先复制一份用于持久化，pdf.js 可能会 detach 原始 buffer
+            const savedBuffer = new Uint8Array(arrayBuffer).slice().buffer;
             const loadingTask = window.pdfjsLib.getDocument({ data: arrayBuffer });
             _pdfDoc = await loadingTask.promise;
             _totalPages = _pdfDoc.numPages;
@@ -311,6 +469,7 @@
             // 更新 UI
             document.getElementById('pdfTotalPages').textContent = _totalPages;
             document.getElementById('pdfFilename').textContent = file.name;
+            _lastFileName = file.name;
             loadingEl.style.display = 'none';
 
             // 加载目录
@@ -318,6 +477,9 @@
 
             // 渲染第一页
             await _renderPage(_currentPage);
+
+            // 持久化文件数据（用于下次恢复）
+            await _savePdfData(savedBuffer, file.name);
         } catch (e) {
             console.error('[PDF阅读器] 加载失败:', e);
             loadingEl.innerHTML = '<span style="color:#ff6b6b">加载失败：' + (e.message || '未知错误') + '</span>';
@@ -384,7 +546,9 @@
 
         try {
             const page = await _pdfDoc.getPage(pageNum);
+            const dpr = window.devicePixelRatio || 1;
             const viewport = page.getViewport({ scale: _scale });
+            const renderViewport = page.getViewport({ scale: _scale * dpr });
 
             const viewer = document.getElementById('pdfViewer');
             const loadingEl = document.getElementById('pdfLoadingIndicator');
@@ -395,8 +559,8 @@
 
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+            canvas.height = renderViewport.height;
+            canvas.width = renderViewport.width;
             canvas.style.width = viewport.width + 'px';
             canvas.style.height = viewport.height + 'px';
 
@@ -404,11 +568,14 @@
 
             await page.render({
                 canvasContext: ctx,
-                viewport: viewport
+                viewport: renderViewport
             }).promise;
 
             _currentPage = pageNum;
             document.getElementById('pdfPageInput').value = pageNum;
+
+            // 保存阅读进度
+            _saveCurrentPage();
 
             // 滚动到顶部
             viewer.scrollTop = 0;
