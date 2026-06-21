@@ -1,0 +1,10 @@
+{
+  "id": "cantonese-pronunciation",
+  "name": "粤语拼读",
+  "version": "1.0.0",
+  "description": "内嵌粤语拼读网站，学习粤语发音",
+  "icon": "🗣️",
+  "author": "时钟应用",
+  "main": "plugin.js",
+  "css": "style.css"
+}

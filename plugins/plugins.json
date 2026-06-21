@@ -1,0 +1,15 @@
+{
+  "plugins": [
+    "pomodoro",
+    "daily-stories",
+    "bgm-music",
+    "particle-lines",
+    "halftime",
+    "creative-calendar",
+    "habit",
+    "countdown",
+    "ambient-sound",
+    "pdf-reader",
+    "cantonese-pronunciation"
+  ]
+}

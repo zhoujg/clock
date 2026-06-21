@@ -271,10 +271,24 @@ class PluginManager {
             return Object.values(this.manifests);
         }
 
-        // 通过扫描已知插件目录下的 manifest.json 来发现
-        // 由于浏览器无法直接列出目录，我们尝试加载所有可能的插件路径
-        // 这里用一个内置的"种子列表"来定位目录，然后加载每个目录的 manifest
-        const seedIds = ['pomodoro', 'daily-stories', 'bgm-music', 'particle-lines', 'halftime', 'creative-calendar', 'habit', 'countdown', 'ambient-sound', 'pdf-reader'];
+        // 从 plugins.json 读取插件列表
+        let seedIds = [];
+        try {
+            const resp = await fetch(`plugins/plugins.json?v=${Date.now()}`);
+            if (resp.ok) {
+                const data = await resp.json();
+                seedIds = data.plugins || [];
+                console.log(`[PluginManager] 从 plugins.json 读取到 ${seedIds.length} 个插件`);
+            }
+        } catch (e) {
+            console.warn('[PluginManager] 无法读取 plugins.json，使用空列表:', e);
+        }
+
+        // 如果 plugins.json 读取失败或为空，使用回退列表
+        if (seedIds.length === 0) {
+            console.warn('[PluginManager] plugins.json 为空，使用回退列表');
+            seedIds = ['pomodoro', 'daily-stories', 'bgm-music', 'particle-lines', 'halftime', 'creative-calendar', 'habit', 'countdown', 'ambient-sound', 'pdf-reader'];
+        }
 
         const results = await Promise.allSettled(
             seedIds.map(id => this._loadManifest(id))
