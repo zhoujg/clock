@@ -734,6 +734,131 @@
     margin-top: 8px;
 }
 
+/* ========== 手指提示（虚拟键盘下方） ========== */
+.finger-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 16px;
+    padding: 20px 32px;
+    background: linear-gradient(135deg, #f0f0f5 0%, #e5e5ea 100%);
+    border-radius: 20px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.hand-group {
+    position: relative;
+    opacity: 0.5;
+    transform: scale(0.85);
+    transition: all 0.3s ease;
+    filter: grayscale(50%);
+}
+
+.hand-group.active {
+    opacity: 1;
+    transform: scale(1);
+    filter: grayscale(0%);
+}
+
+.hand-group.left-hand.active {
+    filter: drop-shadow(0 0 15px rgba(33, 150, 243, 0.8));
+}
+
+.hand-group.right-hand.active {
+    filter: drop-shadow(0 0 15px rgba(76, 175, 80, 0.8));
+}
+
+.hand-svg {
+    width: 70px;
+    height: 90px;
+}
+
+/* 手指背景色（未选中） */
+.finger-bg {
+    fill: rgba(120, 120, 130, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* 手指高亮层（选中时显示） */
+.finger-active {
+    fill: transparent;
+    stroke: transparent;
+    stroke-width: 2;
+    transition: all 0.3s ease;
+}
+
+/* 手指高亮颜色 */
+.finger-active[data-finger="pinky"].active {
+    fill: #ff9f43;
+    stroke: #ee8c38;
+}
+
+.finger-active[data-finger="ring"].active {
+    fill: #feca57;
+    stroke: #f9b832;
+}
+
+.finger-active[data-finger="middle"].active {
+    fill: #48dbfb;
+    stroke: #33c9e8;
+}
+
+.finger-active[data-finger="index"].active {
+    fill: #1dd1a1;
+    stroke: #17b98a;
+}
+
+/* 手掌 */
+.palm {
+    fill: rgba(180, 170, 160, 0.4);
+    transition: all 0.3s ease;
+}
+
+.hand-group.active .palm {
+    fill: rgba(200, 190, 180, 0.5);
+}
+
+.hand-group.left-hand.active .palm {
+    fill: rgba(100, 149, 237, 0.4);
+}
+
+.hand-group.right-hand.active .palm {
+    fill: rgba(144, 238, 144, 0.4);
+}
+
+/* 高亮动画 */
+.finger-active.active {
+    animation: fingerGlow 0.4s ease;
+}
+
+@keyframes fingerGlow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}
+
+/* 移动端手指提示 */
+@media (max-width: 768px) {
+    .finger-hint {
+        gap: 24px;
+        padding: 16px 20px;
+    }
+    
+    .hand-svg {
+        width: 55px;
+        height: 72px;
+    }
+    
+    .hand-group {
+        transform: scale(0.75);
+    }
+    
+    .hand-group.active {
+        transform: scale(0.9);
+    }
+}
+
 .hint-home {
     font-weight: 600;
     color: #007AFF;

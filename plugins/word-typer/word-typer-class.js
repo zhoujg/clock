@@ -93,6 +93,7 @@ class WordTyperManager {
         this.overlay = null;
         this.isPanelOpen = false;
         this.audioInitialized = false; // 音频上下文是否已初始化
+        this.isSpeaking = false; // 是否正在发音
         
         // 学习状态
         this.currentDict = 'cet4';
@@ -104,6 +105,60 @@ class WordTyperManager {
         this.startTime = null;
         this.selectedChapter = null; // 当前选择的章节
         this.wordErrorCount = 0; // 当前单词错误次数
+        
+        // 手指数据定义（标准Touch Typing手指分配）
+        // 左手：小指、无名指、中指、食指
+        // 右手：食指、中指、无名指、小指
+        this.fingerMap = {
+            // 左手小指 (Left Pinky)
+            'q': { hand: 'left', finger: 'pinky', icon: '🔑', label: '左手小指' },
+            'a': { hand: 'left', finger: 'pinky', icon: '🔑', label: '左手小指' },
+            'z': { hand: 'left', finger: 'pinky', icon: '🔑', label: '左手小指' },
+            
+            // 左手无名指 (Left Ring)
+            'w': { hand: 'left', finger: 'ring', icon: '💎', label: '左手无名指' },
+            's': { hand: 'left', finger: 'ring', icon: '💎', label: '左手无名指' },
+            'x': { hand: 'left', finger: 'ring', icon: '💎', label: '左手无名指' },
+            
+            // 左手中指 (Left Middle)
+            'e': { hand: 'left', finger: 'middle', icon: '🖕🏻', label: '左手中指' },
+            'd': { hand: 'left', finger: 'middle', icon: '🖕🏻', label: '左手中指' },
+            'c': { hand: 'left', finger: 'middle', icon: '🖕🏻', label: '左手中指' },
+            
+            // 左手食指 (Left Index) - 上排需要抬手
+            'r': { hand: 'left', finger: 'index', icon: '👆', label: '左手食指' },
+            'f': { hand: 'left', finger: 'index', icon: '👆', label: '左手食指' },
+            'v': { hand: 'left', finger: 'index', icon: '👆', label: '左手食指' },
+            't': { hand: 'left', finger: 'index', icon: '👆', label: '左手食指' },
+            'g': { hand: 'left', finger: 'index', icon: '👆', label: '左手食指' },
+            'b': { hand: 'left', finger: 'index', icon: '👆', label: '左手食指' },
+            
+            // 右手食指 (Right Index) - 上排需要抬手
+            'y': { hand: 'right', finger: 'index', icon: '👆', label: '右手食指' },
+            'h': { hand: 'right', finger: 'index', icon: '👆', label: '右手食指' },
+            'n': { hand: 'right', finger: 'index', icon: '👆', label: '右手食指' },
+            'u': { hand: 'right', finger: 'index', icon: '👆', label: '右手食指' },
+            'j': { hand: 'right', finger: 'index', icon: '👆', label: '右手食指' },
+            'm': { hand: 'right', finger: 'index', icon: '👆', label: '右手食指' },
+            
+            // 右手中指 (Right Middle)
+            'i': { hand: 'right', finger: 'middle', icon: '🖕🏻', label: '右手中指' },
+            'k': { hand: 'right', finger: 'middle', icon: '🖕🏻', label: '右手中指' },
+            ',': { hand: 'right', finger: 'middle', icon: '🖕🏻', label: '右手中指' },
+            
+            // 右手无名指 (Right Ring)
+            'o': { hand: 'right', finger: 'ring', icon: '💎', label: '右手无名指' },
+            'l': { hand: 'right', finger: 'ring', icon: '💎', label: '右手无名指' },
+            '.': { hand: 'right', finger: 'ring', icon: '💎', label: '右手无名指' },
+            
+            // 右手小指 (Right Pinky)
+            'p': { hand: 'right', finger: 'pinky', icon: '🔑', label: '右手小指' },
+            ';': { hand: 'right', finger: 'pinky', icon: '🤙', label: '右手小指' },
+            '/': { hand: 'right', finger: 'pinky', icon: '🤙', label: '右手小指' },
+            
+            // 空格键 - 双手拇指
+            ' ': { hand: 'thumb', finger: 'thumb', icon: '👍', label: '双手拇指' }
+        };
         
         // 学习模式设置
         this.settings = {
@@ -136,6 +191,12 @@ class WordTyperManager {
         this.loadProgress();
         this.createUI();
         this.bindEvents();
+        
+        // 默认开启听音填词模式（如果用户从未设置过）
+        if (localStorage.getItem('wordTyperListenMode') === null) {
+            localStorage.setItem('wordTyperListenMode', 'true');
+        }
+        
         // 音频上下文在用户打开面板时初始化（延迟到用户交互后）
     }
     
@@ -159,6 +220,16 @@ class WordTyperManager {
             // 直接初始化 AudioContext
             // 浏览器会在用户首次点击插件按钮时自动授予权限
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // 确保 AudioContext 处于运行状态
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume().then(() => {
+                    console.log('[word-typer] ✅ 音频上下文已恢复运行');
+                }).catch(err => {
+                    console.warn('[word-typer] ⚠️ 音频上下文恢复失败:', err);
+                });
+            }
+            
             this.audioInitialized = true;
             console.log('[word-typer] ✅ 音频上下文已初始化');
         } catch (error) {
@@ -497,9 +568,14 @@ class WordTyperManager {
         // 按分类组织词库
         const categories = {
             'practice': {
-                name: '词库',
+                name: '适合初学打字',
                 icon: '⌨️',
-                dicts: ['keyboard','common','cet4', 'cet6','toefl', 'ielts', 'gre']
+                dicts: ['keyboard']
+            },            
+            'dict': {
+                name: '词库',
+                icon: '📚',
+                dicts: ['common','cet4', 'cet6','toefl', 'ielts', 'gre']
             }
         };
 
@@ -745,15 +821,15 @@ class WordTyperManager {
                         <div class="key" data-key="p">P</div>
                     </div>
                     <div class="keyboard-row">
-                        <div class="key home-key" data-key="a">A</div>
-                        <div class="key home-key" data-key="s">S</div>
-                        <div class="key home-key" data-key="d">D</div>
-                        <div class="key home-key" data-key="f">F</div>
-                        <div class="key home-key" data-key="g">G</div>
-                        <div class="key home-key" data-key="h">H</div>
-                        <div class="key home-key" data-key="j">J</div>
-                        <div class="key home-key" data-key="k">K</div>
-                        <div class="key home-key" data-key="l">L</div>
+                        <div class="key" data-key="a">A</div>
+                        <div class="key" data-key="s">S</div>
+                        <div class="key" data-key="d">D</div>
+                        <div class="key" data-key="f">F</div>
+                        <div class="key" data-key="g">G</div>
+                        <div class="key" data-key="h">H</div>
+                        <div class="key" data-key="j">J</div>
+                        <div class="key" data-key="k">K</div>
+                        <div class="key" data-key="l">L</div>
                     </div>
                     <div class="keyboard-row">
                         <div class="key" data-key="z">Z</div>
@@ -763,6 +839,47 @@ class WordTyperManager {
                         <div class="key" data-key="b">B</div>
                         <div class="key" data-key="n">N</div>
                         <div class="key" data-key="m">M</div>
+                    </div>
+                    <!-- 手指提示区域 -->
+                    <div class="finger-hint" id="fingerHint">
+                        <!-- 左手 -->
+                        <div class="hand-group" id="handLeft">
+                            <svg class="hand-svg left-hand" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+                                <!-- 小指 -->
+                                <ellipse class="finger-bg" data-finger="pinky" cx="18" cy="28" rx="9" ry="23"/>
+                                <ellipse class="finger-active" data-finger="pinky" cx="18" cy="28" rx="9" ry="23"/>
+                                <!-- 无名指 -->
+                                <ellipse class="finger-bg" data-finger="ring" cx="38" cy="20" rx="9" ry="26"/>
+                                <ellipse class="finger-active" data-finger="ring" cx="38" cy="20" rx="9" ry="26"/>
+                                <!-- 中指 -->
+                                <ellipse class="finger-bg" data-finger="middle" cx="58" cy="18" rx="9" ry="28"/>
+                                <ellipse class="finger-active" data-finger="middle" cx="58" cy="18" rx="9" ry="28"/>
+                                <!-- 食指 -->
+                                <ellipse class="finger-bg" data-finger="index" cx="78" cy="22" rx="9" ry="25"/>
+                                <ellipse class="finger-active" data-finger="index" cx="78" cy="22" rx="9" ry="25"/>
+                                <!-- 手掌 -->
+                                <rect class="palm" x="8" y="50" width="84" height="70" rx="12"/>
+                            </svg>
+                        </div>
+                        <!-- 右手 -->
+                        <div class="hand-group" id="handRight">
+                            <svg class="hand-svg right-hand" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+                                <!-- 食指 -->
+                                <ellipse class="finger-bg" data-finger="index" cx="22" cy="22" rx="9" ry="25"/>
+                                <ellipse class="finger-active" data-finger="index" cx="22" cy="22" rx="9" ry="25"/>
+                                <!-- 中指 -->
+                                <ellipse class="finger-bg" data-finger="middle" cx="42" cy="18" rx="9" ry="28"/>
+                                <ellipse class="finger-active" data-finger="middle" cx="42" cy="18" rx="9" ry="28"/>
+                                <!-- 无名指 -->
+                                <ellipse class="finger-bg" data-finger="ring" cx="62" cy="20" rx="9" ry="26"/>
+                                <ellipse class="finger-active" data-finger="ring" cx="62" cy="20" rx="9" ry="26"/>
+                                <!-- 小指 -->
+                                <ellipse class="finger-bg" data-finger="pinky" cx="82" cy="28" rx="9" ry="23"/>
+                                <ellipse class="finger-active" data-finger="pinky" cx="82" cy="28" rx="9" ry="23"/>
+                                <!-- 手掌 -->
+                                <rect class="palm" x="8" y="50" width="84" height="70" rx="12"/>
+                            </svg>
+                        </div>
                     </div>
                     <div class="keyboard-hint">
                         <span class="hint-left">左手区域</span>
@@ -1506,6 +1623,17 @@ class WordTyperManager {
             if (nextKey) {
                 nextKey.classList.add('next');
             }
+            
+            // 更新手指提示
+            this.updateFingerHint(nextKeyToPress);
+        }
+        
+        // 如果不是键盘模式，隐藏手指提示
+        if (this.currentDict !== 'keyboard') {
+            const fingerHint = document.getElementById('fingerHint');
+            if (fingerHint) {
+                fingerHint.style.display = 'none';
+            }
         }
 
         // 自动提交
@@ -1516,6 +1644,52 @@ class WordTyperManager {
                 setTimeout(() => this.handleWrong(), 300);
             }
         }
+    }
+    
+    // 更新手指提示
+    updateFingerHint(key) {
+        const fingerHint = document.getElementById('fingerHint');
+        if (!fingerHint) return;
+        
+        const fingerData = this.fingerMap[key];
+        if (!fingerData) return;
+        
+        // 显示手指提示区域
+        fingerHint.style.display = 'flex';
+        
+        // 获取左右手容器
+        const handLeft = document.getElementById('handLeft');
+        const handRight = document.getElementById('handRight');
+        
+        // 重置所有手的状态
+        [handLeft, handRight].forEach(hand => {
+            if (hand) {
+                hand.classList.remove('active');
+                hand.querySelectorAll('.finger-active').forEach(el => {
+                    el.classList.remove('active');
+                });
+            }
+        });
+        
+        // 激活对应的手
+        let activeHand = null;
+        if (fingerData.hand === 'left') {
+            activeHand = handLeft;
+        } else if (fingerData.hand === 'right') {
+            activeHand = handRight;
+        } else {
+            activeHand = handLeft;
+        }
+        
+        if (activeHand) {
+            activeHand.classList.add('active');
+        }
+        
+        // 激活对应的手指
+        const activeFingerEls = fingerHint.querySelectorAll(`.finger-active[data-finger="${fingerData.finger}"]`);
+        activeFingerEls.forEach(el => {
+            el.classList.add('active');
+        });
     }
 
     handleLetterInput(key) {
@@ -1640,66 +1814,109 @@ class WordTyperManager {
     }
 
     pronounceWord() {
+        if (!this.currentWord) {
+            console.log('[word-typer] 发音失败: 没有当前单词');
+            return;
+        }
+        
+        // 确保 AudioContext 处于运行状态（如果已初始化）
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+        
+        if ('speechSynthesis' in window) {
+            try {
+                // 先取消所有等待中的发音（防止队列堵塞）
+                window.speechSynthesis.cancel();
+                this.isSpeaking = false;
+                
+                // 等待一小段时间确保取消完成
+                setTimeout(() => {
+                    this.doPronounce();
+                }, 50);
+            } catch (error) {
+                console.error('[word-typer] 发音错误:', error);
+            }
+        } else {
+            console.error('[word-typer] 浏览器不支持语音合成');
+        }
+    }
+    
+    // 实际执行发音（延迟调用，避免队列冲突）
+    doPronounce() {
         if (!this.currentWord) return;
         
         if ('speechSynthesis' in window) {
             try {
-                window.speechSynthesis.cancel();
-                
                 const utterance = new SpeechSynthesisUtterance(this.currentWord.word);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.8;
                 utterance.pitch = 1.0;
                 utterance.volume = 1.0;
                 
-                // 选择优质英语语音
-                const voices = window.speechSynthesis.getVoices();
-                this.setPreferredVoice(utterance, voices);
+                // 添加回调
+                utterance.onstart = () => {
+                    this.isSpeaking = true;
+                    console.log('[word-typer] ✅ 发音已开始:', this.currentWord.word);
+                };
+                utterance.onend = () => {
+                    this.isSpeaking = false;
+                    console.log('[word-typer] ✅ 发音已完成:', this.currentWord.word);
+                };
+                utterance.onerror = (event) => {
+                    this.isSpeaking = false;
+                    // 忽略 canceled 错误（这是正常的取消）
+                    if (event.error !== 'canceled') {
+                        console.error('[word-typer] 发音错误:', event.error);
+                    }
+                };
                 
-                window.speechSynthesis.speak(utterance);
+                console.log('[word-typer] 发音单词:', this.currentWord.word);
+                
+                // 获取语音列表（可能是异步的）
+                const setVoiceAndSpeak = () => {
+                    const voices = window.speechSynthesis.getVoices();
+                    console.log('[word-typer] 可用语音数量:', voices.length);
+                    this.setPreferredVoice(utterance, voices);
+                    console.log('[word-typer] 选择语音后 utterance.voice:', utterance.voice ? utterance.voice.name : '未设置');
+                    window.speechSynthesis.speak(utterance);
+                    console.log('[word-typer] speak() 调用后 - speaking:', window.speechSynthesis.speaking);
+                };
+                
+                // 检查语音列表是否已加载
+                const voices = window.speechSynthesis.getVoices();
+                console.log('[word-typer] 初始语音数量:', voices.length);
+                
+                if (voices.length > 0) {
+                    setVoiceAndSpeak();
+                } else {
+                    // 等待语音列表加载
+                    const onVoicesChanged = () => {
+                        console.log('[word-typer] 语音列表已加载');
+                        setVoiceAndSpeak();
+                        window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
+                    };
+                    window.speechSynthesis.addEventListener('voiceschanged', onVoicesChanged);
+                    console.log('[word-typer] 等待语音列表加载...');
+                    
+                    // 超时处理：1秒后仍然尝试发音
+                    setTimeout(() => {
+                        window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
+                        const voicesAfterTimeout = window.speechSynthesis.getVoices();
+                        console.log('[word-typer] 超时后语音数量:', voicesAfterTimeout.length);
+                        if (voicesAfterTimeout.length === 0) {
+                            console.log('[word-typer] 无可用语音，使用默认语音');
+                            window.speechSynthesis.speak(utterance);
+                        }
+                    }, 1000);
+                }
             } catch (error) {
                 console.error('[word-typer] 发音错误:', error);
             }
         }
     }
     
-    // 选择最佳语音
-    setPreferredVoice(utterance, voices) {
-        if (!voices || voices.length === 0) return;
-        
-        // macOS 优质英语语音（按优先级排序）
-        const preferredVoices = [
-            'Samantha',      // 最优质的女声（美式英语）
-            'Alex',          // 优质男声（美式英语）
-            'Karen',         // 澳大利亚英语女声
-            'Moira',         // 爱尔兰英语女声
-            'Tessa',         // 南非英语女声
-            'Daniel',        // 英式英语男声
-            'Fiona',         // 苏格兰英语女声
-            'Veena',         // 印度英语女声
-            'Google US English',  // Google 语音
-            'Microsoft Zira Desktop',  // Windows 语音
-        ];
-        
-        // 优先选择首选语音
-        for (const voiceName of preferredVoices) {
-            const voice = voices.find(v => v.name.includes(voiceName));
-            if (voice) {
-                utterance.voice = voice;
-                console.log('[word-typer] 使用语音:', voice.name);
-                return;
-            }
-        }
-        
-        // 如果首选语音都不可用，选择任意一个英语语音
-        const englishVoice = voices.find(v => v.lang.startsWith('en'));
-        if (englishVoice) {
-            utterance.voice = englishVoice;
-            console.log('[word-typer] 使用默认英语语音:', englishVoice.name);
-        }
-    }
-
-    // 选择最佳语音
+    // 选择最佳语音（确保选择英语语音）
     setPreferredVoice(utterance, voices) {
         // macOS 优质语音（按优先级排序）
         const macOSVoices = [
