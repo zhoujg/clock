@@ -111,10 +111,10 @@
 
 /* ========== 词库画廊 ========== */
 .dict-gallery {
-    margin-bottom: 24px;
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 8px;
+    margin-bottom: 16px;
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
 }
 
 .dict-gallery::-webkit-scrollbar {
@@ -136,7 +136,7 @@
 }
 
 .dict-category {
-    margin-bottom: 32px;
+    margin-bottom: 16px;
 }
 
 .dict-category:last-child {
@@ -146,28 +146,28 @@
 .category-title {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin: 0 0 16px 0;
-    font-size: 18px;
+    gap: 6px;
+    margin: 0 0 10px 0;
+    font-size: 14px;
     font-weight: 600;
     color: #1d1d1f;
 }
 
 .category-icon {
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .dict-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
 }
 
 .dict-card {
     background: white;
     border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 10px;
+    padding: 12px;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
@@ -183,42 +183,45 @@
 }
 
 .dict-card-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
+    font-size: 32px;
+    margin-bottom: 6px;
 }
 
 .dict-card-name {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: #1d1d1f;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .dict-card-desc {
-    font-size: 13px;
+    font-size: 12px;
     color: #86868b;
-    margin-bottom: 16px;
-    line-height: 1.4;
-    min-height: 36px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    min-height: auto;
 }
 
 .dict-card-actions {
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
     width: 100%;
 }
 
 .dict-card-btn {
-    flex: 1;
-    padding: 8px 16px;
+    flex: 1 1 calc(50% - 3px);
+    min-width: 80px;
+    padding: 6px 10px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     background: #007AFF;
     color: white;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .dict-card-btn:hover {
@@ -455,6 +458,30 @@
     transform: scale(0.95);
 }
 
+/* ========== 提示音按钮 ========== */
+.word-typer-sound-toggle {
+    padding: 6px 14px;
+    background: rgba(0, 0, 0, 0.05);
+    color: #1d1d1f;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.word-typer-sound-toggle:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+}
+
+.word-typer-sound-toggle:active {
+    transform: scale(0.95);
+}
+
 /* ========== 设置面板 ========== */
 .settings-panel {
     display: flex;
@@ -565,6 +592,11 @@
     background: #007AFF;
     border-radius: 2px;
     animation: blink 1s infinite;
+}
+
+/* 隐藏的字母不显示下划线 */
+.word-letter.current[data-visible="false"]::after {
+    display: none;
 }
 
 .word-letter.correct {
@@ -875,11 +907,36 @@
     }
 
     .dict-cards {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
     
     .dict-gallery {
-        max-height: 55vh;
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .dict-card {
+        padding: 10px;
+    }
+
+    .dict-card-icon {
+        font-size: 28px;
+        margin-bottom: 4px;
+    }
+
+    .dict-card-name {
+        font-size: 13px;
+    }
+
+    .dict-card-desc {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    .dict-card-btn {
+        padding: 5px 8px;
+        font-size: 11px;
     }
 
     .chapter-grid {
@@ -1091,4 +1148,237 @@
     .hint-home {
         color: #5AC8FA;
     }
+}
+
+/* ========== 全局复习错词按钮 ========== */
+
+.review-all-wrong-btn {
+    width: 100%;
+    padding: 12px 20px;
+    margin-top: 16px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #FF9500 0%, #FF5E3A 100%);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(255, 94, 58, 0.3);
+}
+
+.review-all-wrong-btn:hover {
+    background: linear-gradient(135deg, #FF5E3A 0%, #FF9500 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 94, 58, 0.4);
+}
+
+.review-all-wrong-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(255, 94, 58, 0.3);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .review-all-wrong-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+/* ========== 标题行布局 ========== */
+
+.header-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.header-title-row h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d1d1f;
+    white-space: nowrap;
+}
+
+/* ========== 标题栏复习按钮 ========== */
+
+.header-review-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #FF9500 0%, #FF5E3A 100%);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(255, 94, 58, 0.3);
+}
+
+.header-review-btn:hover {
+    background: linear-gradient(135deg, #FF5E3A 0%, #FF9500 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(255, 94, 58, 0.4);
+}
+
+.header-review-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(255, 94, 58, 0.3);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .header-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .header-title-row h3 {
+        font-size: 14px;
+    }
+
+    .header-review-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+}
+
+/* ========== 词库卡片样式优化 ========== */
+
+/* 按钮居中显示 */
+.dict-card-actions {
+    justify-content: center;
+}
+
+.dict-card-btn {
+    max-width: 200px;
+}
+
+/* ========== 图标按钮样式 ========== */
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 122, 255, 0.1);
+    color: #007AFF;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: rgba(0, 122, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.btn-icon:active {
+    transform: scale(0.95);
+}
+
+/* ========== 单词和发音按钮同行布局 ========== */
+
+.word-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.word-main {
+    margin-bottom: 0;
+}
+
+/* ========== 内联发音按钮（无底色） ========== */
+
+.btn-pronounce-inline {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #007AFF;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-pronounce-inline:hover {
+    background: rgba(0, 122, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.btn-pronounce-inline:active {
+    transform: scale(0.95);
+}
+
+/* ========== 听音填词模式样式 ========== */
+
+/* 隐藏的字母（显示为下划线） */
+.word-letter[data-visible="false"] {
+    color: #FF9500;
+    font-weight: bold;
+    margin: 0 2px;
+    min-width: 20px;
+    display: inline-block;
+    text-align: center;
+}
+
+/* 显示答案后，隐藏的字母变回正常颜色 */
+.word-letter.revealed {
+    color: #34C759;
+    border-bottom-color: #34C759;
+}
+
+/* 听音填词按钮样式 */
+.dict-card-btn-secondary[data-mode="listenAndType"] {
+    background: linear-gradient(135deg, #AF52DE 0%, #5856D6 100%);
+}
+
+.dict-card-btn-secondary[data-mode="listenAndType"]:hover {
+    background: linear-gradient(135deg, #5856D6 0%, #AF52DE 100%);
+}
+
+/* ========== 听音填词开关按钮 ========== */
+
+.word-typer-listen-toggle {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(175, 82, 222, 0.1);
+    color: #AF52DE;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.word-typer-listen-toggle:hover {
+    background: rgba(175, 82, 222, 0.2);
+}
+
+.word-typer-listen-toggle.active {
+    background: linear-gradient(135deg, #AF52DE 0%, #5856D6 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(175, 82, 222, 0.3);
 }

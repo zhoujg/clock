@@ -92,6 +92,7 @@ class WordTyperManager {
         this.panel = null;
         this.overlay = null;
         this.isPanelOpen = false;
+        this.audioInitialized = false; // 音频上下文是否已初始化
         
         // 学习状态
         this.currentDict = 'cet4';
@@ -102,6 +103,7 @@ class WordTyperManager {
         this.isLearning = false;
         this.startTime = null;
         this.selectedChapter = null; // 当前选择的章节
+        this.wordErrorCount = 0; // 当前单词错误次数
         
         // 学习模式设置
         this.settings = {
@@ -122,6 +124,10 @@ class WordTyperManager {
             wordsLearned: []
         };
 
+        // 音频上下文（用于提示音）
+        this.audioContext = null;
+        this.soundEnabled = true; // 提示音开关
+
         this.init();
     }
 
@@ -130,6 +136,246 @@ class WordTyperManager {
         this.loadProgress();
         this.createUI();
         this.bindEvents();
+        // 音频上下文在用户打开面板时初始化（延迟到用户交互后）
+    }
+    
+    /**
+     * 初始化音频上下文（需要用户交互后才能创建）
+     * 只有在用户点击"背单词"按钮打开面板时才调用
+     */
+    initAudioContext() {
+        // 防止重复初始化
+        if (this.audioInitialized) {
+            return;
+        }
+        
+        try {
+            // 延迟创建 AudioContext，等待用户交互
+            const initAudio = () => {
+                if (!this.audioContext) {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.audioInitialized = true;  // 标记已初始化
+                    console.log('[word-typer] ✅ 音频上下文已初始化');
+                }
+                // 移除事件监听器
+                document.removeEventListener('click', initAudio);
+                document.removeEventListener('keydown', initAudio);
+            };
+            
+            // 监听第一次用户交互
+            document.addEventListener('click', initAudio, { once: true });
+            document.addEventListener('keydown', initAudio, { once: true });
+        } catch (error) {
+            console.warn('[word-typer] ⚠️ 音频初始化失败:', error);
+        }
+    }
+
+    /**
+     * 播放正确提示音（上升音调）
+     */
+    playCorrectSound() {
+        if (!this.soundEnabled) return;
+        
+        try {
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const ctx = this.audioContext;
+            
+            // 确保音频上下文处于运行状态
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+            
+            // 创建振荡器和增益节点
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            // 连接到输出
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            // 设置声音参数（愉快的上升音调）
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+            oscillator.frequency.linearRampToValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+            oscillator.frequency.linearRampToValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+            
+            // 设置音量包络（快速淡入淡出）
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.15);
+            gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+            
+            // 播放声音
+            oscillator.start(ctx.currentTime);
+            oscillator.stop(ctx.currentTime + 0.3);
+            
+        } catch (error) {
+            console.warn('[word-typer] ⚠️ 播放正确提示音失败:', error);
+        }
+    }
+
+    /**
+     * 播放错误提示音（下降音调 + 不和谐）
+     */
+    playWrongSound() {
+        if (!this.soundEnabled) return;
+        
+        try {
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const ctx = this.audioContext;
+            
+            // 确保音频上下文处于运行状态
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+            
+            // 创建两个振荡器（产生不和谐音）
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            // 连接到输出
+            osc1.connect(gainNode);
+            osc2.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            // 设置声音参数（警示性的下降音调）
+            osc1.type = 'sawtooth';
+            osc1.frequency.setValueAtTime(392.00, ctx.currentTime); // G4
+            osc1.frequency.linearRampToValueAtTime(349.23, ctx.currentTime + 0.15); // F4
+            osc1.frequency.linearRampToValueAtTime(293.66, ctx.currentTime + 0.3); // D4
+            
+            osc2.type = 'sawtooth';
+            osc2.frequency.setValueAtTime(396.00, ctx.currentTime); // 稍微失谐，产生不和谐效果
+            osc2.frequency.linearRampToValueAtTime(353.23, ctx.currentTime + 0.15);
+            osc2.frequency.linearRampToValueAtTime(297.66, ctx.currentTime + 0.3);
+            
+            // 设置音量包络
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.2);
+            gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
+            
+            // 播放声音
+            osc1.start(ctx.currentTime);
+            osc1.stop(ctx.currentTime + 0.4);
+            osc2.start(ctx.currentTime);
+            osc2.stop(ctx.currentTime + 0.4);
+            
+        } catch (error) {
+            console.warn('[word-typer] ⚠️ 播放错误提示音失败:', error);
+        }
+    }
+
+    /**
+     * 播放按键正确提示音（短促高音）
+     */
+    playKeyCorrectSound() {
+        if (!this.soundEnabled) return;
+        
+        try {
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const ctx = this.audioContext;
+            
+            // 确保音频上下文处于运行状态
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+            
+            // 创建振荡器和增益节点（短促的高音）
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            // 连接到输出
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            // 设置声音参数（短促清脆的高音）
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880.00, ctx.currentTime); // A5 - 高音
+            
+            // 设置音量包络（非常短促）
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01); // 快速淡入
+            gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.08); // 快速淡出
+            
+            // 播放声音
+            oscillator.start(ctx.currentTime);
+            oscillator.stop(ctx.currentTime + 0.08);
+            
+        } catch (error) {
+            console.warn('[word-typer] ⚠️ 播放按键正确提示音失败:', error);
+        }
+    }
+
+    /**
+     * 播放按键错误提示音（短促低音）
+     */
+    playKeyWrongSound() {
+        if (!this.soundEnabled) return;
+        
+        try {
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const ctx = this.audioContext;
+            
+            // 确保音频上下文处于运行状态
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+            
+            // 创建振荡器和增益节点（短促的低音）
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            // 连接到输出
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            // 设置声音参数（短促的低音）
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(220.00, ctx.currentTime); // A3 - 低音
+            
+            // 设置音量包络（非常短促）
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.01); // 快速淡入
+            gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1); // 快速淡出
+            
+            // 播放声音
+            oscillator.start(ctx.currentTime);
+            oscillator.stop(ctx.currentTime + 0.1);
+            
+        } catch (error) {
+            console.warn('[word-typer] ⚠️ 播放按键错误提示音失败:', error);
+        }
+    }
+
+    /**
+     * 切换提示音开关
+     */
+    toggleSound() {
+        this.soundEnabled = !this.soundEnabled;
+        const soundBtn = document.getElementById('wordTyperSoundToggle');
+        if (soundBtn) {
+            soundBtn.textContent = this.soundEnabled ? '🔔' : '🔕';
+            soundBtn.title = this.soundEnabled ? '关闭提示音' : '开启提示音';
+        }
+        
+        // 保存设置
+        localStorage.setItem('wordTyperSound', this.soundEnabled.toString());
+        
+        this.showFeedback(this.soundEnabled ? '✓ 已开启提示音' : '✓ 已关闭提示音', 'success');
     }
 
     destroy() {
@@ -255,24 +501,9 @@ class WordTyperManager {
         // 按分类组织词库
         const categories = {
             'practice': {
-                name: '入门练习',
+                name: '词库',
                 icon: '⌨️',
-                dicts: ['keyboard']
-            },
-            'cet': {
-                name: '中国考试',
-                icon: '🇨🇳',
-                dicts: ['cet4', 'cet6']
-            },
-            'international': {
-                name: '国际考试',
-                icon: '🌏',
-                dicts: ['toefl', 'ielts', 'gre']
-            },
-            'common': {
-                name: '日常词汇',
-                icon: '📚',
-                dicts: ['common']
+                dicts: ['keyboard','common','cet4', 'cet6','toefl', 'ielts', 'gre']
             }
         };
 
@@ -298,11 +529,11 @@ class WordTyperManager {
                         <div class="dict-card-name">${dict.name}</div>
                         <div class="dict-card-desc">${dict.description}</div>
                         <div class="dict-card-actions">
-                            <button class="dict-card-btn" data-dict="${dictKey}" data-mode="new">
-                                📚 学习
+                            <button class="dict-card-btn" data-dict="${dictKey}" data-mode="chapter">
+                                📚 选择章节
                             </button>
-                            <button class="dict-card-btn dict-card-btn-secondary" data-dict="${dictKey}" data-mode="review">
-                                🔄 复习
+                            <button class="dict-card-btn dict-card-btn-secondary" data-dict="${dictKey}" data-mode="random">
+                                🎲 随机练习
                             </button>
                         </div>
                     </div>
@@ -373,13 +604,7 @@ class WordTyperManager {
                         <p class="chapter-desc">${dict.description}</p>
                     </div>
                 </div>
-                
-                <div class="chapter-tabs">
-                    <button class="chapter-tab active" data-tab="sequence">📖 章节选择</button>
-                    <button class="chapter-tab" data-tab="random">🎲 随机练习</button>
-                    <button class="chapter-tab" data-tab="mistake">📝 错题回顾</button>
-                </div>
-                
+                                
                 <div class="chapter-grid">
         `;
 
@@ -456,9 +681,16 @@ class WordTyperManager {
     getPanelHTML() {
         return `
             <div class="word-typer-header">
-                <h3>📖 单词打字背诵</h3>
+                <div class="header-title-row">
+                    <h3>📖 单词打字背诵</h3>
+                    <button class="header-review-btn" id="reviewAllWrongBtn">
+                        🔄 复习错词
+                    </button>
+                </div>
                 <div class="header-actions">
+                    <button class="word-typer-sound-toggle" id="wordTyperSoundToggle" title="切换提示音">🔔</button>
                     <button class="word-typer-voice-toggle" id="wordTyperVoiceToggle" title="切换发音">🔊</button>
+                    <button class="word-typer-listen-toggle" id="wordTyperListenToggle" title="听音填词模式">🎧</button>
                     <button class="word-typer-close-btn" id="wordTyperCloseBtn">✕</button>
                 </div>
             </div>
@@ -497,7 +729,10 @@ class WordTyperManager {
                 
                 <div class="word-display-area">
                     <div class="word-phonetic" id="wordPhonetic"></div>
-                    <div class="word-main" id="wordMain"></div>
+                    <div class="word-main-row">
+                        <div class="word-main" id="wordMain"></div>
+                        <button class="btn-pronounce-inline" id="btnPronounce" title="发音">🔊</button>
+                    </div>
                     <div class="word-translation" id="wordTranslation"></div>
                 <!-- 虚拟键盘（仅键盘练习模式显示） -->
                 <div class="virtual-keyboard" id="wordTyperVirtualKeyboard" style="display:none;">
@@ -551,7 +786,6 @@ class WordTyperManager {
                 </div>
                 
                 <div class="learning-controls">
-                    <button class="btn-secondary" id="btnPronounce">🔊 发音</button>
                     <button class="btn-secondary" id="btnSkip">⏭️ 跳过</button>
                     <button class="btn-danger" id="btnQuitLearning">❌ 退出</button>
                 </div>
@@ -605,16 +839,30 @@ class WordTyperManager {
             });
         }
 
+        // 提示音切换按钮
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'wordTyperSoundToggle') {
+                this.toggleSound();
+            }
+        });
+
         // 语音切换按钮
         document.addEventListener('click', (e) => {
             if (e.target.id === 'wordTyperVoiceToggle') {
                 const enabled = this.toggleVoice();
                 this.showFeedback(enabled ? '✓ 已开启发音' : '✓ 已关闭发音', 'success');
             }
+            
+            // 听音填词模式开关
+            if (e.target.id === 'wordTyperListenToggle') {
+                const enabled = this.toggleListenMode();
+                this.showFeedback(enabled ? '✓ 已开启听音填词' : '✓ 已关闭听音填词', 'success');
+            }
         });
 
         // 词库卡片点击
         document.addEventListener('click', (e) => {
+            // 点击按钮
             const btn = e.target.closest('.dict-card-btn');
             if (btn) {
                 const dictKey = btn.dataset.dict;
@@ -623,9 +871,20 @@ class WordTyperManager {
                 if (dictKey) {
                     this.currentDict = dictKey;
                     
-                    // 显示章节选择界面
-                    this.showChapterSelection(mode);
+                    if (mode === 'chapter') {
+                        // 选择章节模式：显示章节选择界面
+                        this.showChapterSelection('new');
+                    } else if (mode === 'random') {
+                        // 随机练习模式：随机选择20个单词
+                        this.startLearning('random');
+                    }
                 }
+            }
+            
+            // 全局复习错词按钮
+            if (e.target.id === 'reviewAllWrongBtn') {
+                console.log('[word-typer] 点击全局复习错词按钮');
+                this.startLearning('wrong');
             }
         });
 
@@ -719,8 +978,13 @@ class WordTyperManager {
             this.panel.classList.add('open');
             this.overlay.style.display = 'block';
             this.isPanelOpen = true;
+            
+            // 用户打开面板时才初始化音频上下文
+            this.initAudioContext();
+            
             this.updateStatsDisplay();
             this.updateVoiceButton();
+            this.updateListenModeButton();  // 初始化听音填词按钮状态
         }
     }
 
@@ -1005,12 +1269,40 @@ class WordTyperManager {
                 return progress.familiarity <= 2;
             });
             console.log(`[word-typer] "学习新词"模式筛选出:`, wordsToLearn.length, '词');
+        } else if (mode === 'random') {
+            // 随机练习：从所有单词中随机选择20个
+            console.log(`[word-typer] "随机练习"模式：从 ${words.length} 个单词中随机选择20个`);
+            
+            // 打乱所有单词的顺序
+            const shuffled = this.shuffleArray([...words]);
+            
+            // 选择前20个（如果总数不足20个，则选择所有）
+            wordsToLearn = shuffled.slice(0, 20);
+            
+            console.log(`[word-typer] "随机练习"模式选中:`, wordsToLearn.length, '词');
         } else if (mode === 'wrong') {
-            // 复习错词：错误次数多的词
-            wordsToLearn = words.filter(w => {
-                const progress = this.getWordProgress(w.word);
-                return progress.wrong > 0 && progress.familiarity < 4;
-            });
+            // 复习错词：从所有词库中筛选错误次数多的词
+            console.log(`[word-typer] "复习错词"模式：从所有词库中筛选错词`);
+            
+            wordsToLearn = [];
+            
+            // 遍历所有词库
+            for (const dictKey of Object.keys(WORD_DICTIONARIES)) {
+                try {
+                    const dictWords = await this.loadDictionaryWords(dictKey);
+                    if (dictWords && dictWords.length > 0) {
+                        // 筛选该词库中的错词
+                        const wrongWords = dictWords.filter(w => {
+                            const progress = this.getWordProgress(w.word);
+                            return progress.wrong > 0 && progress.familiarity < 4;
+                        });
+                        wordsToLearn.push(...wrongWords);
+                    }
+                } catch (error) {
+                    console.warn(`[word-typer] ⚠️ 加载词库 ${dictKey} 失败:`, error);
+                }
+            }
+            
             console.log(`[word-typer] "复习错词"模式筛选出:`, wordsToLearn.length, '词');
         } else {
             // 全部复习
@@ -1020,7 +1312,14 @@ class WordTyperManager {
 
         if (wordsToLearn.length === 0) {
             const chapterText = this.selectedChapter ? `第 ${this.selectedChapter} 章` : '';
-            alert(mode === 'wrong' ? `${chapterText}没有需要复习的错词` : `${chapterText}所有单词已掌握！`);
+            
+            if (mode === 'wrong') {
+                // 复习模式没有错词时，显示提示并回到首页
+                this.showFeedback('✓ 没有需要复习的错词', 'success');
+                this.showGallery(); // 回到插件首页
+            } else {
+                alert(`${chapterText}所有单词已掌握！`);
+            }
             return;
         }
         
@@ -1064,15 +1363,15 @@ class WordTyperManager {
 
         this.currentWord = this.currentWords[this.currentIndex];
         this.userInput = '';
+        this.wordErrorCount = 0;  // 重置错误计数
         
         this.updateWordDisplay();
         this.updateTypingDisplay();
         this.updateProgress();
 
-        // 自动发音
-        if (this.settings.autoVoice) {
-            this.pronounceWord();
-        }
+        // 自动发音 2 遍
+        this.pronounceWord();
+        setTimeout(() => this.pronounceWord(), 800);
     }
 
     updateWordDisplay() {
@@ -1110,12 +1409,53 @@ class WordTyperManager {
         const wordMainEl = document.getElementById('wordMain');
         if (wordMainEl) {
             wordMainEl.innerHTML = '';
-            for (let i = 0; i < this.currentWord.word.length; i++) {
-                const letter = document.createElement('span');
-                letter.className = 'word-letter';
-                letter.textContent = this.currentWord.word[i];
-                letter.dataset.index = i;
-                wordMainEl.appendChild(letter);
+            
+            // 检查是否开启听音填词模式（全局设置）
+            const listenMode = localStorage.getItem('wordTyperListenMode') === 'true';
+            
+            // 听音填词模式：随机隐藏部分字母
+            if (listenMode) {
+                const word = this.currentWord.word;
+                const wordLength = word.length;
+                
+                // 计算要显示的字母数量（30%-50%）
+                const minVisible = Math.max(1, Math.floor(wordLength * 0.3));
+                const maxVisible = Math.max(minVisible, Math.floor(wordLength * 0.5));
+                const visibleCount = minVisible + Math.floor(Math.random() * (maxVisible - minVisible + 1));
+                
+                // 随机选择要显示的字母位置
+                const positions = Array.from({length: wordLength}, (_, i) => i);
+                const shuffledPositions = this.shuffleArray(positions);
+                const visiblePositions = new Set(shuffledPositions.slice(0, visibleCount));
+                
+                // 生成字母显示
+                for (let i = 0; i < wordLength; i++) {
+                    const letter = document.createElement('span');
+                    letter.className = 'word-letter';
+                    letter.dataset.index = i;
+                    
+                    if (visiblePositions.has(i)) {
+                        // 显示字母
+                        letter.textContent = word[i];
+                        letter.dataset.visible = 'true';
+                    } else {
+                        // 隐藏字母，显示为下划线
+                        letter.textContent = '_';
+                        letter.dataset.visible = 'false';
+                        letter.style.color = '#FF9500';  // 橙色提示
+                    }
+                    
+                    wordMainEl.appendChild(letter);
+                }
+            } else {
+                // 普通模式：显示完整单词
+                for (let i = 0; i < this.currentWord.word.length; i++) {
+                    const letter = document.createElement('span');
+                    letter.className = 'word-letter';
+                    letter.textContent = this.currentWord.word[i];
+                    letter.dataset.index = i;
+                    wordMainEl.appendChild(letter);
+                }
             }
         }
     }
@@ -1183,8 +1523,78 @@ class WordTyperManager {
     }
 
     handleLetterInput(key) {
-        this.userInput += key.toLowerCase();
+        // 判断当前输入的字母是否正确
+        const currentIndex = this.userInput.length;
+        const targetChar = this.currentWord.word[currentIndex].toLowerCase();
+        const inputChar = key.toLowerCase();
+        
+        if (inputChar === targetChar) {
+            // 输入正确
+            this.playKeyCorrectSound();
+            this.userInput += inputChar;
+            
+            // 听音填词模式：显示对应的隐藏字母
+            const listenMode = localStorage.getItem('wordTyperListenMode') === 'true';
+            if (listenMode) {
+                this.revealLetter(currentIndex);
+            }
+        } else {
+            // 输入错误：清空输入，重新从第一个字母开始
+            this.playKeyWrongSound();
+            this.userInput = '';  // 清空输入
+            
+            // 增加错误次数
+            this.wordErrorCount++;
+            console.log(`[word-typer] 单词错误次数: ${this.wordErrorCount}/3`);
+            
+            // 检查是否达到3次错误
+            if (this.wordErrorCount > 3) {
+                // 第4次显示所有字母
+                console.log('[word-typer] 错误3次，显示所有字母');
+                this.showFeedback('💡 显示完整单词', 'info');
+                this.revealAllLetters();  // 显示所有字母
+            } else {
+                // 重新发音（如果开启了发音功能）
+                const voiceEnabled = localStorage.getItem('wordTyperVoice') !== 'false';
+                if (voiceEnabled) {
+                    this.pronounceWord();
+                }
+                
+                this.showFeedback(`✗ 输入错误 (${this.wordErrorCount}/3)，请重新输入`, 'error');
+            }
+        }
+        
         this.updateTypingDisplay();
+    }
+    
+    // 显示单个字母（听音填词模式下）
+    revealLetter(index) {
+        const wordMainEl = document.getElementById('wordMain');
+        if (wordMainEl) {
+            const letters = wordMainEl.querySelectorAll('.word-letter');
+            if (letters[index]) {
+                const letter = letters[index];
+                letter.textContent = this.currentWord.word[index];
+                letter.style.color = '#34C759';  // 绿色表示正确
+                letter.dataset.visible = 'true';
+                letter.classList.add('revealed');
+            }
+        }
+    }
+    
+    // 显示所有字母（听音填词模式下）
+    revealAllLetters() {
+        const wordMainEl = document.getElementById('wordMain');
+        if (wordMainEl) {
+            const letters = wordMainEl.querySelectorAll('.word-letter');
+            letters.forEach(letter => {
+                const index = parseInt(letter.dataset.index);
+                letter.textContent = this.currentWord.word[index];
+                letter.style.color = '#FF9500';  // 橙色提示
+                letter.dataset.visible = 'true';
+                letter.classList.add('revealed');
+            });
+        }
     }
 
     handleCorrect() {
@@ -1195,6 +1605,9 @@ class WordTyperManager {
             time: Date.now() - this.startTime
         });
         this.updateWordProgress(this.currentWord.word, true);
+        
+        // 播放正确提示音
+        this.playCorrectSound();
         
         this.showFeedback('✓ 正确！', 'success');
         
@@ -1213,6 +1626,9 @@ class WordTyperManager {
         });
         this.updateWordProgress(this.currentWord.word, false);
         
+        // 播放错误提示音
+        this.playWrongSound();
+        
         this.showFeedback(`✗ 错误！正确答案: ${this.currentWord.word}`, 'error');
         
         // 清空输入，重新来过
@@ -1230,34 +1646,60 @@ class WordTyperManager {
     pronounceWord() {
         if (!this.currentWord) return;
         
-        // 检查是否启用语音
-        const enableVoice = localStorage.getItem('wordTyperVoice') !== 'false';
-        if (!enableVoice) return;
-        
         if ('speechSynthesis' in window) {
-            // 取消之前的语音
-            window.speechSynthesis.cancel();
-            
-            const utterance = new SpeechSynthesisUtterance(this.currentWord.word);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.8;  // 0.8倍速，更清晰
-            utterance.pitch = 1.0; // 标准音调
-            utterance.volume = 0.9; // 适中音量
-            
-            // 加载语音列表（如果还没加载）
-            let voices = window.speechSynthesis.getVoices();
-            
-            // 如果语音列表为空，等待加载
-            if (voices.length === 0) {
-                window.speechSynthesis.addEventListener('voiceschanged', () => {
-                    voices = window.speechSynthesis.getVoices();
-                    this.setPreferredVoice(utterance, voices);
-                    window.speechSynthesis.speak(utterance);
-                }, { once: true });
-            } else {
+            try {
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(this.currentWord.word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                // 选择优质英语语音
+                const voices = window.speechSynthesis.getVoices();
                 this.setPreferredVoice(utterance, voices);
+                
                 window.speechSynthesis.speak(utterance);
+            } catch (error) {
+                console.error('[word-typer] 发音错误:', error);
             }
+        }
+    }
+    
+    // 选择最佳语音
+    setPreferredVoice(utterance, voices) {
+        if (!voices || voices.length === 0) return;
+        
+        // macOS 优质英语语音（按优先级排序）
+        const preferredVoices = [
+            'Samantha',      // 最优质的女声（美式英语）
+            'Alex',          // 优质男声（美式英语）
+            'Karen',         // 澳大利亚英语女声
+            'Moira',         // 爱尔兰英语女声
+            'Tessa',         // 南非英语女声
+            'Daniel',        // 英式英语男声
+            'Fiona',         // 苏格兰英语女声
+            'Veena',         // 印度英语女声
+            'Google US English',  // Google 语音
+            'Microsoft Zira Desktop',  // Windows 语音
+        ];
+        
+        // 优先选择首选语音
+        for (const voiceName of preferredVoices) {
+            const voice = voices.find(v => v.name.includes(voiceName));
+            if (voice) {
+                utterance.voice = voice;
+                console.log('[word-typer] 使用语音:', voice.name);
+                return;
+            }
+        }
+        
+        // 如果首选语音都不可用，选择任意一个英语语音
+        const englishVoice = voices.find(v => v.lang.startsWith('en'));
+        if (englishVoice) {
+            utterance.voice = englishVoice;
+            console.log('[word-typer] 使用默认英语语音:', englishVoice.name);
         }
     }
 
@@ -1329,6 +1771,28 @@ class WordTyperManager {
         return newState;
     }
     
+    // 切换听音填词模式
+    toggleListenMode() {
+        const currentState = localStorage.getItem('wordTyperListenMode') === 'true';
+        const newState = !currentState;
+        localStorage.setItem('wordTyperListenMode', newState.toString());
+        
+        this.updateListenModeButton();
+        
+        return newState;
+    }
+    
+    // 更新听音填词按钮状态
+    updateListenModeButton() {
+        const listenBtn = document.getElementById('wordTyperListenToggle');
+        if (listenBtn) {
+            const enabled = localStorage.getItem('wordTyperListenMode') === 'true';
+            listenBtn.textContent = enabled ? '🎧' : '🎧';
+            listenBtn.title = enabled ? '关闭听音填词' : '开启听音填词';
+            listenBtn.classList.toggle('active', enabled);
+        }
+    }
+    
     // 更新语音按钮状态
     updateVoiceButton() {
         const voiceBtn = document.getElementById('wordTyperVoiceToggle');
@@ -1336,6 +1800,15 @@ class WordTyperManager {
             const enabled = localStorage.getItem('wordTyperVoice') !== 'false';
             voiceBtn.textContent = enabled ? '🔊' : '🔇';
             voiceBtn.title = enabled ? '关闭发音' : '开启发音';
+        }
+        
+        // 更新提示音按钮
+        const soundBtn = document.getElementById('wordTyperSoundToggle');
+        if (soundBtn) {
+            const soundEnabled = localStorage.getItem('wordTyperSound') !== 'false';
+            this.soundEnabled = soundEnabled;
+            soundBtn.textContent = soundEnabled ? '🔔' : '🔕';
+            soundBtn.title = soundEnabled ? '关闭提示音' : '开启提示音';
         }
     }
 
@@ -1368,23 +1841,70 @@ class WordTyperManager {
         const total = this.sessionStats.correct + this.sessionStats.wrong;
         const accuracy = total > 0 ? ((this.sessionStats.correct / total) * 100).toFixed(1) : 0;
 
-        const message = `学习完成！\n\n` +
-            `总计: ${total} 个单词\n` +
-            `正确: ${this.sessionStats.correct}\n` +
-            `错误: ${this.sessionStats.wrong}\n` +
-            `准确率: ${accuracy}%\n` +
-            `用时: ${this.sessionStats.totalTime} 秒\n\n` +
-            `是否继续学习下一组？`;
+        // 根据学习模式显示不同的提示信息
+        let message = '';
+        if (this.lastLearningMode === 'wrong') {
+            message = `复习完成！\n\n` +
+                `总计: ${total} 个单词\n` +
+                `正确: ${this.sessionStats.correct}\n` +
+                `错误: ${this.sessionStats.wrong}\n` +
+                `准确率: ${accuracy}%\n` +
+                `用时: ${this.sessionStats.totalTime} 秒\n\n` +
+                `是否开始学习新词？`;
+        } else if (this.lastLearningMode === 'random') {
+            message = `随机练习完成！\n\n` +
+                `总计: ${total} 个单词\n` +
+                `正确: ${this.sessionStats.correct}\n` +
+                `错误: ${this.sessionStats.wrong}\n` +
+                `准确率: ${accuracy}%\n` +
+                `用时: ${this.sessionStats.totalTime} 秒\n\n` +
+                `是否再次随机练习？`;
+        } else {
+            message = `学习完成！\n\n` +
+                `总计: ${total} 个单词\n` +
+                `正确: ${this.sessionStats.correct}\n` +
+                `错误: ${this.sessionStats.wrong}\n` +
+                `准确率: ${accuracy}%\n` +
+                `用时: ${this.sessionStats.totalTime} 秒\n\n` +
+                `是否继续学习下一章？`;
+        }
 
         // 询问是否继续
         if (confirm(message)) {
             console.log('[word-typer] 用户选择继续学习');
             
-            // 获取当前学习模式（从上次会话保存）
-            const lastMode = this.lastLearningMode || 'new';
-            
-            // 重新开始学习
-            await this.startLearning(lastMode);
+            if (this.lastLearningMode === 'wrong') {
+                // 复习模式完成后，切换到学习新词模式（从第1章开始）
+                console.log('[word-typer] 复习完成，切换到学习新词模式');
+                this.lastLearningMode = 'new';
+                this.selectedChapter = 1;
+                await this.startLearning('new');
+            } else if (this.lastLearningMode === 'random') {
+                // 随机练习完成后，再次随机练习
+                console.log('[word-typer] 再次随机练习');
+                await this.startLearning('random');
+            } else {
+                // 学习模式，自动进入下一章
+                const wordsPerChapter = 20;
+                const allWords = await this.loadDictionaryWords(this.currentDict);
+                const totalChapters = Math.ceil(allWords.length / wordsPerChapter);
+                
+                console.log(`[word-typer] 当前章节: ${this.selectedChapter}, 总章节数: ${totalChapters}`);
+                
+                if (this.selectedChapter && this.selectedChapter < totalChapters) {
+                    // 还有下一章，自动进入下一章
+                    this.selectedChapter++;
+                    console.log(`[word-typer] 自动进入第 ${this.selectedChapter} 章`);
+                    await this.startLearning('new');
+                } else if (this.selectedChapter >= totalChapters && totalChapters > 0) {
+                    // 已经是最后一章了，提示用户
+                    alert(`🎉 恭喜！您已完成所有 ${totalChapters} 章的学习！\n\n可以点击【复习错词】按钮巩固错词。`);
+                    this.quitLearning();
+                } else {
+                    // 没有选择章节（直接学习的），重新开始
+                    await this.startLearning('new');
+                }
+            }
         } else {
             console.log('[word-typer] 用户选择退出');
             this.quitLearning();
@@ -1416,13 +1936,17 @@ class WordTyperManager {
         let totalCorrect = 0;
         let totalWrong = 0;
 
-        Object.values(this.wordProgress).forEach(progress => {
-            totalWords++;
-            if (progress.familiarity >= 4) {
-                masteredWords++;
+        // 只统计实际学习过的单词（至少有一次正确或错误记录）
+        Object.entries(this.wordProgress).forEach(([word, progress]) => {
+            // 只统计实际交互过的单词（correct > 0 或 wrong > 0 或 familiarity > 0）
+            if (progress.correct > 0 || progress.wrong > 0 || progress.familiarity > 0) {
+                totalWords++;
+                if (progress.familiarity >= 4) {
+                    masteredWords++;
+                }
+                totalCorrect += progress.correct;
+                totalWrong += progress.wrong;
             }
-            totalCorrect += progress.correct;
-            totalWrong += progress.wrong;
         });
 
         const statTotalWords = document.getElementById('statTotalWords');

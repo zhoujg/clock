@@ -6,5 +6,5 @@
   "icon": "⏳",
   "author": "滴答时钟",
   "main": "plugin.js",
-  "default": true
+  "default": false
 }
