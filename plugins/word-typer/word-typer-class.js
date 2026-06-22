@@ -149,22 +149,18 @@ class WordTyperManager {
             return;
         }
         
+        // 检查是否已存在 AudioContext
+        if (this.audioContext) {
+            this.audioInitialized = true;
+            return;
+        }
+        
         try {
-            // 延迟创建 AudioContext，等待用户交互
-            const initAudio = () => {
-                if (!this.audioContext) {
-                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    this.audioInitialized = true;  // 标记已初始化
-                    console.log('[word-typer] ✅ 音频上下文已初始化');
-                }
-                // 移除事件监听器
-                document.removeEventListener('click', initAudio);
-                document.removeEventListener('keydown', initAudio);
-            };
-            
-            // 监听第一次用户交互
-            document.addEventListener('click', initAudio, { once: true });
-            document.addEventListener('keydown', initAudio, { once: true });
+            // 直接初始化 AudioContext
+            // 浏览器会在用户首次点击插件按钮时自动授予权限
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.audioInitialized = true;
+            console.log('[word-typer] ✅ 音频上下文已初始化');
         } catch (error) {
             console.warn('[word-typer] ⚠️ 音频初始化失败:', error);
         }

@@ -13,7 +13,7 @@
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    z-index: 9999;
+    z-index: 1999;  /* 低于插件库 (3000)，低于面板 (2000) */
     display: none;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -40,7 +40,7 @@
     max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
-    z-index: 10000;
+    z-index: 2000;  /* 低于插件库 (3000)，高于普通界面元素 */
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
